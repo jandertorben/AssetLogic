@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>FIELDFIX</title>
+<style>
+/* ===== RESET & VARS ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:       #1A1A1A;
+  --bg2:      #242424;
+  --bg3:      #2E2E2E;
+  --bg4:      #333;
+  --yellow:   #FFD700;
+  --yellow-dk:#C9A900;
+  --white:    #F0F0F0;
+  --gray:     #8A8A8A;
+  --gray2:    #555;
+  --red:      #FF4444;
+  --green:    #2ECC71;
+  --border:   #383838;
+  --r:        12px;
+  --nav-h:    68px;
+  --hdr-h:    64px;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  display:flex;
+  flex-direction:column;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* ===== HEADER ===== */
+header{
+  height:var(--hdr-h);
+  background:#111;
+  border-bottom:2px solid var(--yellow);
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  flex-shrink:0;
+  position:relative;
+  z-index:50;
+  box-shadow:0 2px 16px rgba(255,215,0,0.12);
+}
+.hdr-logo{display:flex;align-items:center;gap:11px;flex:1}
+.logo-img{
+  width:40px;height:40px;
+  object-fit:contain;border-radius:7px;
+  flex-shrink:0;
+}
+.logo-fallback{
+  width:40px;height:40px;
+  background:var(--yellow);color:#111;
+  font-weight:900;font-size:15px;
+  border-radius:7px;
+  display:none;align-items:center;justify-content:center;
+  letter-spacing:-1px;flex-shrink:0;
+}
+.brand-name{
+  font-size:22px;font-weight:900;
+  letter-spacing:5px;color:var(--yellow);
+  text-transform:uppercase;line-height:1;
+}
+.hdr-right{
+  display:flex;align-items:center;gap:10px;
+}
+.hdr-avatar{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--yellow),var(--yellow-dk));
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;color:#111;
+  cursor:pointer;flex-shrink:0;
+}
+.hdr-notif{
+  width:36px;height:36px;
+  background:var(--bg3);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.hdr-notif svg{width:18px;height:18px;color:var(--gray);}
+.notif-dot{
+  position:absolute;top:6px;right:7px;
+  width:8px;height:8px;
+  background:var(--red);border-radius:50%;
+  border:2px solid #111;
+}
+
+/* ===== SCROLL AREA ===== */
+.app-body{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:calc(var(--nav-h) + 12px);
+}
+
+/* ===== PAGES ===== */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ===== GREETING BAR ===== */
+.greeting-bar{
+  padding:18px 18px 0;
+}
+.greeting-name{
+  font-size:22px;font-weight:800;
+  color:var(--white);
+  line-height:1.2;
+}
+.greeting-sub{font-size:13px;color:var(--gray);margin-top:3px;}
+.status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(46,204,113,0.12);
+  border:1px solid rgba(46,204,113,0.3);
+  border-radius:20px;
+  padding:6px 14px;
+  margin-top:12px;
+  font-size:12px;font-weight:700;
+  color:var(--green);
+  letter-spacing:0.3px;
+}
+.status-badge .dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);flex-shrink:0;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ===== SECTION LABEL ===== */
+.sec-label{
+  font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gray);
+  font-weight:700;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:12px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ===== SEARCH ===== */
+.search-wrap{
+  padding:20px 18px 0;
+}
+.search-row{display:flex;gap:10px;align-items:stretch;}
+.search-field-wrap{flex:1;position:relative;}
+.search-field-wrap svg{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;color:var(--gray);pointer-events:none;
+}
+#errorInput{
+  width:100%;
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  color:var(--white);
+  padding:14px 14px 14px 44px;
+  border-radius:var(--r);
+  font-size:15px;
+  font-family:'Courier New',monospace;
+  font-weight:700;letter-spacing:1px;
+  outline:none;-webkit-appearance:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+#errorInput::placeholder{color:var(--gray);font-family:'Segoe UI',system-ui,sans-serif;font-weight:400;letter-spacing:0;font-size:14px;}
+#errorInput:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(255,215,0,.13);}
+.btn-search{
+  background:var(--bg3);border:1.5px solid var(--border);
+  color:var(--white);padding:14px 18px;
+  border-radius:var(--r);cursor:pointer;
+  font-size:13px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  transition:all .2s;white-space:nowrap;
+}
+.btn-search:hover,.btn-search:active{border-color:var(--yellow);color:var(--yellow);}
+
+/* ===== RESULT AREA ===== */
+#solutionArea{padding:14px 18px 0;display:none;}
+
+/* ===== NOT FOUND ===== */
+.not-found-box{
+  background:#200;
+  border:1.5px solid rgba(255,68,68,0.5);
+  border-radius:var(--r);
+  padding:18px 20px;
+  animation:fadeUp .3s ease;
+}
+.not-found-title{
+  font-size:15px;font-weight:800;
+  color:var(--red);
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:10px;
+}
+.not-found-body{
+  font-size:13px;color:#ccc;line-height:1.65;
+}
+.not-found-body a{
+  color:var(--yellow);text-decoration:none;font-weight:700;
+}
+
+/* ===== SOLUTION CARD ===== */
+.solution-card{
+  background:var(--bg2);
+  border:1.5px solid var(--yellow);
+  border-radius:var(--r);
+  overflow:hidden;
+  box-shadow:0 0 28px rgba(255,215,0,.09);
+  animation:fadeUp .35s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.sol-hdr{
+  background:linear-gradient(135deg,rgba(255,215,0,.13),rgba(255,215,0,.04));
+  padding:15px 18px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,215,0,.18);
+  flex-wrap:wrap;gap:10px;
+}
+.err-badge{
+  background:var(--yellow);color:#111;
+  padding:5px 11px;border-radius:6px;
+  font-family:'Courier New',monospace;
+  font-weight:900;font-size:13px;letter-spacing:1px;
+  white-space:nowrap;flex-shrink:0;
+}
+.err-title{font-size:15px;font-weight:700;color:var(--white);line-height:1.3;}
+.sol-body{padding:16px 18px 20px;}
+.sol-lbl{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--yellow);font-weight:700;margin-bottom:12px;
+}
+.steps{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.steps li{display:flex;align-items:flex-start;gap:11px;font-size:14px;line-height:1.55;color:var(--white);}
+.step-num{
+  background:var(--yellow);color:#111;
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;flex-shrink:0;margin-top:1px;
+}
+.step-chk{
+  background:rgba(255,215,0,.12);border:1.5px solid rgba(255,215,0,.35);
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+}
+.step-chk svg{width:11px;height:11px;color:var(--yellow);}
+.tags-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid var(--border);
+}
+.tag{
+  font-size:11px;font-weight:700;letter-spacing:.4px;
+  padding:4px 9px;border-radius:4px;text-transform:uppercase;
+}
+.tag.red {background:rgba(255,68,68,.14);color:var(--red);border:1px solid rgba(255,68,68,.3);}
+.tag.grn {background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.28);}
+.tag.ylw {background:rgba(255,215,0,.1);color:var(--yellow);border:1px solid rgba(255,215,0,.28);}
+
+/* ===== SCAN BUTTON ===== */
+.scan-section{padding:20px 18px 0;}
+.btn-scan{
+  background:var(--yellow);color:#111;
+  border:none;border-radius:var(--r);
+  padding:20px;cursor:pointer;
+  font-size:17px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;
+  width:100%;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  transition:all .15s;
+  box-shadow:0 4px 22px rgba(255,215,0,.28);
+  position:relative;overflow:hidden;
+}
+.btn-scan::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+  transform:translateX(-100%);transition:transform .55s;
+}
+.btn-scan:hover::before{transform:translateX(100%);}
+.btn-scan:hover{background:#ffe53d;box-shadow:0 6px 28px rgba(255,215,0,.42);}
+.btn-scan:active{transform:scale(.98);}
+.btn-scan svg{width:26px;height:26px;flex-shrink:0;}
+
+/* ===== MACHINE CARDS ===== */
+.machines-section{padding:24px 18px 0;}
+.machines-list{display:flex;flex-direction:column;gap:11px;}
+.machine-card{
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  padding:15px 16px;
+  cursor:pointer;
+  transition:all .2s;
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:14px;
+}
+.machine-card::after{
+  content:'';position:absolute;
+  left:0;top:0;bottom:0;width:4px;
+  background:var(--yellow);border-radius:2px 0 0 2px;
+}
+.machine-card.err::after{background:var(--red);}
+.machine-card.ok::after {background:var(--green);}
+.machine-card.mnt::after{background:var(--yellow);}
+.machine-card:hover{border-color:rgba(255,215,0,.45);transform:translateX(3px);}
+.mc-icon{
+  font-size:26px;flex-shrink:0;
+  width:48px;height:48px;
+  background:var(--bg3);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.mc-body{flex:1;min-width:0;}
+.mc-name{font-size:14px;font-weight:800;line-height:1.25;color:var(--white);}
+.mc-loc{font-size:12px;color:var(--gray);margin-top:2px;}
+.mc-code{
+  font-family:'Courier New',monospace;
+  font-size:11px;font-weight:700;
+  color:var(--yellow);margin-top:5px;
+  display:inline-block;
+  background:rgba(255,215,0,.08);
+  padding:2px 7px;border-radius:4px;
+  border:1px solid rgba(255,215,0,.2);
+}
+.mc-code.none{color:var(--green);background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.2);}
+.mc-right{flex-shrink:0;text-align:right;}
+.mc-status{
+  font-size:10px;font-weight:700;
+  padding:4px 9px;border-radius:5px;
+  text-transform:uppercase;letter-spacing:.5px;
+  white-space:nowrap;
+}
+.s-ok {background:rgba(46,204,113,.15);color:var(--green);}
+.s-err{background:rgba(255,68,68,.15);color:var(--red);}
+.s-mnt{background:rgba(255,215,0,.12);color:var(--yellow);}
+.mc-arr{color:var(--gray2);margin-top:8px;font-size:20px;text-align:right;}
+
+/* ===== RECENT ===== */
+.recent-section{padding:24px 18px 0;}
+.recent-list{display:flex;flex-direction:column;gap:8px;}
+.recent-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 15px;cursor:pointer;
+  transition:all .2s;
+}
+.recent-item:hover{border-color:rgba(255,215,0,.4);}
+.ri-code{
+  font-family:'Courier New',monospace;font-weight:900;
+  font-size:13px;color:var(--yellow);min-width:115px;flex-shrink:0;
+}
+.ri-desc{font-size:13px;color:var(--gray);flex:1;}
+.ri-arr{color:var(--gray2);font-size:18px;}
+
+/* ===== AUFGABEN PAGE ===== */
+.tasks-section{padding:20px 18px 0;}
+.task-item{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:15px 16px;
+  margin-bottom:10px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:13px;
+}
+.task-item:hover{border-color:rgba(255,215,0,.4);}
+.task-check{
+  width:22px;height:22px;border-radius:6px;
+  border:2px solid var(--gray2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.task-check.done{background:var(--green);border-color:var(--green);}
+.task-check.done svg{display:block;}
+.task-check svg{display:none;width:13px;height:13px;color:#111;}
+.task-body{flex:1;}
+.task-title{font-size:14px;font-weight:700;color:var(--white);}
+.task-title.done{text-decoration:line-through;color:var(--gray);}
+.task-sub{font-size:12px;color:var(--gray);margin-top:2px;}
+.task-pri{
+  font-size:10px;font-weight:700;padding:3px 8px;
+  border-radius:4px;text-transform:uppercase;flex-shrink:0;
+}
+.pri-high{background:rgba(255,68,68,.14);color:var(--red);border:1px solid rgba(255,68,68,.25);}
+.pri-mid {background:rgba(255,215,0,.1);color:var(--yellow);border:1px solid rgba(255,215,0,.25);}
+.pri-low {background:rgba(46,204,113,.1);color:var(--green);border:1px solid rgba(46,204,113,.2);}
+
+/* ===== PROFIL PAGE ===== */
+.profil-section{padding:20px 18px 0;}
+.profil-card{
+  background:var(--bg2);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:22px;
+  display:flex;align-items:center;gap:18px;
+  margin-bottom:20px;
+}
+.profil-avatar{
+  width:64px;height:64px;
+  background:linear-gradient(135deg,var(--yellow),var(--yellow-dk));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-weight:900;color:#111;flex-shrink:0;
+}
+.profil-name{font-size:18px;font-weight:800;color:var(--white);}
+.profil-role{font-size:13px;color:var(--gray);margin-top:3px;}
+.profil-id{font-size:12px;color:var(--yellow);margin-top:5px;font-family:'Courier New',monospace;}
+.settings-list{display:flex;flex-direction:column;gap:2px;}
+.set-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border-radius:10px;
+  padding:14px 16px;cursor:pointer;transition:all .2s;
+}
+.set-item:hover{background:var(--bg3);}
+.set-icon{
+  width:36px;height:36px;background:var(--bg3);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.set-icon svg{width:18px;height:18px;color:var(--yellow);}
+.set-label{flex:1;font-size:14px;font-weight:600;color:var(--white);}
+.set-arr{color:var(--gray2);font-size:18px;}
+
+/* ===== BOTTOM NAV ===== */
+nav{
+  height:var(--nav-h);
+  background:#111;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:stretch;
+  flex-shrink:0;
+  position:relative;z-index:50;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:5px;cursor:pointer;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  background:none;border:none;padding:0;
+}
+.nav-item svg{width:22px;height:22px;color:var(--gray2);transition:color .15s;}
+.nav-item span{font-size:10px;font-weight:600;color:var(--gray2);letter-spacing:.3px;transition:color .15s;}
+.nav-item.active svg,.nav-item.active span{color:var(--yellow);}
+.nav-item.scan-btn{flex:none;width:72px;position:relative;top:-18px;}
+.nav-item.scan-btn .scan-fab{
+  width:58px;height:58px;
+  background:var(--yellow);color:#111;
+  border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;
+  box-shadow:0 4px 20px rgba(255,215,0,.4);
+  border:3px solid #111;
+  transition:all .15s;
+}
+.nav-item.scan-btn .scan-fab svg{color:#111;width:24px;height:24px;}
+.nav-item.scan-btn .scan-fab span{font-size:8px;font-weight:900;color:#111;letter-spacing:1px;}
+.nav-item.scan-btn .scan-fab:hover{transform:scale(1.06);box-shadow:0 6px 26px rgba(255,215,0,.55);}
+
+/* ===== SCAN OVERLAY ===== */
+#scanOverlay{
+  display:none;position:fixed;inset:0;
+  background:#000;z-index:9999;
+  flex-direction:column;align-items:center;justify-content:center;
+}
+#scanOverlay.active{display:flex;}
+.scan-ui-top{text-align:center;margin-bottom:26px;}
+.scan-title{color:var(--yellow);font-size:13px;font-weight:900;letter-spacing:4px;text-transform:uppercase;}
+.scan-sub{color:var(--gray);font-size:12px;margin-top:6px;letter-spacing:.5px;}
+.scan-viewport{
+  position:relative;
+  width:min(88vw,380px);height:min(62vw,280px);
+  border-radius:10px;overflow:hidden;
+  border:2px solid var(--yellow);
+  box-shadow:0 0 40px rgba(255,215,0,.3);
+}
+.cam-bg{position:absolute;inset:0;background:#080d08;overflow:hidden;}
+.cam-bg::before{
+  content:'';position:absolute;inset:-50%;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(0,30,0,.14) 0px,transparent 2px),
+    repeating-linear-gradient(90deg,rgba(0,30,0,.07) 0px,transparent 3px);
+  animation:camNoise .1s steps(1) infinite;
+}
+@keyframes camNoise{
+  0% {transform:translate(0,0)}
+  25%{transform:translate(2px,-1px)}
+  50%{transform:translate(-1px,2px)}
+  75%{transform:translate(1px,1px)}
+}
+.cam-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,50,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,50,.035) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.cam-plate{
+  position:absolute;left:50%;top:54%;
+  transform:translate(-50%,-50%);
+  width:72%;height:20%;
+  background:rgba(70,70,70,.55);
+  border:1px solid rgba(140,140,140,.45);
+  border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Courier New',monospace;
+  font-size:clamp(13px,3.5vw,20px);
+  font-weight:900;letter-spacing:4px;
+  color:rgba(255,215,0,.85);
+}
+.corner{position:absolute;width:20px;height:20px;border-color:var(--yellow);border-style:solid;}
+.corner.tl{top:10px;left:10px;border-width:2px 0 0 2px;}
+.corner.tr{top:10px;right:10px;border-width:2px 2px 0 0;}
+.corner.bl{bottom:10px;left:10px;border-width:0 0 2px 2px;}
+.corner.br{bottom:10px;right:10px;border-width:0 2px 2px 0;}
+.scan-line{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,0,60,.9) 30%,#ff003c 50%,rgba(255,0,60,.9) 70%,transparent);
+  box-shadow:0 0 10px 2px rgba(255,0,60,.55),0 0 22px 4px rgba(255,0,60,.18);
+  animation:scanSweep 1.6s linear infinite;
+}
+@keyframes scanSweep{
+  0%  {top:5%;opacity:1}
+  90% {top:95%;opacity:1}
+  100%{top:95%;opacity:0}
+}
+.scan-ui-bot{margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.scan-status{
+  font-size:12px;color:var(--yellow);
+  letter-spacing:3px;font-weight:700;text-transform:uppercase;
+}
+.scan-dots span{
+  display:inline-block;width:6px;height:6px;
+  border-radius:50%;background:var(--yellow);margin:0 3px;
+  animation:dotB 1s infinite;
+}
+.scan-dots span:nth-child(2){animation-delay:.15s;}
+.scan-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes dotB{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.btn-cancel{
+  background:transparent;
+  border:1.5px solid rgba(255,255,255,.18);
+  color:var(--gray);padding:10px 30px;
+  border-radius:var(--r);cursor:pointer;
+  font-size:13px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;transition:all .2s;
+}
+.btn-cancel:hover{border-color:var(--red);color:var(--red);}
+
+/* ===== FOOTER (inside pages) ===== */
+.page-footer{
+  padding:28px 18px 10px;
+  text-align:center;
+}
+.page-footer p{font-size:11px;color:var(--gray2);letter-spacing:.5px;}
+.page-footer strong{color:var(--yellow);}
+
+/* ===== RESPONSIVE ===== */
+@media(min-width:600px){
+  .machines-list{display:grid;grid-template-columns:repeat(2,1fr);}
+  .machine-card{flex-direction:column;align-items:flex-start;}
+  .machine-card::after{width:100%;height:4px;left:0;top:0;right:0;bottom:auto;border-radius:12px 12px 0 0;}
+  .machine-card:hover{transform:translateY(-3px);}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="hdr-logo">
+    <img src="img/ff_logo.jpg" alt="FieldFix" class="logo-img"
+         onerror="this.style.display='none';document.getElementById('lf').style.display='flex';">
+    <div id="lf" class="logo-fallback">FF</div>
+    <span class="brand-name">FIELDFIX</span>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-notif" onclick="showPage('aufgaben')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="hdr-avatar" onclick="showPage('profil')">MK</div>
+  </div>
+</header>
+
+<!-- ===== SCROLL BODY ===== -->
+<div class="app-body">
+
+  <!-- ==================== HOME PAGE ==================== -->
+  <div id="page-home" class="page active">
+
+    <!-- Greeting -->
+    <div class="greeting-bar">
+      <div class="greeting-name">Guten Morgen, Marco K. 👋</div>
+      <div class="greeting-sub">Dienstag, 04. März 2026</div>
+      <div class="status-badge">
+        <span class="dot"></span>
+        Offline-Modus aktiv &nbsp;|&nbsp; 847 Fehlercodes lokal verfügbar
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <div style="height:20px;"></div>
+      <div class="sec-label">Fehlercode-Suche</div>
+      <div class="search-row">
+        <div class="search-field-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="errorInput"
+            placeholder="z. B. E-0147 oder WARN_KPD_07"
+            autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text">
+        </div>
+        <button class="btn-search" onclick="searchCode()">Suchen</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="solutionArea"></div>
+
+    <!-- Scan Button -->
+    <div class="scan-section">
+      <div class="sec-label">Scanner</div>
+      <button class="btn-scan" onclick="startScan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+          <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+          <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+        </svg>
+        Code scannen
+      </button>
+    </div>
+
+    <!-- Machines -->
+    <div class="machines-section">
+      <div class="sec-label">Maschinenpark</div>
+      <div class="machines-list">
+
+        <div class="machine-card err" onclick="loadCode('E-0147')">
+          <div class="mc-icon">🔧</div>
+          <div class="mc-body">
+            <div class="mc-name">Hydraulikpresse HX-400</div>
+            <div class="mc-loc">📍 Halle 4 Block C</div>
+            <span class="mc-code">E-0147</span>
+          </div>
+          <div class="mc-right">
+            <div class="mc-status s-err">Fehler</div>
+            <div class="mc-arr">›</div>
+          </div>
+        </div>
+
+        <div class="machine-card mnt" onclick="loadCode('WARN_KPD_07')">
+          <div class="mc-icon">⚙️</div>
+          <div class="mc-body">
+            <div class="mc-name">Kompressor KPD-200</div>
+            <div class="mc-loc">📍 Keller Technikraum</div>
+            <span class="mc-code">WARN_KPD_07</span>
+          </div>
+          <div class="mc-right">
+            <div class="mc-status s-mnt">Wartung</div>
+            <div class="mc-arr">›</div>
+          </div>
+        </div>
+
+        <div class="machine-card ok">
+          <div class="mc-icon">⚡</div>
+          <div class="mc-body">
+            <div class="mc-name">Schweißanlage WS-Pro</div>
+            <div class="mc-loc">📍 Halle 2 Station 7</div>
+            <span class="mc-code none">Kein Fehler</span>
+          </div>
+          <div class="mc-right">
+            <div class="mc-status s-ok">OK</div>
+            <div class="mc-arr">›</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Recent -->
+    <div class="recent-section">
+      <div class="sec-label">Zuletzt verwendet</div>
+      <div class="recent-list">
+        <div class="recent-item" onclick="loadCode('E-0147')">
+          <span class="ri-code">E-0147</span>
+          <span class="ri-desc">Drucksensor P3 Überdruck</span>
+          <span class="ri-arr">›</span>
+        </div>
+        <div class="recent-item" onclick="loadCode('WARN_KPD_07')">
+          <span class="ri-code">WARN_KPD_07</span>
+          <span class="ri-desc">Filterwechsel überfällig</span>
+          <span class="ri-arr">›</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <p><strong>Entwickelt von Torben</strong> – Field Service Expertise</p>
+      <p style="margin-top:4px;">FIELDFIX v2.0 · 2026 · Offline-First Diagnostics</p>
+    </div>
+  </div>
+
+  <!-- ==================== AUFGABEN PAGE ==================== -->
+  <div id="page-aufgaben" class="page">
+    <div class="tasks-section">
+      <div style="height:4px;"></div>
+      <div class="sec-label">Offene Aufgaben</div>
+
+      <div class="task-item" onclick="toggleTask(this)">
+        <div class="task-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="task-body">
+          <div class="task-title">Sensor P3 kalibrieren – HX-400</div>
+          <div class="task-sub">Halle 4 Block C · Fällig heute</div>
+        </div>
+        <div class="task-pri pri-high">Hoch</div>
+      </div>
+
+      <div class="task-item" onclick="toggleTask(this)">
+        <div class="task-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="task-body">
+          <div class="task-title">Filterpatrone Typ-B wechseln – KPD-200</div>
+          <div class="task-sub">Keller Technikraum · Fällig 06.03.2026</div>
+        </div>
+        <div class="task-pri pri-mid">Mittel</div>
+      </div>
+
+      <div class="task-item" onclick="toggleTask(this)">
+        <div class="task-check done">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="task-body">
+          <div class="task-title done">Druckprüfung FL-900 durchgeführt</div>
+          <div class="task-sub">Halle 2 · Erledigt am 03.03.2026</div>
+        </div>
+        <div class="task-pri pri-low">Erledigt</div>
+      </div>
+
+      <div class="task-item" onclick="toggleTask(this)">
+        <div class="task-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="task-body">
+          <div class="task-title">Jahreswartung WS-Pro einplanen</div>
+          <div class="task-sub">Halle 2 Station 7 · Fällig 15.03.2026</div>
+        </div>
+        <div class="task-pri pri-low">Niedrig</div>
+      </div>
+    </div>
+    <div class="page-footer">
+      <p><strong>Entwickelt von Torben</strong> – Field Service Expertise</p>
+    </div>
+  </div>
+
+  <!-- ==================== PROFIL PAGE ==================== -->
+  <div id="page-profil" class="page">
+    <div class="profil-section">
+      <div class="profil-card">
+        <div class="profil-avatar">MK</div>
+        <div>
+          <div class="profil-name">Marco Köhler</div>
+          <div class="profil-role">Senior Field Service Techniker</div>
+          <div class="profil-id">ID: FF-2024-MK-087</div>
+        </div>
+      </div>
+
+      <div class="sec-label">Einstellungen</div>
+      <div class="settings-list">
+        <div class="set-item">
+          <div class="set-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <span class="set-label">Benachrichtigungen</span>
+          <span class="set-arr">›</span>
+        </div>
+        <div class="set-item">
+          <div class="set-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+            </svg>
+          </div>
+          <span class="set-label">Offline-Datenbank aktualisieren</span>
+          <span class="set-arr">›</span>
+        </div>
+        <div class="set-item">
+          <div class="set-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span class="set-label">Sicherheit & PIN</span>
+          <span class="set-arr">›</span>
+        </div>
+        <div class="set-item">
+          <div class="set-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <span class="set-label">Über FIELDFIX</span>
+          <span class="set-arr">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="page-footer">
+      <p><strong>Entwickelt von Torben</strong> – Field Service Expertise</p>
+      <p style="margin-top:4px;">FIELDFIX v2.0 · 2026</p>
+    </div>
+  </div>
+
+</div><!-- end app-body -->
+
+<!-- ===== BOTTOM NAV ===== -->
+<nav>
+  <button class="nav-item active" id="nav-home" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span>Home</span>
+  </button>
+
+  <button class="nav-item scan-btn" onclick="startScan()">
+    <div class="scan-fab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+        <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+        <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+        <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+      </svg>
+      <span>SCAN</span>
+    </div>
+  </button>
+
+  <button class="nav-item" id="nav-aufgaben" onclick="showPage('aufgaben')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 11l3 3L22 4"/>
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+    <span>Aufgaben</span>
+  </button>
+
+  <button class="nav-item" id="nav-profil" onclick="showPage('profil')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span>Profil</span>
+  </button>
+</nav>
+
+<!-- ===== SCAN OVERLAY ===== -->
+<div id="scanOverlay">
+  <div class="scan-ui-top">
+    <div class="scan-title">Scanner aktiv</div>
+    <div class="scan-sub">Halten Sie den Fehlercode in den Bereich</div>
+  </div>
+  <div class="scan-viewport">
+    <div class="cam-bg">
+      <div class="cam-grid"></div>
+      <div class="cam-plate">E-0147</div>
+    </div>
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    <div class="scan-line"></div>
+  </div>
+  <div class="scan-ui-bot">
+    <div class="scan-status">Scanne<span class="scan-dots"><span></span><span></span><span></span></span></div>
+    <button class="btn-cancel" onclick="cancelScan()">Abbrechen</button>
+  </div>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ===== ERROR DATABASE =====
+const DB = {
+  'E-0147': {
+    code:'E-0147', title:'Drucksensor P3 Überdruck',
+    severity:'KRITISCH', severityClass:'red',
+    machine:'Hydraulikpresse HX-400',
+    steps:[
+      'Anlage sofort stoppen und Druckentlastung sicherstellen.',
+      'Sensor P3 auf Verschmutzung, Ablagerungen oder Beschädigung prüfen.',
+      'Kalibrierung über Admin-Panel → Sensoren → P3 → Neu starten.',
+      'Druckverlauf 5 min. beobachten und Normalwert ≤ 280 bar bestätigen.'
+    ],
+    extra:{'Betroffene Einheit':'Druckkreis A','Grenzwert':'280 bar','Ist-Wert':'312 bar'}
+  },
+  'WARN_KPD_07': {
+    code:'WARN_KPD_07', title:'Filterwechsel überfällig',
+    severity:'WARTUNG', severityClass:'ylw',
+    machine:'Kompressor KPD-200',
+    steps:[
+      'Kompressor herunterfahren und Zufuhr sperren.',
+      'Filterpatrone Typ-B (Art.-Nr. FP-B220) entnehmen und entsorgen.',
+      'Neue Filterpatrone einsetzen und Dichtigkeit prüfen.',
+      'Wartungszähler zurücksetzen: Admin-Panel → Wartung → KPD-200 → Reset.'
+    ],
+    extra:{'Filtertyp':'Typ-B (FP-B220)','Betriebsstunden':'2.847 h','Intervall':'2.500 h'}
+  }
+};
+
+// ===== NAVIGATION =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item[id]').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  document.querySelector('.app-body').scrollTop = 0;
+}
+
+// ===== SEARCH =====
+function searchCode(override) {
+  const raw = override || document.getElementById('errorInput').value;
+  const q   = raw.trim().toUpperCase();
+  const area = document.getElementById('solutionArea');
+  if (!q) return;
+
+  area.style.display = 'block';
+
+  const key = Object.keys(DB).find(k => k.toUpperCase() === q);
+  if (key) {
+    renderSolution(DB[key], area);
+  } else {
+    area.innerHTML = `
+      <div class="not-found-box">
+        <div class="not-found-title">
+          ⚠️ Code nicht in lokaler Datenbank
+        </div>
+        <div class="not-found-body">
+          Bitte prüfen Sie die Bedienungsanleitung auf <strong>Seite 236</strong> oder kontaktieren Sie direkt den Servicepartner unter
+          <a href="tel:+49123456789">+49 123 456789</a>.
+        </div>
+      </div>`;
+  }
+
+  setTimeout(() => {
+    area.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 50);
+}
+
+function loadCode(code) {
+  showPage('home');
+  document.getElementById('errorInput').value = code;
+  searchCode(code);
+}
+
+function renderSolution(d, area) {
+  const stepsHTML = d.steps.map((s,i) => `
+    <li><span class="step-num">${i+1}</span><span>${s}</span></li>`).join('');
+
+  const extraHTML = d.extra ? Object.entries(d.extra).map(([k,v]) => `
+    <li>
+      <span class="step-chk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </span>
+      <span><strong>${k}:</strong> ${v}</span>
+    </li>`).join('') : '';
+
+  area.innerHTML = `
+    <div class="solution-card">
+      <div class="sol-hdr">
+        <span class="err-badge">${d.code}</span>
+        <span class="err-title">${d.title}</span>
+      </div>
+      <div class="sol-body">
+        <div class="sol-lbl">Lösungsschritte</div>
+        <ul class="steps">${stepsHTML}</ul>
+        ${d.extra ? `<div class="sol-lbl" style="margin-top:16px;">Technische Details</div><ul class="steps">${extraHTML}</ul>` : ''}
+        <div class="tags-row">
+          <span class="tag ${d.severityClass}">${d.severity}</span>
+          <span class="tag grn">Sofortmaßnahme</span>
+          <span class="tag ylw">${d.machine}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ===== SCANNER =====
+let scanTimer = null;
+
+function startScan() {
+  const ov = document.getElementById('scanOverlay');
+  ov.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  scanTimer = setTimeout(() => finishScan('E-0147'), 2000);
+}
+
+function finishScan(code) {
+  closeScan();
+  loadCode(code);
+}
+
+function cancelScan() {
+  if (scanTimer) { clearTimeout(scanTimer); scanTimer = null; }
+  closeScan();
+}
+
+function closeScan() {
+  document.getElementById('scanOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// ===== AUFGABEN TOGGLE =====
+function toggleTask(el) {
+  const check = el.querySelector('.task-check');
+  const title = el.querySelector('.task-title');
+  const isDone = check.classList.toggle('done');
+  title.classList.toggle('done', isDone);
+}
+
+// ===== ENTER KEY =====
+document.getElementById('errorInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchCode();
+});
+
+// ===== CLOSE SCAN ON BACKDROP =====
+document.getElementById('scanOverlay').addEventListener('click', function(e) {
+  if (e.target === this) cancelScan();
+});
+</script>
+</body>
+</html>
