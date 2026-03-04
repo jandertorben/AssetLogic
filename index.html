@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FIELDFIX</title>
+<link rel="apple-touch-icon" href="img/fieldfix_icon.png">
+<link rel="icon" href="img/fieldfix_icon.png">
 <style>
 /* ===== RESET & VARS ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -72,6 +74,17 @@ header{
 .hdr-right{
   display:flex;align-items:center;gap:10px;
 }
+.cloud-status{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:600;
+  color:#5adf8a;letter-spacing:.3px;
+  background:rgba(46,204,113,.1);
+  border:1px solid rgba(46,204,113,.25);
+  border-radius:20px;padding:4px 10px;
+  white-space:nowrap;flex-shrink:0;
+}
+.cloud-status svg{width:13px;height:13px;flex-shrink:0;}
+@media(max-width:380px){.cloud-status span{display:none;}}
 .hdr-avatar{
   width:36px;height:36px;
   background:linear-gradient(135deg,var(--yellow),var(--yellow-dk));
@@ -260,6 +273,19 @@ header{
 .tag.red {background:rgba(255,68,68,.14);color:var(--red);border:1px solid rgba(255,68,68,.3);}
 .tag.grn {background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.28);}
 .tag.ylw {background:rgba(255,215,0,.1);color:var(--yellow);border:1px solid rgba(255,215,0,.28);}
+.btn-manual{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:14px;
+  padding:10px 16px;
+  border:1.5px solid var(--yellow);
+  border-radius:8px;
+  color:var(--yellow);
+  font-size:13px;font-weight:700;
+  text-decoration:none;
+  transition:all .2s;
+  background:rgba(255,215,0,.05);
+}
+.btn-manual:hover{background:rgba(255,215,0,.12);}
 
 /* ===== SCAN BUTTON ===== */
 .scan-section{padding:20px 18px 0;}
@@ -573,6 +599,12 @@ nav{
     <span class="brand-name">FIELDFIX</span>
   </div>
   <div class="hdr-right">
+    <div class="cloud-status">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+      </svg>
+      <span>Cloud Sync: Aktiv (04.03.2026)</span>
+    </div>
     <div class="hdr-notif" onclick="showPage('aufgaben')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -909,7 +941,8 @@ const DB = {
       'Kalibrierung über Admin-Panel → Sensoren → P3 → Neu starten.',
       'Druckverlauf 5 min. beobachten und Normalwert ≤ 280 bar bestätigen.'
     ],
-    extra:{'Betroffene Einheit':'Druckkreis A','Grenzwert':'280 bar','Ist-Wert':'312 bar'}
+    extra:{'Betroffene Einheit':'Druckkreis A','Grenzwert':'280 bar','Ist-Wert':'312 bar'},
+    manual:'https://www.hydraulik-presse.de/handbuch-hx400.pdf'
   },
   'WARN_KPD_07': {
     code:'WARN_KPD_07', title:'Filterwechsel überfällig',
@@ -921,7 +954,8 @@ const DB = {
       'Neue Filterpatrone einsetzen und Dichtigkeit prüfen.',
       'Wartungszähler zurücksetzen: Admin-Panel → Wartung → KPD-200 → Reset.'
     ],
-    extra:{'Filtertyp':'Typ-B (FP-B220)','Betriebsstunden':'2.847 h','Intervall':'2.500 h'}
+    extra:{'Filtertyp':'Typ-B (FP-B220)','Betriebsstunden':'2.847 h','Intervall':'2.500 h'},
+    manual:'https://www.kompressor-service.de/handbuch-kpd200.pdf'
   }
 };
 
@@ -1000,6 +1034,9 @@ function renderSolution(d, area) {
           <span class="tag grn">Sofortmaßnahme</span>
           <span class="tag ylw">${d.machine}</span>
         </div>
+        <a href="${d.manual || '#'}" target="_blank" rel="noopener" class="btn-manual">
+          📖 Technisches Handbuch öffnen
+        </a>
       </div>
     </div>`;
 }
