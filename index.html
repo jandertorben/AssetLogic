@@ -83,8 +83,34 @@ header{
   border-radius:20px;padding:4px 10px;
   white-space:nowrap;flex-shrink:0;
 }
-.cloud-status svg{width:13px;height:13px;flex-shrink:0;}
-@media(max-width:380px){.cloud-status span{display:none;}}
+.cloud-icon{font-size:13px;flex-shrink:0;}
+@media(max-width:400px){.cloud-status .cloud-text{display:none;}}
+
+/* ===== ACCORDION ===== */
+.acc-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;padding:10px 0 8px;
+  border:none;background:none;width:100%;text-align:left;
+  -webkit-tap-highlight-color:transparent;
+}
+.acc-hdr:first-child{padding-top:0;}
+.acc-lbl{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--yellow);font-weight:700;
+}
+.acc-arrow{
+  color:var(--yellow);transition:transform .25s ease;flex-shrink:0;
+}
+.acc-arrow svg{width:16px;height:16px;display:block;}
+.acc-hdr.collapsed .acc-arrow{transform:rotate(-90deg);}
+.acc-body{
+  overflow:hidden;
+  max-height:600px;
+  transition:max-height .3s ease, opacity .25s ease;
+  opacity:1;
+}
+.acc-body.collapsed{max-height:0;opacity:0;}
+.acc-divider{height:1px;background:var(--border);margin:4px 0 14px;}
 .hdr-avatar{
   width:36px;height:36px;
   background:linear-gradient(135deg,var(--yellow),var(--yellow-dk));
@@ -600,10 +626,8 @@ nav{
   </div>
   <div class="hdr-right">
     <div class="cloud-status">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
-      </svg>
-      <span>Cloud Sync: Aktiv (04.03.2026)</span>
+      <span class="cloud-icon">☁️</span>
+      <span class="cloud-text">FieldFix Cloud Sync: Aktiv</span>
     </div>
     <div class="hdr-notif" onclick="showPage('aufgaben')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1019,6 +1043,18 @@ function renderSolution(d, area) {
       <span><strong>${k}:</strong> ${v}</span>
     </li>`).join('') : '';
 
+  const chevron = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+  const extraSection = d.extra ? `
+    <div class="acc-divider"></div>
+    <button class="acc-hdr" onclick="toggleAcc(this)" type="button">
+      <span class="acc-lbl">Technische Details</span>
+      <span class="acc-arrow">${chevron}</span>
+    </button>
+    <div class="acc-body">
+      <ul class="steps" style="margin-bottom:4px;">${extraHTML}</ul>
+    </div>` : '';
+
   area.innerHTML = `
     <div class="solution-card">
       <div class="sol-hdr">
@@ -1026,19 +1062,29 @@ function renderSolution(d, area) {
         <span class="err-title">${d.title}</span>
       </div>
       <div class="sol-body">
-        <div class="sol-lbl">Lösungsschritte</div>
-        <ul class="steps">${stepsHTML}</ul>
-        ${d.extra ? `<div class="sol-lbl" style="margin-top:16px;">Technische Details</div><ul class="steps">${extraHTML}</ul>` : ''}
+        <button class="acc-hdr" onclick="toggleAcc(this)" type="button">
+          <span class="acc-lbl">Lösungsschritte</span>
+          <span class="acc-arrow">${chevron}</span>
+        </button>
+        <div class="acc-body">
+          <ul class="steps">${stepsHTML}</ul>
+        </div>
+        ${extraSection}
         <div class="tags-row">
           <span class="tag ${d.severityClass}">${d.severity}</span>
           <span class="tag grn">Sofortmaßnahme</span>
           <span class="tag ylw">${d.machine}</span>
         </div>
-        <a href="${d.manual || '#'}" target="_blank" rel="noopener" class="btn-manual">
+        <a href="${d.manual}" target="_blank" rel="noopener" class="btn-manual">
           📖 Technisches Handbuch öffnen
         </a>
       </div>
     </div>`;
+}
+
+function toggleAcc(btn) {
+  btn.classList.toggle('collapsed');
+  btn.nextElementSibling.classList.toggle('collapsed');
 }
 
 // ===== SCANNER =====
