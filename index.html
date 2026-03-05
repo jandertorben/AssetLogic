@@ -34,7 +34,7 @@
   --warn-bg:    #FFF3E0;
   --r:          10px;
   --nav-h:      64px;
-  --hdr-h:      60px;
+  --hdr-h:      70px;
   --sidebar-w:  224px;
   --shadow:     0 1px 3px rgba(0,45,90,.07), 0 4px 14px rgba(0,45,90,.06);
   --shadow-md:  0 2px 8px rgba(0,45,90,.10), 0 8px 24px rgba(0,45,90,.08);
@@ -64,7 +64,7 @@ body{
 #loginScreen.hidden{display:none;}
 .login-logo{text-align:center;margin-bottom:36px;}
 .login-logo-img{
-  width:auto;height:96px;
+  width:120px;height:auto;
   object-fit:contain;
   display:block;margin:0 auto 16px;
   filter:drop-shadow(0 4px 16px rgba(0,0,0,.18));
@@ -111,11 +111,12 @@ header{
   position:relative;z-index:100;
   box-shadow:0 2px 16px rgba(0,0,0,.22);
 }
-.hdr-logo{display:flex;align-items:center;gap:12px;}
+.hdr-logo{display:flex;align-items:center;gap:0;}
 .logo-img{
-  height:35px;width:auto;
+  height:54px;width:auto;
   object-fit:contain;flex-shrink:0;
   display:block;
+  margin-right:15px;
 }
 .hdr-brand{display:flex;flex-direction:column;justify-content:center;line-height:1;}
 .brand-name{
@@ -183,7 +184,7 @@ header{
 .app-body{
   flex:1;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  padding-bottom:calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px));
+  padding-bottom:calc(var(--nav-h) + 80px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ===== PAGES ===== */
