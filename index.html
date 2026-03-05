@@ -256,7 +256,12 @@ header{
   border-radius:var(--r);padding:18px 20px;
   position:relative;overflow:hidden;
   box-shadow:var(--shadow);
+  cursor:pointer;transition:box-shadow .2s,border-color .2s;
 }
+.stat-card:hover{box-shadow:var(--shadow-md);}
+.stat-card.crit.active{border-color:var(--red);background:var(--red-bg);}
+.stat-card.warn.active{border-color:var(--warning);background:var(--warn-bg);}
+.stat-card.scan.active{border-color:var(--accent);background:var(--accent-lt);}
 .stat-card::before{
   content:'';position:absolute;left:0;top:0;bottom:0;
   width:4px;border-radius:2px 0 0 2px;
@@ -1092,18 +1097,18 @@ nav.bottom-nav{
       <!-- Desktop stats -->
       <div class="d-stats-bar">
         <div class="d-stats-grid">
-          <div class="stat-card crit">
+          <div class="stat-card crit" onclick="filterDashboard('err')">
             <div class="stat-value">2</div>
             <div class="stat-label">Aktive Fehler</div>
             <div class="stat-icon">&#128308;</div>
           </div>
-          <div class="stat-card warn">
-            <div class="stat-value">1</div>
+          <div class="stat-card warn" onclick="filterDashboard('mnt')">
+            <div class="stat-value">2</div>
             <div class="stat-label">Wartung f&auml;llig</div>
             <div class="stat-icon">&#9888;&#65039;</div>
           </div>
-          <div class="stat-card scan">
-            <div class="stat-value">4</div>
+          <div class="stat-card scan" onclick="filterDashboard(null)">
+            <div class="stat-value">9</div>
             <div class="stat-label">Assets erfasst</div>
             <div class="stat-icon">&#128230;</div>
           </div>
@@ -1869,6 +1874,27 @@ function renderAssetsGrid() {
   document.getElementById('assetTotal').textContent = total;
   document.getElementById('assetErrors').textContent = errors;
   document.getElementById('assetMaint').textContent = maint;
+}
+
+// ===== DASHBOARD FILTER =====
+let _dashFilter = null;
+
+function filterDashboard(status) {
+  _dashFilter = (_dashFilter === status) ? null : status;
+  document.querySelectorAll('.stat-card').forEach(c => {
+    const isCrit = c.classList.contains('crit');
+    const isWarn = c.classList.contains('warn');
+    const isScan = c.classList.contains('scan');
+    c.classList.toggle('active',
+      (_dashFilter === 'err' && isCrit) ||
+      (_dashFilter === 'mnt' && isWarn) ||
+      (!_dashFilter && false)
+    );
+  });
+  document.querySelectorAll('.machine-card').forEach(card => {
+    const show = !_dashFilter || card.classList.contains(_dashFilter);
+    card.style.display = show ? '' : 'none';
+  });
 }
 
 let _assetStatusFilter = null;
