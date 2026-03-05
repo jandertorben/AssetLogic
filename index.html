@@ -403,6 +403,14 @@ header{
 
 /* ===== MACHINE CARDS ===== */
 .machines-section{padding:24px 18px 0;}
+.btn-show-all-assets{
+  width:100%;margin-top:14px;padding:11px 16px;
+  background:var(--accent-lt);color:var(--accent);
+  border:1px solid rgba(21,101,192,.2);border-radius:var(--r);
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:background .2s,color .2s;
+}
+.btn-show-all-assets:hover{background:var(--accent);color:#fff;}
 .machines-list{display:flex;flex-direction:column;gap:10px;}
 .machine-card{
   background:#fff;border:1px solid var(--border);border-radius:var(--r);
@@ -720,6 +728,74 @@ header{
 .acc-body.collapsed{max-height:0;opacity:0;}
 .acc-divider{height:1px;background:var(--border);margin:4px 0 14px;}
 
+/* ===== ASSETS PAGE ===== */
+.assets-section{padding:20px 18px 0;}
+.assets-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.assets-stat{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:12px 14px;text-align:center;box-shadow:var(--shadow);
+}
+.assets-stat-val{font-size:24px;font-weight:900;line-height:1;}
+.assets-stat-val.red{color:var(--red);}
+.assets-stat-val.orange{color:var(--warning);}
+.assets-stat-val.blue{color:var(--accent);}
+.assets-stat-lbl{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+.assets-search{
+  display:flex;gap:8px;margin-bottom:16px;
+}
+.assets-search-input{
+  flex:1;background:#fff;border:1.5px solid var(--border);
+  color:var(--text);padding:11px 14px;border-radius:8px;
+  font-size:13px;font-family:inherit;outline:none;
+  transition:border-color .2s;
+}
+.assets-search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(21,101,192,.1);}
+.assets-grid{display:flex;flex-direction:column;gap:12px;}
+.asset-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;box-shadow:var(--shadow);
+  transition:box-shadow .2s,transform .2s;display:flex;
+  position:relative;
+}
+.asset-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;}
+.asset-card.ok::before{background:var(--green);}
+.asset-card.mnt::before{background:var(--warning);}
+.asset-card.err::before{background:var(--red);}
+.asset-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.asset-thumb{
+  width:72px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;background:var(--bg);
+  border-right:1px solid var(--border);
+}
+.asset-info{flex:1;padding:13px 14px;min-width:0;}
+.asset-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.asset-type{font-size:11px;color:var(--text-muted);margin-bottom:6px;}
+.asset-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.asset-meta-item{
+  font-size:11px;color:var(--text-muted);
+  display:flex;align-items:center;gap:3px;
+}
+.asset-meta-item strong{color:var(--text);font-weight:700;}
+.asset-serial{
+  font-family:'Courier New',monospace;font-size:10px;font-weight:700;
+  color:var(--accent);background:var(--accent-lt);
+  border:1px solid rgba(21,101,192,.18);border-radius:4px;
+  padding:2px 7px;display:inline-block;margin-bottom:8px;
+}
+.asset-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.asset-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;}
+.as-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,50,.2);}
+.as-mnt{background:var(--warn-bg);color:var(--warning);border:1px solid rgba(230,81,0,.2);}
+.as-err{background:var(--red-bg);color:var(--red);border:1px solid rgba(198,40,40,.2);}
+.btn-asset-detail{
+  font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-lt);
+  border:1px solid rgba(21,101,192,.2);border-radius:6px;
+  padding:5px 12px;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.btn-asset-detail:hover{background:var(--accent);color:#fff;}
+
 /* ===== AUFGABEN ===== */
 .tasks-section{padding:20px 18px 0;}
 .task-item{
@@ -872,7 +948,8 @@ nav.bottom-nav{
   .serial-search-section{display:block;padding:20px 24px 0;}
   .machines-section{padding:20px 24px 0;}
   .page-footer{padding:24px 24px 12px;}
-  .machine-detail-header,.machine-detail-body,.tasks-section,.profil-section{padding-left:24px;padding-right:24px;}
+  .machine-detail-header,.machine-detail-body,.tasks-section,.profil-section,.assets-section{padding-left:24px;padding-right:24px;}
+  .assets-grid{display:grid;grid-template-columns:repeat(2,1fr);}
   .d-workspace{display:flex;gap:0;align-items:flex-start;}
   .d-main-col{flex:1;min-width:0;overflow-y:auto;height:calc(100vh - var(--hdr-h));}
   .d-feed{
@@ -1140,6 +1217,7 @@ nav.bottom-nav{
               </div>
 
             </div>
+            <button class="btn-show-all-assets" onclick="showPage('assets');renderAssetsGrid();">Alle 9 Maschinen anzeigen &rarr;</button>
           </div>
 
           <div class="page-footer">
@@ -1212,11 +1290,48 @@ nav.bottom-nav{
       </div>
     </div><!-- end page-home -->
 
+    <!-- ==================== MASCHINENSTAMM ==================== -->
+    <div id="page-assets" class="page">
+      <div class="assets-section">
+        <div style="height:4px;"></div>
+        <div class="sec-label">Maschinenstamm</div>
+
+        <div class="assets-stats">
+          <div class="assets-stat">
+            <div class="assets-stat-val blue" id="assetTotal">9</div>
+            <div class="assets-stat-lbl">Assets gesamt</div>
+          </div>
+          <div class="assets-stat">
+            <div class="assets-stat-val red" id="assetErrors">2</div>
+            <div class="assets-stat-lbl">Fehler aktiv</div>
+          </div>
+          <div class="assets-stat">
+            <div class="assets-stat-val orange" id="assetMaint">2</div>
+            <div class="assets-stat-lbl">Wartung f&auml;llig</div>
+          </div>
+        </div>
+
+        <div class="assets-search">
+          <input type="text" class="assets-search-input" id="assetSearchInput"
+            placeholder="&#128269; Maschine suchen..."
+            oninput="filterAssets(this.value)">
+        </div>
+
+        <div class="assets-grid" id="assetsGrid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+      <div class="page-footer">
+        <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+        <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+      </div>
+    </div><!-- end page-assets -->
+
     <!-- ==================== MACHINE DETAIL ==================== -->
     <div id="page-machine" class="page">
 
       <div class="machine-detail-header">
-        <button class="md-back" onclick="showPage('home')">
+        <button class="md-back" onclick="showPage('assets');renderAssetsGrid();">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
           Zur&uuml;ck zum Maschinenstamm
         </button>
@@ -1519,6 +1634,91 @@ const MACHINES = {
       maintenance: 'vor 203 Betriebsstunden',
       komp: ['Schutzgasversorgung SG-1', 'Drahtvorschub DV-Pro', 'K\u00fchlsystem WCS-2', 'Steuereinheit SE-500']
     }
+  },
+  'LH-566': {
+    name: 'Liebherr LH 566',
+    type: 'Materialumschlag-Bagger',
+    serial: 'SN: LH566-034-2020',
+    serialAliases: ['lh566', 'lh-566', 'lh566-034', 'lh566-034-2020', 'liebherr 566'],
+    location: 'Recyclinghof Ost, Tor 3',
+    status: 'ok',
+    activeCode: null,
+    config: {
+      baujahr: '2020',
+      motor: 'Liebherr D936 A7 / Liebherr LiDAT RC-8',
+      hours: '4.310 h',
+      sw: 'FW 3.4.2',
+      maintenance: 'vor 190 Betriebsstunden',
+      komp: ['Greifer GRP-5T', 'Hydraulikaggregat HA-LH8', 'LiDAT Telematik', 'Klimaanlage KA-200']
+    }
+  },
+  'KOM-PC210': {
+    name: 'Komatsu PC210LC-11',
+    type: 'Hydraulikbagger',
+    serial: 'SN: PC210-119-2022',
+    serialAliases: ['pc210', 'kom-pc210', 'pc210-119', 'pc210-119-2022', 'komatsu pc210'],
+    location: 'Baustelle S\u00fcd, Abschnitt 2',
+    status: 'mnt',
+    activeCode: 'WARN_PC210_OIL',
+    config: {
+      baujahr: '2022',
+      motor: 'Komatsu SAA6D107E-3 / KDSS RC-5',
+      hours: '2.650 h',
+      sw: 'FW 2.1.4',
+      maintenance: 'vor 150 Betriebsstunden (\u00d6lwechsel f\u00e4llig)',
+      komp: ['Schaufel 0,9 m\u00b3', 'Schnellwechsler SW-K2', 'Komtrax Telematik', 'R\u00fcckfahrkamera RC-Pro']
+    }
+  },
+  'PM-36': {
+    name: 'Putzmeister M36-5',
+    type: 'Autobetonpumpe',
+    serial: 'SN: PM365-008-2021',
+    serialAliases: ['pm36', 'pm-36', 'pm365-008', 'pm365-008-2021', 'putzmeister m36'],
+    location: 'Baustelle Nord, Block B',
+    status: 'err',
+    activeCode: 'E-PM36-HYD',
+    config: {
+      baujahr: '2021',
+      motor: 'MAN D2676 / Rexroth A10VSO RC-6',
+      hours: '1.875 h',
+      sw: 'FW 1.9.7',
+      maintenance: 'vor 375 Betriebsstunden',
+      komp: ['Betonverteilermast 5-armig', 'Hydraulikpumpe HP-PM6', 'Betonpumpe BP-140', 'St\u00fctzenbeine SL-4']
+    }
+  },
+  'AC-XATS': {
+    name: 'Atlas Copco XATS 367',
+    type: 'Mobiler Kompressor',
+    serial: 'SN: XATS367-021-2023',
+    serialAliases: ['xats367', 'ac-xats', 'xats367-021', 'xats367-021-2023', 'atlas copco xats'],
+    location: 'Fuhrpark, Stellplatz 14',
+    status: 'ok',
+    activeCode: null,
+    config: {
+      baujahr: '2023',
+      motor: 'John Deere 4045HF285 / Atlas Copco E-Controller',
+      hours: '890 h',
+      sw: 'FW 4.0.1',
+      maintenance: 'vor 110 Betriebsstunden',
+      komp: ['Verdichterstufe VS-367', '\u00d6lfilter OF-AC3', 'Druckregler DR-10', 'Anh\u00e4nger-Fahrwerk AF-2']
+    }
+  },
+  'MAN-TGS': {
+    name: 'MAN TGS 26.480',
+    type: 'Servicefahrzeug',
+    serial: 'SN: MANTGS-003-2022',
+    serialAliases: ['mantgs', 'man-tgs', 'mantgs-003', 'mantgs-003-2022', 'man tgs'],
+    location: 'Fuhrpark, Stellplatz 2',
+    status: 'ok',
+    activeCode: null,
+    config: {
+      baujahr: '2022',
+      motor: 'MAN D2676 LF26 / MAN TipMatic ECS',
+      hours: '67.400 km',
+      sw: 'FW MAN 7.2',
+      maintenance: 'vor 12.600 km',
+      komp: ['Ladekran Fassi F195', 'Werkzeugkoffer WK-Pro', 'Kompressor 230V/24V', 'Teilelagersystem TLS-300']
+    }
   }
 };
 
@@ -1569,8 +1769,108 @@ const DB = {
       bezeichnung: 'Filterpatrone Typ-B, 220\u00a0mm',
       lager: 'Lager A \u2013 Regal 3C'
     }
+  },
+  'WARN_PC210_OIL': {
+    code: 'WARN_PC210_OIL',
+    title: 'Motoröl-Wechselintervall überschritten',
+    severity: 'WARTUNG',
+    severityClass: 'ylw',
+    machine: 'Komatsu PC210LC-11',
+    steps: [
+      'Maschine auf ebenem Untergrund abstellen und Motor abkühlen lassen.',
+      'Motoröl ablassen und Ölfilter (Art.-Nr. KOM-OF-PC210) ersetzen.',
+      'Neues Motoröl SAE 15W-40 einfüllen (Füllmenge: 21 L).',
+      'Wartungsintervall im Komtrax-System zurücksetzen.'
+    ],
+    extra: {
+      'Ölsorte': 'SAE 15W-40',
+      'Füllmenge': '21 Liter',
+      'Überfällig seit': '150 Betriebsstunden'
+    },
+    erp: {
+      artikelnr: 'KOM-OF-PC210',
+      bezeichnung: 'Motorölfilter Komatsu PC210',
+      lager: 'Lager A – Regal 7B'
+    }
+  },
+  'E-PM36-HYD': {
+    code: 'E-PM36-HYD',
+    title: 'Hydraulikdruck Ausleger – Druckabfall kritisch',
+    severity: 'KRITISCH',
+    severityClass: 'red',
+    machine: 'Putzmeister M36-5',
+    steps: [
+      'Betonpumpe sofort stoppen und Mast einfahren.',
+      'Hydraulikschläuche und Kupplungen auf Leckagen prüfen.',
+      'Hydrauliköl-Füllstand kontrollieren, ggf. Hydrauliköl HLP 46 nachfüllen.',
+      'Hydraulikpumpe HP-PM6 auf Verschleiß prüfen, bei Bedarf tauschen.'
+    ],
+    extra: {
+      'Betroffener Kreis': 'Auslegerzylinder CH-3',
+      'Solldruck': '260 bar',
+      'Istdruck': '195 bar'
+    },
+    erp: {
+      artikelnr: 'PM-HP-PM6-SEAL',
+      bezeichnung: 'Hydraulikpumpe PM6 Dichtungssatz',
+      lager: 'Lager B – Regal 9A'
+    }
   }
 };
+
+// ===== ASSETS PAGE =====
+const MACHINE_ICONS = {
+  'Hydraulikbagger': '\uD83C\uDFD7\uFE0F',
+  'Materialumschlag-Bagger': '\uD83C\uDFD7\uFE0F',
+  'Autobetonpumpe': '\uD83D\uDE9A',
+  'Mobiler Kompressor': '\u2699\uFE0F',
+  'Servicefahrzeug': '\uD83D\uDE9B',
+  'Hydraulikpresse': '\uD83D\uDD29',
+  'MIG/MAG Schwei\u00dfanlage': '\u26A1',
+  'Industriekompressor': '\u2699\uFE0F'
+};
+
+function renderAssetsGrid() {
+  const grid = document.getElementById('assetsGrid');
+  const ids = Object.keys(MACHINES);
+  let total = ids.length, errors = 0, maint = 0;
+  let html = '';
+  ids.forEach(id => {
+    const m = MACHINES[id];
+    if (m.status === 'err') errors++;
+    else if (m.status === 'mnt') maint++;
+    const icon = MACHINE_ICONS[m.type] || '\uD83D\uDD27';
+    const statusLabel = m.status === 'err' ? 'Fehler aktiv' : m.status === 'mnt' ? 'Wartung f\u00e4llig' : 'Betrieb OK';
+    const statusCls = m.status === 'err' ? 'as-err' : m.status === 'mnt' ? 'as-mnt' : 'as-ok';
+    html += `<div class="asset-card ${m.status}" data-id="${id}" data-search="${(m.name + ' ' + m.type + ' ' + m.serial + ' ' + m.location).toLowerCase()}">
+      <div class="asset-thumb">${icon}</div>
+      <div class="asset-info">
+        <div class="asset-name">${m.name}</div>
+        <div class="asset-type">${m.type}</div>
+        <div class="asset-meta">
+          <div class="asset-meta-item"><strong>${m.config.hours}</strong></div>
+          <div class="asset-meta-item">\uD83D\uDCCD ${m.location}</div>
+        </div>
+        <div class="asset-serial">${m.serial}</div>
+        <div class="asset-actions">
+          <span class="asset-status ${statusCls}">${statusLabel}</span>
+          <button class="btn-asset-detail" onclick="openMachine('${id}')">Konfiguration \u00f6ffnen</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+  document.getElementById('assetTotal').textContent = total;
+  document.getElementById('assetErrors').textContent = errors;
+  document.getElementById('assetMaint').textContent = maint;
+}
+
+function filterAssets(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('#assetsGrid .asset-card').forEach(card => {
+    card.style.display = (!q || card.dataset.search.includes(q)) ? '' : 'none';
+  });
+}
 
 // ===== SERIAL NUMBER SEARCH =====
 function searchBySerial() {
@@ -1643,7 +1943,8 @@ function showPage(name) {
 function setDNav(el, page) {
   document.querySelectorAll('.d-nav-item').forEach(n => n.classList.remove('active'));
   el.classList.add('active');
-  if (page === 'home') showPage('home');
+  if (page === 'assets') { showPage('assets'); renderAssetsGrid(); document.getElementById('assetSearchInput').value = ''; }
+  else if (page === 'home') showPage('home');
 }
 
 // ===== OPEN MACHINE DETAIL =====
