@@ -56,8 +56,8 @@ body{
 #loginScreen{
   display:flex;flex-direction:column;align-items:center;justify-content:space-between;
   position:fixed;inset:0;z-index:9000;
-  height:100dvh;
-  padding:8vh 24px calc(20px + env(safe-area-inset-bottom, 0px));
+  min-height:100dvh;
+  padding:5vh 24px calc(40px + env(safe-area-inset-bottom, 0px));
   background:linear-gradient(160deg, var(--primary-dk) 0%, var(--primary) 55%, var(--primary-lt) 100%);
 }
 #loginScreen.hidden{display:none;}
@@ -74,6 +74,7 @@ body{
   background:#fff;border-radius:16px;padding:32px 28px;
   width:100%;max-width:380px;
   box-shadow:0 24px 64px rgba(0,0,0,.35);
+  margin:auto 0;
 }
 .login-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:5px;}
 .login-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.5;}
@@ -798,7 +799,7 @@ nav.bottom-nav{
   text-align:center;flex-shrink:0;
   font-size:11px;color:rgba(255,255,255,.38);
   line-height:1.8;letter-spacing:.3px;
-  padding-bottom:20px;
+  padding-bottom:40px;
   width:100%;max-width:380px;
 }
 .login-footer strong{color:rgba(255,255,255,.6);font-weight:700;}
