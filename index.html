@@ -574,18 +574,31 @@ header{
 .tag.blu{background:var(--accent-lt);color:var(--accent);border:1px solid rgba(21,101,192,.22);}
 
 /* ERP Button */
+/* Action button row */
+.action-btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
 .btn-erp{
   display:flex;align-items:center;justify-content:center;gap:9px;
-  margin-top:16px;padding:14px 16px;
+  padding:13px 16px;
   background:linear-gradient(135deg,var(--primary),var(--accent));
   color:#fff;border:none;border-radius:8px;
-  font-size:14px;font-weight:700;cursor:pointer;
-  transition:all .2s;width:100%;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;flex:1;min-width:140px;
   box-shadow:0 3px 12px rgba(0,45,90,.22);
 }
 .btn-erp:hover{box-shadow:0 6px 22px rgba(0,45,90,.32);transform:translateY(-1px);}
 .btn-erp:active{transform:translateY(0);}
-.btn-erp svg{width:18px;height:18px;flex-shrink:0;}
+.btn-erp svg{width:17px;height:17px;flex-shrink:0;}
+.btn-drawing{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:13px 16px;
+  background:#fff;color:var(--accent);
+  border:1.5px solid var(--accent);border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;flex:1;min-width:140px;
+}
+.btn-drawing:hover{background:var(--accent-lt);transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.15);}
+.btn-drawing:active{transform:translateY(0);}
+.btn-drawing svg{width:17px;height:17px;flex-shrink:0;}
 .erp-result{
   margin-top:10px;padding:11px 14px;
   background:var(--green-bg);border:1px solid rgba(46,125,50,.22);
@@ -593,6 +606,44 @@ header{
   display:none;align-items:flex-start;gap:8px;line-height:1.6;
 }
 .erp-result svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+/* Drawing modal */
+#drawingModal{
+  display:none;position:fixed;inset:0;z-index:8000;
+  background:rgba(0,29,58,.65);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:24px;
+}
+#drawingModal.active{display:flex;}
+.drawing-modal-card{
+  background:#fff;border-radius:14px;width:100%;max-width:420px;
+  box-shadow:0 24px 60px rgba(0,0,0,.28);overflow:hidden;
+  animation:fadeUp .25s cubic-bezier(.4,0,.2,1);
+}
+.drawing-modal-hdr{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  padding:18px 20px;display:flex;align-items:center;gap:12px;
+}
+.drawing-modal-hdr svg{width:22px;height:22px;color:#fff;flex-shrink:0;}
+.drawing-modal-title{font-size:15px;font-weight:800;color:#fff;}
+.drawing-modal-body{padding:24px 20px;}
+.drawing-loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:8px 0;}
+.drawing-spinner{
+  width:44px;height:44px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.drawing-loading-text{font-size:13px;color:var(--text-muted);font-weight:600;text-align:center;line-height:1.6;}
+.drawing-machine-name{font-size:14px;font-weight:800;color:var(--primary);margin-bottom:4px;text-align:center;}
+.drawing-modal-footer{
+  padding:16px 20px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;
+}
+.btn-modal-close{
+  padding:9px 20px;border-radius:7px;border:1.5px solid var(--border);
+  background:var(--bg);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;
+}
+.btn-modal-close:hover{border-color:var(--accent);color:var(--accent);}
 .btn-manual{
   display:inline-flex;align-items:center;gap:7px;margin-top:10px;
   padding:9px 14px;border:1.5px solid var(--border);border-radius:7px;
@@ -1277,6 +1328,35 @@ nav.bottom-nav{
   </button>
 </nav>
 
+<!-- DRAWING MODAL -->
+<div id="drawingModal">
+  <div class="drawing-modal-card">
+    <div class="drawing-modal-hdr">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <line x1="10" y1="9" x2="8" y2="9"/>
+      </svg>
+      <div class="drawing-modal-title">Technische Zeichnung</div>
+    </div>
+    <div class="drawing-modal-body">
+      <div class="drawing-loading">
+        <div class="drawing-machine-name" id="drawingMachineName"></div>
+        <div class="drawing-spinner"></div>
+        <div class="drawing-loading-text">
+          Lade CAD-Zeichnung aus ERP-System&hellip;<br>
+          <span style="font-size:11px;opacity:.7;">Explosionszeichnung &middot; Baugruppenansicht</span>
+        </div>
+      </div>
+    </div>
+    <div class="drawing-modal-footer">
+      <button class="btn-modal-close" onclick="closeDrawingModal()">Schlie&szlig;en</button>
+    </div>
+  </div>
+</div>
+
 <!-- SCAN OVERLAY -->
 <div id="scanOverlay">
   <div class="scan-ui-top">
@@ -1598,18 +1678,29 @@ function renderSolution(d, area) {
     <div class="acc-body"><ul class="steps" style="margin-bottom:4px;">${extraHTML}</ul></div>` : '';
 
   const erpId = 'erp-' + d.code.replace(/[^a-z0-9]/gi, '');
+  const machineName = document.getElementById('md-machine-name') ? document.getElementById('md-machine-name').textContent : d.machine;
   const erpSection = d.erp ? `
-    <button class="btn-erp" id="btn-${erpId}"
-      onclick="triggerErp(this,'${erpId}','${d.erp.artikelnr}','${d.erp.bezeichnung}','${d.erp.lager}')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="2" y="3" width="20" height="14" rx="2"/>
-        <path d="M8 21h8M12 17v4"/>
-        <line x1="7" y1="8" x2="9" y2="8"/>
-        <line x1="7" y1="11" x2="13" y2="11"/>
-        <line x1="13" y1="8" x2="17" y2="8"/>
-      </svg>
-      Passendes Ersatzteil pr\u00fcfen
-    </button>
+    <div class="action-btn-row">
+      <button class="btn-erp" id="btn-${erpId}"
+        onclick="triggerErp(this,'${erpId}','${d.erp.artikelnr}','${d.erp.bezeichnung}','${d.erp.lager}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+          <line x1="7" y1="8" x2="9" y2="8"/>
+          <line x1="7" y1="11" x2="13" y2="11"/>
+          <line x1="13" y1="8" x2="17" y2="8"/>
+        </svg>
+        Ersatzteil pr\u00fcfen
+      </button>
+      <button class="btn-drawing" onclick="openDrawingModal('${machineName.replace(/'/g,"\\'")}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+          <line x1="8" y1="2" x2="8" y2="18"/>
+          <line x1="16" y1="6" x2="16" y2="22"/>
+        </svg>
+        Techn. Zeichnung
+      </button>
+    </div>
     <div class="erp-result" id="${erpId}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
       <span></span>
@@ -1640,6 +1731,20 @@ function renderSolution(d, area) {
       </div>
     </div>`;
 }
+
+// ===== DRAWING MODAL =====
+function openDrawingModal(machineName) {
+  document.getElementById('drawingMachineName').textContent = machineName;
+  document.getElementById('drawingModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawingModal() {
+  document.getElementById('drawingModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.getElementById('drawingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDrawingModal();
+});
 
 function triggerErp(btn, erpId, artikelnr, bezeichnung, lager) {
   btn.disabled = true;
