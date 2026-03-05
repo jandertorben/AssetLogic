@@ -106,26 +106,41 @@ body{
 header{
   height:var(--hdr-h);
   background:var(--primary);
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:flex-start;
   padding:0 18px;flex-shrink:0;
   position:relative;z-index:100;
   box-shadow:0 2px 16px rgba(0,0,0,.22);
 }
-.hdr-logo{display:flex;align-items:center;gap:0;}
+.hdr-logo{
+  display:flex;align-items:center;gap:0;
+  flex:1;min-width:0;
+  /* right icons reserve ~90px, so text can't overflow into them */
+  padding-right:90px;
+}
 .logo-img{
   height:54px;width:auto;
   object-fit:contain;flex-shrink:0;
   display:block;
-  margin-right:15px;
+  margin-right:12px;
 }
-.hdr-brand{display:flex;flex-direction:column;justify-content:center;line-height:1;}
+.hdr-brand{
+  display:flex;flex-direction:column;justify-content:center;
+  line-height:1;min-width:0;overflow:hidden;
+}
 .brand-name{
-  font-size:17px;font-weight:800;color:#fff;
+  font-size:16px;font-weight:800;color:#fff;
   letter-spacing:2px;text-transform:uppercase;
   font-family:'Inter','Roboto','Segoe UI',system-ui,sans-serif;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.brand-by{font-size:10px;color:rgba(255,255,255,.45);font-weight:400;margin-top:3px;letter-spacing:.3px;}
-.hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0;position:absolute;right:18px;}
+.brand-by{
+  font-size:10px;color:rgba(255,255,255,.45);font-weight:400;
+  margin-top:3px;letter-spacing:.3px;white-space:nowrap;
+}
+.hdr-right{
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;position:absolute;right:18px;
+}
 .hdr-avatar{
   width:34px;height:34px;
   background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);
