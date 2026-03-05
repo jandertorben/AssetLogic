@@ -2207,7 +2207,7 @@ function triggerSync() {
   const now = new Date();
   const time = now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
   document.getElementById('syncToastText').textContent =
-    `Daten mit JMA-Zentrale abgeglichen (Stand: ${time})`;
+    `Daten mit Zentrale abgeglichen (Stand: ${time})`;
 
   const toast = document.getElementById('syncToast');
   toast.classList.add('show');
