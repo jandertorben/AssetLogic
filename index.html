@@ -216,39 +216,41 @@ header{
 .d-feed{display:none;}
 .feed-header{
   font-size:10px;letter-spacing:3px;text-transform:uppercase;
-  color:rgba(255,255,255,.4);font-weight:700;margin-bottom:14px;
+  color:var(--text-muted);font-weight:700;margin-bottom:14px;
   display:flex;align-items:center;gap:10px;
 }
-.feed-header::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+.feed-header::after{content:'';flex:1;height:1px;background:var(--border);}
 .feed-live{
-  display:inline-flex;align-items:center;gap:5px;
-  background:rgba(198,40,40,.15);border:1px solid rgba(198,40,40,.28);
-  border-radius:10px;padding:3px 10px;font-size:10px;color:#EF9A9A;font-weight:700;
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--red-bg);border:1px solid rgba(198,40,40,.2);
+  border-radius:20px;padding:4px 11px;font-size:10px;color:var(--red);font-weight:700;
   letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;
 }
-.feed-live-dot{width:6px;height:6px;border-radius:50%;background:#EF5350;animation:pulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
+.feed-live-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:livePulse 2.4s ease-in-out infinite;flex-shrink:0;}
 .feed-list{display:flex;flex-direction:column;gap:8px;}
 .feed-item{
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
+  background:#fff;border:1px solid var(--border);
   border-radius:9px;padding:12px 13px;
   transition:all .2s;cursor:pointer;
+  box-shadow:var(--shadow);
 }
-.feed-item:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.09);}
-.feed-item-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.feed-item:hover{border-color:rgba(0,45,90,.22);box-shadow:var(--shadow-md);transform:translateX(-2px);}
+.feed-item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .feed-code{
   font-family:'Courier New',monospace;font-weight:900;font-size:11px;
-  padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0;
+  padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;
 }
-.feed-code.err{background:rgba(198,40,40,.2);color:#EF9A9A;border:1px solid rgba(198,40,40,.3);}
-.feed-code.wrn{background:rgba(230,81,0,.18);color:#FFCC80;border:1px solid rgba(230,81,0,.28);}
-.feed-desc{font-size:12px;color:rgba(255,255,255,.78);font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.feed-item-bot{display:flex;justify-content:space-between;align-items:center;}
-.feed-machine{font-size:11px;color:rgba(255,255,255,.38);}
-.feed-time{font-size:10px;color:rgba(255,255,255,.28);white-space:nowrap;}
+.feed-code.err{background:var(--red-bg);color:var(--red);border:1px solid rgba(198,40,40,.2);}
+.feed-code.wrn{background:var(--warn-bg);color:var(--warning);border:1px solid rgba(230,81,0,.2);}
+.feed-desc{font-size:12px;color:var(--text);font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.feed-item-bot{display:flex;justify-content:space-between;align-items:center;margin-top:2px;}
+.feed-machine{font-size:11px;color:var(--text-muted);font-weight:500;}
+.feed-time{font-size:10px;color:#A0ADBF;white-space:nowrap;}
 .feed-pulse-row{
   display:flex;align-items:center;gap:8px;padding:10px 13px;
-  background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);
-  border-radius:9px;font-size:12px;color:rgba(255,255,255,.28);
+  background:var(--bg);border:1px dashed var(--border);
+  border-radius:9px;font-size:12px;color:var(--text-muted);
 }
 
 /* ===== DESKTOP ADMIN TOPBAR ===== */
@@ -744,12 +746,12 @@ nav.bottom-nav{
   .d-workspace{display:flex;gap:0;align-items:flex-start;}
   .d-main-col{flex:1;min-width:0;overflow-y:auto;height:calc(100vh - var(--hdr-h));}
   .d-feed{
-    width:280px;flex-shrink:0;
-    border-left:1px solid rgba(255,255,255,.07);
-    background:var(--sidebar);
+    width:288px;flex-shrink:0;
+    border-left:1px solid var(--border);
+    background:#F8FAFC;
     height:calc(100vh - var(--hdr-h));
     overflow-y:auto;
-    padding:20px 14px;
+    padding:20px 16px;
   }
   .machines-list{display:grid;grid-template-columns:repeat(2,1fr);}
   .machine-card{flex-direction:row;align-items:center;}
