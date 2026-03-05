@@ -68,7 +68,8 @@ body{
   display:block;margin:0 auto;
   filter:drop-shadow(0 4px 16px rgba(0,0,0,.18));
 }
-.login-brand{font-size:30px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;}
+.login-brand{font-size:24px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:14px;}
+.login-brand-sub{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.4px;margin-top:4px;}
 .login-tagline{display:none;}
 .login-card{
   background:#fff;border-radius:16px;padding:32px 28px;
@@ -709,6 +710,10 @@ header{
   box-shadow:0 24px 60px rgba(0,0,0,.28);overflow:hidden;
   animation:fadeUp .25s cubic-bezier(.4,0,.2,1);
 }
+@media(max-width:767px){
+  #drawingModal{padding:12px;}
+  .drawing-modal-card{max-width:100%;border-radius:12px;}
+}
 .drawing-modal-hdr{
   background:linear-gradient(135deg,var(--primary),var(--accent));
   padding:18px 20px;display:flex;align-items:center;gap:12px;
@@ -947,7 +952,7 @@ nav.bottom-nav{
   text-align:center;flex-shrink:0;
   font-size:11px;color:rgba(255,255,255,.38);
   line-height:1.8;letter-spacing:.3px;
-  padding-bottom:40px;
+  padding-bottom:20px;margin-bottom:20px;
   width:100%;max-width:380px;
 }
 .login-footer strong{color:rgba(255,255,255,.6);font-weight:700;}
@@ -1007,6 +1012,8 @@ nav.bottom-nav{
 <div id="loginScreen">
   <div class="login-logo">
     <img src="img/as_logo.png" alt="AssetLogic" class="login-logo-img">
+    <div class="login-brand">ASSET LOGIC</div>
+    <div class="login-brand-sub">by Torben Jander</div>
   </div>
   <div class="login-card">
     <div class="login-title">Anmelden</div>
