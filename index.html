@@ -407,6 +407,27 @@ header{
 .btn-scan svg{width:22px;height:22px;flex-shrink:0;}
 
 /* ===== MACHINE CARDS ===== */
+.erp-tile{
+  display:flex;align-items:center;gap:10px;
+  margin:16px 18px 0;padding:11px 14px;
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--shadow);cursor:pointer;
+  transition:background .2s;
+}
+.erp-tile:hover{background:var(--bg);}
+.erp-tile-icon{position:relative;flex-shrink:0;}
+.erp-tile-icon svg{width:18px;height:18px;color:var(--accent);}
+.erp-tile-dot{
+  position:absolute;bottom:-1px;right:-2px;
+  width:7px;height:7px;border-radius:50%;
+  background:#4CAF50;border:1.5px solid #fff;
+  animation:livePulse 2.4s ease-in-out infinite;
+}
+.erp-tile-text{flex:1;min-width:0;}
+.erp-tile-label{font-size:12px;font-weight:700;color:var(--text);}
+.erp-tile-sub{font-size:10px;color:var(--text-muted);margin-top:1px;}
+.erp-tile-arr{font-size:16px;color:var(--text-muted);}
+@media(min-width:768px){.erp-tile{display:none;}}
 .machines-section{padding:24px 18px 0;}
 .btn-show-all-assets{
   width:100%;margin-top:14px;padding:11px 16px;
@@ -932,7 +953,11 @@ nav.bottom-nav{
 .login-footer strong{color:rgba(255,255,255,.6);font-weight:700;}
 
 /* hide sync label on very small screens */
-@media(max-width:380px){.hdr-sync-label{display:none;}.hdr-sync{padding:5px 7px;}}
+@media(max-width:767px){
+  .hdr-sync{display:none;}
+  .hdr-logo{padding-right:86px;}
+}
+@media(max-width:380px){.hdr-logo{padding-right:80px;}}
 
 /* ===== TABLET ===== */
 @media(min-width:600px) and (max-width:1023px){
@@ -1162,6 +1187,23 @@ nav.bottom-nav{
             </div>
           </div>
           <div class="scan-section" style="display:none;"></div>
+
+          <!-- ERP-Sync tile (mobile only) -->
+          <div class="erp-tile" onclick="triggerSync()">
+            <div class="erp-tile-icon">
+              <svg id="syncIconMobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/>
+                <polyline points="21 3 21 10 14 10"/>
+                <polyline points="3 21 3 14 10 14"/>
+              </svg>
+              <span class="erp-tile-dot"></span>
+            </div>
+            <div class="erp-tile-text">
+              <div class="erp-tile-label">ERP-Sync: Aktiv</div>
+              <div class="erp-tile-sub">Tippen zum manuellen Synchronisieren</div>
+            </div>
+            <span class="erp-tile-arr">&#8250;</span>
+          </div>
 
           <!-- Machine list -->
           <div class="machines-section">
@@ -2153,11 +2195,14 @@ function renderSolution(d, area) {
 // ===== ERP CLOUD SYNC =====
 let syncToastTimer = null;
 function triggerSync() {
-  const icon = document.getElementById('syncIcon');
-  icon.classList.remove('spinning');
-  void icon.offsetWidth; // reflow to restart animation
-  icon.classList.add('spinning');
-  setTimeout(() => icon.classList.remove('spinning'), 700);
+  ['syncIcon','syncIconMobile'].forEach(id => {
+    const icon = document.getElementById(id);
+    if (!icon) return;
+    icon.classList.remove('spinning');
+    void icon.offsetWidth;
+    icon.classList.add('spinning');
+    setTimeout(() => icon.classList.remove('spinning'), 700);
+  });
 
   const now = new Date();
   const time = now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
