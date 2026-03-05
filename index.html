@@ -105,14 +105,19 @@ header{
   position:relative;z-index:100;
   box-shadow:0 2px 16px rgba(0,0,0,.22);
 }
-.hdr-logo{display:flex;align-items:center;gap:10px;}
+.hdr-logo{display:flex;align-items:center;gap:12px;}
 .logo-img{
-  height:40px;width:auto;
+  height:35px;width:auto;
   object-fit:contain;flex-shrink:0;
   display:block;
 }
-.brand-name{font-size:19px;font-weight:800;letter-spacing:3px;color:#fff;text-transform:uppercase;}
-.brand-sep{color:rgba(255,255,255,.35);margin:0 1px;font-weight:300;}
+.hdr-brand{display:flex;flex-direction:column;justify-content:center;line-height:1;}
+.brand-name{
+  font-size:17px;font-weight:800;color:#fff;
+  letter-spacing:2px;text-transform:uppercase;
+  font-family:'Inter','Roboto','Segoe UI',system-ui,sans-serif;
+}
+.brand-by{font-size:10px;color:rgba(255,255,255,.45);font-weight:400;margin-top:3px;letter-spacing:.3px;}
 .hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0;position:absolute;right:18px;}
 .hdr-avatar{
   width:34px;height:34px;
@@ -797,6 +802,10 @@ nav.bottom-nav{
 <header>
   <div class="hdr-logo">
     <img src="img/as_logo.png" alt="AssetLogic" class="logo-img">
+    <div class="hdr-brand">
+      <span class="brand-name">Asset Logic</span>
+      <span class="brand-by">by Torben Jander</span>
+    </div>
   </div>
   <div class="hdr-right">
     <div class="hdr-notif" onclick="showPage('aufgaben')">
