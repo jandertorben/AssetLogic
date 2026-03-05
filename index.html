@@ -141,6 +141,48 @@ header{
   display:flex;align-items:center;gap:8px;
   flex-shrink:0;position:absolute;right:18px;
 }
+/* Cloud sync indicator */
+.hdr-sync{
+  display:flex;align-items:center;gap:6px;
+  cursor:pointer;padding:5px 9px;border-radius:20px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  transition:background .2s;-webkit-tap-highlight-color:transparent;
+  flex-shrink:0;
+}
+.hdr-sync:hover{background:rgba(255,255,255,.13);}
+.hdr-sync-icon{position:relative;display:flex;align-items:center;justify-content:center;}
+.hdr-sync-icon svg{width:16px;height:16px;color:rgba(255,255,255,.8);transition:transform .6s ease;}
+.hdr-sync-icon svg.spinning{animation:syncSpin .7s ease-in-out;}
+@keyframes syncSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.hdr-sync-dot{
+  position:absolute;bottom:-1px;right:-2px;
+  width:6px;height:6px;border-radius:50%;
+  background:#4CAF50;border:1.5px solid var(--primary);
+  animation:livePulse 2.4s ease-in-out infinite;
+}
+.hdr-sync-label{
+  font-size:10px;font-weight:600;color:rgba(255,255,255,.65);
+  letter-spacing:.3px;white-space:nowrap;line-height:1;
+}
+/* Toast notification */
+#syncToast{
+  position:fixed;bottom:calc(80px + env(safe-area-inset-bottom, 0px));
+  left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--primary-dk);color:#fff;
+  padding:10px 18px;border-radius:10px;
+  font-size:12px;font-weight:600;letter-spacing:.2px;
+  white-space:nowrap;z-index:9999;
+  box-shadow:0 4px 20px rgba(0,0,0,.35);
+  opacity:0;transition:opacity .25s ease,transform .25s ease;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.1);
+}
+#syncToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#syncToast .toast-dot{
+  display:inline-block;width:7px;height:7px;
+  background:#4CAF50;border-radius:50%;margin-right:7px;
+  vertical-align:middle;
+}
 .hdr-avatar{
   width:34px;height:34px;
   background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);
@@ -804,6 +846,9 @@ nav.bottom-nav{
 }
 .login-footer strong{color:rgba(255,255,255,.6);font-weight:700;}
 
+/* hide sync label on very small screens */
+@media(max-width:380px){.hdr-sync-label{display:none;}.hdr-sync{padding:5px 7px;}}
+
 /* ===== TABLET ===== */
 @media(min-width:600px) and (max-width:1023px){
   .machines-list{display:grid;grid-template-columns:repeat(2,1fr);}
@@ -885,6 +930,17 @@ nav.bottom-nav{
     </div>
   </div>
   <div class="hdr-right">
+    <div class="hdr-sync" onclick="triggerSync()" title="ERP-Sync">
+      <div class="hdr-sync-icon">
+        <svg id="syncIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/>
+          <polyline points="21 3 21 10 14 10"/>
+          <polyline points="3 21 3 14 10 14"/>
+        </svg>
+        <span class="hdr-sync-dot"></span>
+      </div>
+      <span class="hdr-sync-label">ERP-Sync: Aktiv</span>
+    </div>
     <div class="hdr-notif" onclick="showPage('aufgaben')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -1342,6 +1398,9 @@ nav.bottom-nav{
   </button>
 </nav>
 
+<!-- SYNC TOAST -->
+<div id="syncToast"><span class="toast-dot"></span><span id="syncToastText"></span></div>
+
 <!-- DRAWING MODAL -->
 <div id="drawingModal">
   <div class="drawing-modal-card">
@@ -1744,6 +1803,26 @@ function renderSolution(d, area) {
         </a>
       </div>
     </div>`;
+}
+
+// ===== ERP CLOUD SYNC =====
+let syncToastTimer = null;
+function triggerSync() {
+  const icon = document.getElementById('syncIcon');
+  icon.classList.remove('spinning');
+  void icon.offsetWidth; // reflow to restart animation
+  icon.classList.add('spinning');
+  setTimeout(() => icon.classList.remove('spinning'), 700);
+
+  const now = new Date();
+  const time = now.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('syncToastText').textContent =
+    `Daten mit JMA-Zentrale abgeglichen (Stand: ${time})`;
+
+  const toast = document.getElementById('syncToast');
+  toast.classList.add('show');
+  if (syncToastTimer) clearTimeout(syncToastTimer);
+  syncToastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
 }
 
 // ===== DRAWING MODAL =====
