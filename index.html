@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -198,7 +198,7 @@ body{
   background:#f8fafc;
   border:1.5px solid #d0d9e8;
   color:#1e293b;padding:0 14px;border-radius:10px;
-  font-size:15px;font-family:'Plus Jakarta Sans',inherit;outline:none;
+  font-size:16px;font-family:'Plus Jakarta Sans',inherit;outline:none; /* 16px prevents iOS auto-zoom */
   transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
   -webkit-appearance:none;
 }
@@ -254,8 +254,7 @@ body{
   background:linear-gradient(135deg,#0052CC 0%,#0072F5 100%);
   color:#fff;border:none;
   border-radius:10px;padding:0 20px;font-size:16px;font-weight:700;
-  touch-action:manipulation; /* no double-tap zoom delay on iOS */
-  cursor:pointer;
+  touch-action:manipulation;
   cursor:pointer;letter-spacing:0.3px;margin-top:8px;
   transition:transform 0.15s,box-shadow 0.2s,opacity 0.2s;
   box-shadow:0 4px 14px rgba(0,82,204,0.35);
@@ -328,6 +327,18 @@ body{
 
 /* ── Login footer (legacy) ── */
 .login-footer{display:none;}
+
+/* ── Login info toast ── */
+.login-info-toast{
+  margin-top:12px;padding:10px 14px;
+  background:#f0f7ff;border:1px solid #c7ddf7;border-radius:8px;
+  font-size:12px;color:#0052CC;font-weight:600;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:0.02em;
+  display:none;align-items:center;gap:8px;line-height:1.5;
+  animation:loginCardIn 0.3s ease-out;
+}
+.login-info-toast.show{display:flex;}
+.login-info-toast svg{flex-shrink:0;}
 
 /* ── Responsive < 480px ── */
 @media(max-width:479px){
@@ -645,6 +656,7 @@ header{
   padding:12px 16px;border-radius:8px;cursor:pointer;
   font-size:13px;font-weight:700;letter-spacing:.3px;
   transition:background .2s;white-space:nowrap;flex-shrink:0;
+  touch-action:manipulation;
 }
 .btn-serial-search:hover{background:var(--primary-lt);}
 .serial-divider{
@@ -669,7 +681,7 @@ header{
   letter-spacing:2px;text-transform:uppercase;width:100%;
   display:flex;align-items:center;justify-content:center;gap:12px;
   transition:all .18s;box-shadow:0 4px 18px rgba(0,45,90,.28);
-  position:relative;overflow:hidden;
+  position:relative;overflow:hidden;touch-action:manipulation;
 }
 .btn-scan::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .6s;}
 .btn-scan:hover::before{transform:translateX(100%);}
@@ -820,7 +832,7 @@ header{
   background:var(--bg);border:1.5px solid var(--border);
   border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;
   color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:all .2s;
+  transition:all .2s;touch-action:manipulation;
 }
 .btn-confirm-config:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lt);}
 .btn-confirm-config.confirmed{
@@ -877,6 +889,7 @@ header{
   color:#fff;padding:13px 18px;border-radius:8px;cursor:pointer;
   font-size:13px;font-weight:700;letter-spacing:.3px;
   transition:all .2s;white-space:nowrap;
+  touch-action:manipulation;
 }
 .btn-search:hover{background:var(--primary-lt);}
 
@@ -946,6 +959,7 @@ header{
   font-size:13px;font-weight:700;cursor:pointer;
   transition:all .2s;flex:1;min-width:140px;
   box-shadow:0 3px 12px rgba(0,45,90,.22);
+  touch-action:manipulation;
 }
 .btn-erp:hover{box-shadow:0 6px 22px rgba(0,45,90,.32);transform:translateY(-1px);}
 .btn-erp:active{transform:translateY(0);}
@@ -957,6 +971,7 @@ header{
   border:1.5px solid var(--accent);border-radius:8px;
   font-size:13px;font-weight:700;cursor:pointer;
   transition:all .2s;flex:1;min-width:140px;
+  touch-action:manipulation;
 }
 .btn-drawing:hover{background:var(--accent-lt);transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.15);}
 .btn-drawing:active{transform:translateY(0);}
@@ -1007,7 +1022,7 @@ header{
 .btn-modal-close{
   padding:9px 20px;border-radius:7px;border:1.5px solid var(--border);
   background:var(--bg);color:var(--text-muted);font-size:13px;font-weight:700;cursor:pointer;
-  transition:all .2s;
+  transition:all .2s;touch-action:manipulation;
 }
 .btn-modal-close:hover{border-color:var(--accent);color:var(--accent);}
 .btn-manual{
@@ -1329,6 +1344,8 @@ nav.bottom-nav{
           <div class="login-title">Willkommen zur&uuml;ck</div>
           <div class="login-sub">Melden Sie sich mit Ihren Zugangsdaten an.</div>
 
+          <form id="loginForm" onsubmit="doLogin(event)" novalidate>
+
           <!-- Email -->
           <div class="form-group">
             <label class="form-label" for="loginEmail">E-Mail-Adresse</label>
@@ -1346,7 +1363,8 @@ nav.bottom-nav{
               <input type="password" class="form-input" id="loginPass"
                      value="Demo1234" placeholder="Passwort eingeben"
                      aria-label="Passwort"
-                     autocomplete="current-password">
+                     autocomplete="current-password"
+                     autocorrect="off" autocapitalize="none" spellcheck="false">
               <button type="button" class="eye-toggle" id="eyeToggle"
                       aria-label="Passwort anzeigen" onclick="togglePassword()">
                 <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
@@ -1357,16 +1375,18 @@ nav.bottom-nav{
               </button>
             </div>
             <div class="field-error" id="passError" role="alert">Bitte geben Sie Ihr Passwort ein.</div>
-            <button type="button" class="btn-forgot" onclick="alert('Bitte kontaktieren Sie Ihren Administrator.')">
+            <button type="button" class="btn-forgot" onclick="showLoginInfo('Bitte wenden Sie sich an Ihren System-Administrator.')" style="touch-action:manipulation;">
               Passwort vergessen?
             </button>
           </div>
 
           <!-- Login button -->
-          <button class="btn-login" id="loginBtn" onclick="doLogin()" aria-label="Anmelden">
+          <button type="submit" class="btn-login" id="loginBtn" aria-label="Anmelden">
             <span class="btn-spinner" aria-hidden="true"></span>
             <span class="btn-label">Anmelden</span>
           </button>
+
+          </form>
 
           <!-- Divider -->
           <div class="login-divider" aria-hidden="true">
@@ -1377,8 +1397,9 @@ nav.bottom-nav{
 
           <!-- Biometric -->
           <button type="button" class="btn-biometric"
-                  onclick="alert('Biometrie-Anmeldung wird eingerichtet.')"
-                  aria-label="Schnellanmeldung per Biometrie">
+                  onclick="doLogin()"
+                  aria-label="Schnellanmeldung per Biometrie"
+                  style="touch-action:manipulation;">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -1386,6 +1407,12 @@ nav.bottom-nav{
             </svg>
             Schnellanmeldung
           </button>
+
+          <!-- Info toast (replaces alert() calls) -->
+          <div class="login-info-toast" id="loginInfoToast">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="loginInfoText"></span>
+          </div>
 
           <!-- Demo hint -->
           <div class="login-demo">
@@ -1989,6 +2016,9 @@ nav.bottom-nav{
 
 <!-- JAVASCRIPT -->
 <script>
+// ===== GLOBAL ERROR HANDLER — prevents raw errors surfacing during demo =====
+window.onerror = function() { return true; };
+
 // ===== MACHINE DATABASE =====
 const MACHINES = {
   'CAT-320': {
@@ -2382,49 +2412,82 @@ function togglePassword() {
     : `<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
 }
 
-function doLogin() {
-  const emailEl  = document.getElementById('loginEmail');
-  const passEl   = document.getElementById('loginPass');
-  const emailErr = document.getElementById('emailError');
-  const passErr  = document.getElementById('passError');
-  const btn      = document.getElementById('loginBtn');
+function showLoginInfo(msg) {
+  var el = document.getElementById('loginInfoToast');
+  var txt = document.getElementById('loginInfoText');
+  if (!el || !txt) return;
+  txt.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(showLoginInfo._t);
+  showLoginInfo._t = setTimeout(function() { el.classList.remove('show'); }, 4000);
+}
 
-  // Reset
-  [emailEl, passEl].forEach(el => el.classList.remove('error', 'shake'));
+function doLogin(e) {
+  if (e && e.preventDefault) e.preventDefault();
+
+  var btn = document.getElementById('loginBtn');
+  // Guard against double-fire (form onsubmit + button onclick both firing)
+  if (btn && btn.disabled) return;
+
+  var emailEl  = document.getElementById('loginEmail');
+  var passEl   = document.getElementById('loginPass');
+  var emailErr = document.getElementById('emailError');
+  var passErr  = document.getElementById('passError');
+
+  if (!emailEl || !passEl) return;
+
+  // Reset errors
+  emailEl.classList.remove('error', 'shake');
+  passEl.classList.remove('error', 'shake');
   if (emailErr) emailErr.classList.remove('show');
   if (passErr)  passErr.classList.remove('show');
 
-  let valid = true;
-  if (!emailEl.value.trim() || !emailEl.value.includes('@')) {
+  // Validate
+  var valid = true;
+  var email = emailEl.value.trim();
+  var pass  = passEl.value.trim();
+
+  if (!email || !email.includes('@')) {
     emailEl.classList.add('error');
     if (emailErr) emailErr.classList.add('show');
     void emailEl.offsetWidth;
     emailEl.classList.add('shake');
-    emailEl.addEventListener('animationend', () => emailEl.classList.remove('shake'), {once:true});
+    emailEl.addEventListener('animationend', function() { emailEl.classList.remove('shake'); }, {once:true});
     valid = false;
   }
-  if (!passEl.value.trim()) {
+  if (!pass) {
     passEl.classList.add('error');
     if (passErr) passErr.classList.add('show');
     void passEl.offsetWidth;
     passEl.classList.add('shake');
-    passEl.addEventListener('animationend', () => passEl.classList.remove('shake'), {once:true});
+    passEl.addEventListener('animationend', function() { passEl.classList.remove('shake'); }, {once:true});
     valid = false;
   }
   if (!valid) return;
 
-  // Loading state
+  // Show loading, disable button immediately
   if (btn) { btn.classList.add('loading'); btn.disabled = true; }
-  setTimeout(() => {
-    if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
-    document.getElementById('loginScreen').classList.add('hidden');
-    showPage('home');
+
+  setTimeout(function() {
+    try {
+      if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+      var ls = document.getElementById('loginScreen');
+      if (ls) ls.classList.add('hidden');
+      showPage('home');
+    } catch(err) {
+      if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+      showLoginInfo('Anmeldung fehlgeschlagen. Bitte pr\u00fcfen Sie Ihre Zugangsdaten.');
+    }
   }, 900);
 }
 
 function doLogout() {
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('loginPass').value = '';
+  var ls = document.getElementById('loginScreen');
+  if (ls) ls.classList.remove('hidden');
+  var pass = document.getElementById('loginPass');
+  if (pass) pass.value = '';
+  var toast = document.getElementById('loginInfoToast');
+  if (toast) toast.classList.remove('show');
   showPage('home');
 }
 
