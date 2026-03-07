@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -42,15 +42,10 @@
   --shadow:     0 1px 3px rgba(0,45,90,.07), 0 4px 14px rgba(0,45,90,.06);
   --shadow-md:  0 2px 8px rgba(0,45,90,.10), 0 8px 24px rgba(0,45,90,.08);
 }
-html{
-  height:100%;
-  /* iOS Safari fallback */
-  height:-webkit-fill-available;
-}
+html{height:100%;height:100dvh;}
 body{
-  height:100%;
-  min-height:100vh;
-  min-height:-webkit-fill-available;
+  height:100%;height:100dvh;
+  min-height:100dvh;
   overflow:hidden;
   background:var(--bg);
   color:var(--text);
@@ -62,50 +57,38 @@ body{
 
 /* ===== LOGIN SCREEN ===== */
 #loginScreen{
-  display:-webkit-box;
-  display:-webkit-flex;
-  display:flex;
-  -webkit-box-orient:vertical;
-  -webkit-flex-direction:column;
-  flex-direction:column;
-  -webkit-box-align:center;
-  -webkit-align-items:center;
-  align-items:center;
-  -webkit-box-pack:center;
-  -webkit-justify-content:center;
-  justify-content:center;
   position:fixed;
-  top:0;right:0;bottom:0;left:0; /* iOS < 14.1 fallback */
+  top:0;right:0;bottom:0;left:0; /* iOS < 14.5 fallback */
   inset:0;
   z-index:9000;
-  min-height:100vh;
-  min-height:-webkit-fill-available;
-  min-height:100dvh;
-  /* padding split – max() shorthand bricht in älteren Safari */
+  overflow:hidden; /* NO overflow-y:auto on fixed — causes iOS touch-event bug */
+  background-color:#f0f4f8;
+  background-image:
+    radial-gradient(ellipse 65% 50% at 50% 0%, rgba(0,82,204,0.07) 0%, transparent 70%),
+    linear-gradient(180deg, #e8eef6 0%, #f0f4f8 60%);
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+#loginScreen.hidden{display:none;}
+
+/* ── Layout wrapper — scrollable inner container (not position:fixed, safe for iOS touch) ── */
+.login-layout{
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:100%;
+  width:100%;
   padding-top:20px;
   padding-top:max(env(safe-area-inset-top,0px),20px);
   padding-right:16px;
   padding-left:16px;
   padding-bottom:20px;
   padding-bottom:max(env(safe-area-inset-bottom,0px),20px);
-  background-color:#f0f4f8;
-  background-image:
-    radial-gradient(ellipse 65% 50% at 50% 0%, rgba(0,82,204,0.07) 0%, transparent 70%),
-    -webkit-linear-gradient(top, #e8eef6 0%, #f0f4f8 60%);
-  background-image:
-    radial-gradient(ellipse 65% 50% at 50% 0%, rgba(0,82,204,0.07) 0%, transparent 70%),
-    linear-gradient(180deg, #e8eef6 0%, #f0f4f8 60%);
   gap:20px;
-  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
-}
-#loginScreen.hidden{display:none;}
-
-/* ── Layout wrapper ── */
-.login-layout{
-  display:flex;flex-direction:column;
-  align-items:center;
-  width:100%;max-width:440px;
-  gap:20px;
+  box-sizing:border-box;
 }
 
 /* ── Left panel (desktop only) ── */
@@ -215,8 +198,7 @@ body{
   background:#f8fafc;
   border:1.5px solid #d0d9e8;
   color:#1e293b;padding:0 14px;border-radius:10px;
-  font-size:16px; /* 16px verhindert iOS Safari Auto-Zoom beim Focus */
-  font-family:'Plus Jakarta Sans',inherit;outline:none;
+  font-size:15px;font-family:'Plus Jakarta Sans',inherit;outline:none;
   transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
   -webkit-appearance:none;
 }
@@ -271,7 +253,9 @@ body{
   width:100%;min-height:52px;
   background:linear-gradient(135deg,#0052CC 0%,#0072F5 100%);
   color:#fff;border:none;
-  border-radius:10px;padding:0 20px;font-size:15px;font-weight:700;
+  border-radius:10px;padding:0 20px;font-size:16px;font-weight:700;
+  touch-action:manipulation; /* no double-tap zoom delay on iOS */
+  cursor:pointer;
   cursor:pointer;letter-spacing:0.3px;margin-top:8px;
   transition:transform 0.15s,box-shadow 0.2s,opacity 0.2s;
   box-shadow:0 4px 14px rgba(0,82,204,0.35);
@@ -282,8 +266,6 @@ body{
 .btn-login:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,82,204,0.45);}
 .btn-login:active:not(:disabled){transform:translateY(0) scale(0.99);}
 .btn-login:disabled{opacity:0.65;cursor:not-allowed;}
-/* iOS Safari: verhindert Double-Tap-Zoom auf Button */
-.btn-login,.btn-manual,.btn-biometric,.eye-toggle,.btn-forgot{touch-action:manipulation;}
 .btn-spinner{
   width:18px;height:18px;border-radius:50%;
   border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;
@@ -351,12 +333,13 @@ body{
 @media(max-width:479px){
   #loginScreen{
     background-image:linear-gradient(180deg, #e8eef6 0%, #f0f4f8 100%);
+  }
+  .login-layout{
     padding-top:16px;
     padding-top:max(env(safe-area-inset-top,0px),16px);
-    padding-right:16px;
-    padding-left:16px;
     padding-bottom:16px;
     padding-bottom:max(env(safe-area-inset-bottom,0px),16px);
+    justify-content:flex-start;
   }
   .login-card{border-radius:12px;}
   .login-card-inner{padding:28px 18px 22px;}
@@ -365,14 +348,14 @@ body{
 /* ── Responsive ≥ 1200px: two-column ── */
 @media(min-width:1200px){
   #loginScreen{
-    padding:0;
-    justify-content:stretch;align-items:stretch;flex-direction:row;
     background-image:none;
   }
   .login-layout{
-    flex-direction:row;max-width:none;
-    width:100%;height:100%;
+    flex-direction:row;
+    justify-content:stretch;
+    padding:0;
     gap:0;align-items:stretch;
+    overflow:hidden;
   }
   .login-left{
     display:flex;flex-direction:column;justify-content:center;
@@ -389,182 +372,6 @@ body{
   .login-logo{display:none;}
   .login-card{max-width:420px;}
 }
-
-/* ===== BIOMETRIC MODAL ===== */
-#biometricModal{
-  display:none;
-  position:fixed;
-  top:0;right:0;bottom:0;left:0;
-  inset:0;z-index:9500;
-  background:rgba(240,244,248,0.82);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  align-items:center;justify-content:center;
-  padding:24px;
-  animation:bioFadeIn 0.25s ease-out both;
-}
-#biometricModal.active{display:flex;}
-@keyframes bioFadeIn{from{opacity:0;}to{opacity:1;}}
-
-.bio-card{
-  background:#ffffff;
-  border:1px solid #e2e8f0;
-  border-radius:24px;
-  padding:40px 32px 32px;
-  max-width:320px;width:100%;
-  text-align:center;
-  box-shadow:0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
-  animation:bioCardIn 0.3s ease-out both;
-  position:relative;overflow:hidden;
-}
-.bio-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,#0052CC,#0098C8,#22B04A);
-}
-@keyframes bioCardIn{
-  from{opacity:0;transform:translateY(16px) scale(0.97);}
-  to{opacity:1;transform:translateY(0) scale(1);}
-}
-
-/* ── Icon area ── */
-.bio-icon-wrap{
-  position:relative;
-  width:100px;height:100px;
-  margin:0 auto 24px;
-  display:flex;align-items:center;justify-content:center;
-}
-/* Pulse rings */
-.bio-ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:2px solid #0052CC;
-  opacity:0;
-  transform:scale(1);
-}
-.bio-ring-1{animation:bioRing 2s ease-out 0s infinite;}
-.bio-ring-2{animation:bioRing 2s ease-out 0.55s infinite;}
-.bio-ring-3{animation:bioRing 2s ease-out 1.1s infinite;}
-@keyframes bioRing{
-  0%{transform:scale(0.75);opacity:0.7;}
-  100%{transform:scale(1.55);opacity:0;}
-}
-/* Stop rings on success */
-.bio-icon-wrap.success .bio-ring{animation:none;opacity:0;}
-.bio-icon-wrap.error .bio-ring{animation:none;opacity:0;}
-
-.bio-icon-bg{
-  width:80px;height:80px;border-radius:50%;
-  background:linear-gradient(135deg,#e8eef6 0%,#f0f4f8 100%);
-  border:2px solid #d0d9e8;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.4s,border-color 0.4s;
-  position:relative;z-index:1;
-}
-.bio-icon-bg.scanning{
-  background:linear-gradient(135deg,#dbeafe 0%,#eff6ff 100%);
-  border-color:#93c5fd;
-}
-.bio-icon-bg.success{
-  background:linear-gradient(135deg,#dcfce7 0%,#f0fdf4 100%);
-  border-color:#86efac;
-}
-.bio-icon-bg.error{
-  background:linear-gradient(135deg,#fee2e2 0%,#fff1f2 100%);
-  border-color:#fca5a5;
-}
-.bio-icon-bg svg{
-  width:38px;height:38px;
-  transition:color 0.4s;
-  color:#0052CC;
-}
-.bio-icon-bg.success svg{color:#16a34a;}
-.bio-icon-bg.error svg{color:#dc2626;}
-
-/* Scan line animation over the fingerprint */
-.bio-scan-line{
-  position:absolute;left:50%;transform:translateX(-50%);
-  width:44px;height:2px;
-  background:linear-gradient(90deg,transparent,#0052CC,transparent);
-  border-radius:2px;
-  top:50%;margin-top:-22px;
-  z-index:2;
-  animation:bioScanLine 1.4s ease-in-out infinite;
-  opacity:0;
-}
-.scanning .bio-scan-line{opacity:1;}
-.success .bio-scan-line,.error .bio-scan-line{opacity:0;animation:none;}
-@keyframes bioScanLine{
-  0%{margin-top:-22px;opacity:0.8;}
-  50%{margin-top:22px;opacity:1;}
-  100%{margin-top:-22px;opacity:0.8;}
-}
-
-/* ── Headline & sub ── */
-.bio-title{
-  font-size:17px;font-weight:800;color:#1e293b;
-  font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:6px;
-}
-.bio-status{
-  font-size:13px;color:#64748b;
-  font-family:'IBM Plex Mono',monospace;letter-spacing:0.04em;
-  min-height:20px;transition:color 0.3s;
-  margin-bottom:24px;
-}
-.bio-status.success{color:#16a34a;}
-.bio-status.error{color:#dc2626;}
-
-/* ── Step indicators ── */
-.bio-steps{
-  display:flex;flex-direction:column;gap:10px;
-  margin-bottom:24px;text-align:left;
-}
-.bio-step{
-  display:flex;align-items:center;gap:10px;
-  font-size:13px;color:#94a3b8;
-  font-family:'Plus Jakarta Sans',sans-serif;
-  transition:color 0.3s;
-}
-.bio-step-dot{
-  width:20px;height:20px;border-radius:50%;flex-shrink:0;
-  border:2px solid #d0d9e8;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.3s,border-color 0.3s;
-  position:relative;
-}
-/* Active step: spinning */
-.bio-step.active .bio-step-dot{
-  border-color:#0052CC;border-top-color:transparent;
-  animation:spin 0.7s linear infinite;
-}
-.bio-step.active{color:#0052CC;font-weight:600;}
-/* Done step: checkmark */
-.bio-step.done .bio-step-dot{
-  background:#16a34a;border-color:#16a34a;animation:none;
-}
-.bio-step.done .bio-step-dot::after{
-  content:'';
-  width:5px;height:9px;
-  border:2px solid #fff;border-top:none;border-left:none;
-  transform:rotate(40deg) translateY(-1px);
-  display:block;
-}
-.bio-step.done{color:#16a34a;}
-/* Error step */
-.bio-step.err .bio-step-dot{background:#dc2626;border-color:#dc2626;animation:none;}
-.bio-step.err .bio-step-dot::after{
-  content:'✕';color:#fff;font-size:10px;font-weight:800;animation:none;
-}
-.bio-step.err{color:#dc2626;}
-
-/* ── Cancel button ── */
-.bio-cancel{
-  width:100%;min-height:44px;
-  background:none;border:1.5px solid #e2e8f0;border-radius:10px;
-  color:#64748b;font-size:13px;font-weight:600;
-  font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;
-  transition:border-color 0.2s,color 0.2s,background 0.2s;
-  -webkit-tap-highlight-color:transparent;
-}
-.bio-cancel:hover{border-color:#0052CC;color:#0052CC;background:#f1f5f9;}
-.bio-cancel:disabled{opacity:0.4;cursor:not-allowed;}
 
 /* ===== HEADER ===== */
 header{
@@ -1204,170 +1011,12 @@ header{
 }
 .btn-modal-close:hover{border-color:var(--accent);color:var(--accent);}
 .btn-manual{
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  margin-top:10px;padding:13px 16px;
-  background:#fff;color:var(--accent);
-  border:1.5px solid var(--accent);border-radius:8px;
-  font-size:13px;font-weight:700;cursor:pointer;width:100%;
-  transition:all .2s;text-decoration:none;font-family:inherit;
+  display:inline-flex;align-items:center;gap:7px;margin-top:10px;
+  padding:9px 14px;border:1.5px solid var(--border);border-radius:7px;
+  color:var(--text-muted);font-size:13px;font-weight:600;text-decoration:none;
+  transition:all .2s;background:var(--bg);
 }
-.btn-manual:hover{background:var(--accent-lt);transform:translateY(-1px);box-shadow:0 4px 14px rgba(21,101,192,.15);}
-.btn-manual:active{transform:translateY(0);}
-.btn-manual svg{width:17px;height:17px;flex-shrink:0;}
-/* ===== MANUAL MODAL ===== */
-#manualModal{
-  display:none;position:fixed;inset:0;z-index:8000;
-  background:rgba(0,29,58,.65);backdrop-filter:blur(4px);
-  align-items:center;justify-content:center;padding:24px;
-}
-#manualModal.active{display:flex;}
-@media(max-width:767px){#manualModal{padding:0;align-items:flex-end;}}
-.manual-card{
-  background:#fff;border-radius:14px;width:100%;max-width:520px;
-  max-height:88vh;
-  box-shadow:0 24px 60px rgba(0,0,0,.28);overflow:hidden;
-  display:flex;flex-direction:column;
-  animation:fadeUp .25s cubic-bezier(.4,0,.2,1);
-}
-@media(max-width:767px){.manual-card{max-width:100%;border-radius:16px 16px 0 0;max-height:92vh;}}
-.manual-hdr{
-  background:linear-gradient(135deg,var(--primary),var(--accent));
-  padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;
-}
-.manual-hdr svg{width:22px;height:22px;color:#fff;flex-shrink:0;}
-.manual-hdr-info{flex:1;min-width:0;}
-.manual-hdr-title{font-size:15px;font-weight:800;color:#fff;}
-.manual-hdr-sub{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
-.manual-close-btn{
-  width:32px;height:32px;border-radius:50%;border:none;
-  background:rgba(255,255,255,.15);color:#fff;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  transition:background .2s;
-}
-.manual-close-btn:hover{background:rgba(255,255,255,.28);}
-.manual-close-btn svg{width:16px;height:16px;}
-/* Loading state */
-.manual-loading{
-  display:flex;flex-direction:column;align-items:center;gap:14px;
-  padding:40px 24px;
-}
-.manual-loading-bar{
-  width:180px;height:4px;background:var(--border);border-radius:4px;overflow:hidden;
-}
-.manual-loading-fill{
-  height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));
-  border-radius:4px;width:0%;
-  animation:manualLoad 1.6s ease-out forwards;
-}
-@keyframes manualLoad{0%{width:0%}60%{width:75%}90%{width:92%}100%{width:100%}}
-.manual-loading-text{font-size:13px;color:var(--text-muted);font-weight:600;text-align:center;line-height:1.6;}
-.manual-loading-machine{font-size:14px;font-weight:800;color:var(--primary);margin-bottom:2px;text-align:center;}
-/* Document meta bar */
-.manual-meta{
-  display:flex;flex-wrap:wrap;gap:0;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.manual-meta-item{
-  flex:1;min-width:100px;
-  padding:8px 14px;
-  border-right:1px solid var(--border);
-  font-size:11px;
-}
-.manual-meta-item:last-child{border-right:none;}
-.manual-meta-label{color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
-.manual-meta-val{color:var(--primary);font-weight:800;}
-/* TOC + content layout */
-.manual-body{
-  display:flex;flex:1;overflow:hidden;min-height:0;
-}
-.manual-toc{
-  width:140px;flex-shrink:0;
-  border-right:1px solid var(--border);
-  overflow-y:auto;padding:12px 0;
-  background:var(--bg);
-}
-@media(max-width:480px){.manual-toc{display:none;}}
-.manual-toc-item{
-  display:block;width:100%;padding:9px 14px;
-  font-size:12px;font-weight:600;color:var(--text-muted);
-  background:none;border:none;text-align:left;cursor:pointer;
-  border-left:3px solid transparent;
-  transition:all .15s;line-height:1.3;
-}
-.manual-toc-item:hover{color:var(--accent);background:var(--accent-lt);}
-.manual-toc-item.active{
-  color:var(--accent);background:var(--accent-lt);
-  border-left-color:var(--accent);
-}
-.manual-content{flex:1;overflow-y:auto;padding:20px 18px;}
-/* Chapter */
-.man-chapter{display:none;}
-.man-chapter.active{display:block;}
-.man-chapter-title{
-  font-size:14px;font-weight:800;color:var(--primary);
-  margin-bottom:14px;padding-bottom:8px;
-  border-bottom:2px solid var(--border);
-  display:flex;align-items:center;gap:8px;
-}
-.man-chapter-num{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:22px;height:22px;border-radius:50%;
-  background:var(--accent);color:#fff;font-size:11px;font-weight:800;flex-shrink:0;
-}
-/* Warning box */
-.man-warn{
-  background:#FFF8E1;border:1px solid #FFB300;border-radius:8px;
-  padding:12px 14px;margin-bottom:12px;
-  display:flex;gap:10px;align-items:flex-start;
-  font-size:12px;color:#5D4037;line-height:1.6;
-}
-.man-warn svg{width:16px;height:16px;flex-shrink:0;color:#F57C00;margin-top:1px;}
-.man-warn strong{color:#E65100;display:block;margin-bottom:2px;}
-.man-note{
-  background:var(--accent-lt);border:1px solid rgba(21,101,192,.2);border-radius:8px;
-  padding:12px 14px;margin-bottom:12px;
-  font-size:12px;color:var(--primary);line-height:1.6;
-}
-/* Specs table */
-.man-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px;}
-.man-table th{
-  background:var(--primary);color:#fff;padding:8px 12px;text-align:left;
-  font-size:11px;font-weight:700;letter-spacing:.4px;
-}
-.man-table th:first-child{border-radius:6px 0 0 0;}
-.man-table th:last-child{border-radius:0 6px 0 0;}
-.man-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
-.man-table tr:last-child td{border-bottom:none;}
-.man-table tr:nth-child(even) td{background:var(--bg);}
-.man-table td:first-child{font-weight:600;color:var(--text-muted);white-space:nowrap;}
-/* Maintenance list */
-.man-maint-row{
-  display:flex;align-items:center;gap:12px;padding:10px 12px;
-  border:1px solid var(--border);border-radius:8px;margin-bottom:8px;
-}
-.man-maint-icon{
-  width:36px;height:36px;border-radius:8px;
-  background:var(--accent-lt);display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.man-maint-icon svg{width:18px;height:18px;color:var(--accent);}
-.man-maint-info{flex:1;min-width:0;}
-.man-maint-label{font-size:13px;font-weight:700;color:var(--text);}
-.man-maint-interval{font-size:11px;color:var(--text-muted);margin-top:2px;}
-.man-maint-badge{
-  font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0;
-  background:var(--green-bg);color:var(--green);
-}
-.man-maint-badge.warn{background:var(--warn-bg);color:var(--warning);}
-/* Footer */
-.manual-footer{
-  padding:12px 20px;border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
-  background:var(--bg);
-}
-.manual-page-info{font-size:11px;color:var(--text-muted);}
-.manual-footer-btns{display:flex;gap:8px;}
-
+.btn-manual:hover{border-color:var(--accent);color:var(--accent);}
 
 /* ===== ACCORDION ===== */
 .acc-hdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 0 8px;border:none;background:none;width:100%;text-align:left;-webkit-tap-highlight-color:transparent;}
@@ -1714,7 +1363,7 @@ nav.bottom-nav{
           </div>
 
           <!-- Login button -->
-          <button class="btn-login" id="loginBtn" onclick="doLogin()" ontouchend="this.onclick()" aria-label="Anmelden">
+          <button class="btn-login" id="loginBtn" onclick="doLogin()" aria-label="Anmelden">
             <span class="btn-spinner" aria-hidden="true"></span>
             <span class="btn-label">Anmelden</span>
           </button>
@@ -1728,7 +1377,7 @@ nav.bottom-nav{
 
           <!-- Biometric -->
           <button type="button" class="btn-biometric"
-                  onclick="startBiometric()" ontouchend="startBiometric()"
+                  onclick="alert('Biometrie-Anmeldung wird eingerichtet.')"
                   aria-label="Schnellanmeldung per Biometrie">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor" stroke-width="1.5">
@@ -1755,42 +1404,6 @@ nav.bottom-nav{
     </div><!-- /.login-right -->
   </div><!-- /.login-layout -->
 </div>
-<!-- ===== BIOMETRIC MODAL ===== -->
-<div id="biometricModal" role="dialog" aria-modal="true" aria-labelledby="bioTitle">
-  <div class="bio-card">
-    <div class="bio-icon-wrap" id="bioIconWrap">
-      <div class="bio-ring bio-ring-1"></div>
-      <div class="bio-ring bio-ring-2"></div>
-      <div class="bio-ring bio-ring-3"></div>
-      <div class="bio-icon-bg" id="bioIconBg">
-        <!-- Fingerprint icon -->
-        <svg id="bioSvgMain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 2C8.13 2 5 5.13 5 9c0 2.2.54 4.27 1.5 6.08M12 2c3.87 0 7 3.13 7 7 0 2.2-.54 4.27-1.5 6.08M12 6c-1.66 0-3 1.34-3 3 0 3.5 1.29 6.7 3.41 9.17M12 6c1.66 0 3 1.34 3 3 0 3.5-1.29 6.7-3.41 9.17M9 9c0-1.66 1.34-3 3-3s3 1.34 3 3c0 2.11-.52 4.1-1.44 5.85"/>
-        </svg>
-        <div class="bio-scan-line"></div>
-      </div>
-    </div>
-    <div class="bio-title" id="bioTitle">Schnellanmeldung</div>
-    <div class="bio-status" id="bioStatus">Bereit zur Anmeldung</div>
-    <div class="bio-steps">
-      <div class="bio-step" id="bioStep1">
-        <div class="bio-step-dot"></div>
-        <span>Biometrie wird gelesen</span>
-      </div>
-      <div class="bio-step" id="bioStep2">
-        <div class="bio-step-dot"></div>
-        <span>Identität wird geprüft</span>
-      </div>
-      <div class="bio-step" id="bioStep3">
-        <div class="bio-step-dot"></div>
-        <span>Sitzung wird geöffnet</span>
-      </div>
-    </div>
-    <button class="bio-cancel" id="bioCancelBtn" onclick="cancelBiometric()">Abbrechen</button>
-  </div>
-</div>
-
 <!-- ===== SHARED HEADER ===== -->
 <header>
   <div class="hdr-logo">
@@ -2356,178 +1969,6 @@ nav.bottom-nav{
   </div>
 </div>
 
-
-<!-- MANUAL MODAL -->
-<div id="manualModal" role="dialog" aria-modal="true" aria-labelledby="manualModalTitle">
-  <div class="manual-card">
-    <!-- Header -->
-    <div class="manual-hdr">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-        <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>
-      </svg>
-      <div class="manual-hdr-info">
-        <div class="manual-hdr-title" id="manualModalTitle">Technisches Handbuch</div>
-        <div class="manual-hdr-sub" id="manualHdrSub">Wird geladen&hellip;</div>
-      </div>
-      <button class="manual-close-btn" onclick="closeManualModal()" aria-label="Schließen">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Loading state -->
-    <div class="manual-loading" id="manualLoading">
-      <div class="manual-loading-machine" id="manualLoadMachine"></div>
-      <div class="manual-loading-bar"><div class="manual-loading-fill" id="manualLoadFill"></div></div>
-      <div class="manual-loading-text">Dokument wird aus DMS geladen&hellip;<br>
-        <span style="font-size:11px;opacity:.7;">Betriebsanleitung &middot; Wartungshandbuch &middot; Rev. aktiv</span>
-      </div>
-    </div>
-
-    <!-- Document view (hidden during loading) -->
-    <div id="manualDoc" style="display:none;flex:1;overflow:hidden;flex-direction:column;min-height:0;">
-      <!-- Meta bar -->
-      <div class="manual-meta">
-        <div class="manual-meta-item">
-          <div class="manual-meta-label">Dok-Nr.</div>
-          <div class="manual-meta-val" id="manDocNr">TM-2024-001</div>
-        </div>
-        <div class="manual-meta-item">
-          <div class="manual-meta-label">Revision</div>
-          <div class="manual-meta-val">Rev. 4.2</div>
-        </div>
-        <div class="manual-meta-item">
-          <div class="manual-meta-label">Datum</div>
-          <div class="manual-meta-val">03/2025</div>
-        </div>
-        <div class="manual-meta-item">
-          <div class="manual-meta-label">Sprache</div>
-          <div class="manual-meta-val">DE / EN</div>
-        </div>
-      </div>
-
-      <!-- Body: TOC + Content -->
-      <div class="manual-body">
-        <!-- Table of contents -->
-        <nav class="manual-toc" aria-label="Kapitelnavigation">
-          <button class="manual-toc-item active" onclick="manualShowChapter(0,this)">1. Sicherheit</button>
-          <button class="manual-toc-item" onclick="manualShowChapter(1,this)">2. Tech. Daten</button>
-          <button class="manual-toc-item" onclick="manualShowChapter(2,this)">3. Wartung</button>
-        </nav>
-
-        <!-- Content -->
-        <div class="manual-content">
-
-          <!-- Chapter 1: Sicherheit -->
-          <div class="man-chapter active" id="manCh0">
-            <div class="man-chapter-title"><span class="man-chapter-num">1</span>Sicherheitshinweise</div>
-            <div class="man-warn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-              <div><strong>WARNUNG – Hydraulikdruck</strong>Vor Wartungsarbeiten Hydrauliksystem vollständig drucklos schalten. Restdruck kann schwere Verletzungen verursachen.</div>
-            </div>
-            <div class="man-warn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-              <div><strong>WARNUNG – Heiße Oberflächen</strong>Motorteile und Hydraulikleitungen können Temperaturen über 80 °C erreichen. Schutzhandschuhe tragen.</div>
-            </div>
-            <div class="man-note">
-              <strong>Hinweis:</strong> Alle Wartungsarbeiten dürfen nur von qualifiziertem Fachpersonal mit geeigneter PSA durchgeführt werden. Landesrecht beachten.
-            </div>
-            <div class="man-warn" style="background:#E3F2FD;border-color:#1565C0;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#1565C0">
-                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              <div style="color:#1A237E"><strong style="color:#0D47A1">INFO – Schutzausrüstung</strong>Helm, Schutzbrille und Sicherheitsschuhe sind bei allen Arbeiten am Gerät Pflicht.</div>
-            </div>
-          </div>
-
-          <!-- Chapter 2: Tech. Daten -->
-          <div class="man-chapter" id="manCh1">
-            <div class="man-chapter-title"><span class="man-chapter-num">2</span>Technische Daten</div>
-            <table class="man-table">
-              <thead><tr><th>Parameter</th><th>Wert</th><th>Einheit</th></tr></thead>
-              <tbody id="manSpecTable">
-                <tr><td>Betriebsgewicht</td><td>21.500</td><td>kg</td></tr>
-                <tr><td>Motorleistung</td><td>122</td><td>kW / 2.000 rpm</td></tr>
-                <tr><td>Max. Grabtiefe</td><td>6.710</td><td>mm</td></tr>
-                <tr><td>Hydraulikdruck</td><td>340</td><td>bar</td></tr>
-                <tr><td>Tankinhalt Diesel</td><td>400</td><td>Liter</td></tr>
-                <tr><td>Hydrauliköl</td><td>280</td><td>Liter</td></tr>
-                <tr><td>Schaufelinhalt</td><td>0,8 – 1,2</td><td>m³</td></tr>
-                <tr><td>Transportbreite</td><td>2.990</td><td>mm</td></tr>
-              </tbody>
-            </table>
-            <div class="man-note">Alle Angaben gemäß Werksnorm. Abweichungen je nach Ausstattungsvariante möglich. Gültig für Seriennummernbereich 001–499.</div>
-          </div>
-
-          <!-- Chapter 3: Wartung -->
-          <div class="man-chapter" id="manCh2">
-            <div class="man-chapter-title"><span class="man-chapter-num">3</span>Wartungsintervalle</div>
-            <div class="man-maint-row">
-              <div class="man-maint-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-              </div>
-              <div class="man-maint-info">
-                <div class="man-maint-label">Motoröl wechseln</div>
-                <div class="man-maint-interval">alle 500 Betriebsstunden &middot; Shell Rimula R4</div>
-              </div>
-              <div class="man-maint-badge">OK</div>
-            </div>
-            <div class="man-maint-row">
-              <div class="man-maint-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24"/></svg>
-              </div>
-              <div class="man-maint-info">
-                <div class="man-maint-label">Hydraulikfilter tauschen</div>
-                <div class="man-maint-interval">alle 1.000 Betriebsstunden &middot; Komatsu OEM</div>
-              </div>
-              <div class="man-maint-badge warn">Fällig</div>
-            </div>
-            <div class="man-maint-row">
-              <div class="man-maint-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
-              </div>
-              <div class="man-maint-info">
-                <div class="man-maint-label">Luftfilter prüfen / tauschen</div>
-                <div class="man-maint-interval">alle 250 Std. prüfen &middot; 1.000 Std. wechseln</div>
-              </div>
-              <div class="man-maint-badge">OK</div>
-            </div>
-            <div class="man-maint-row">
-              <div class="man-maint-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
-              </div>
-              <div class="man-maint-info">
-                <div class="man-maint-label">Kühlmittel prüfen</div>
-                <div class="man-maint-interval">täglich vor Arbeitsbeginn &middot; OAT-Kühlmittel</div>
-              </div>
-              <div class="man-maint-badge">OK</div>
-            </div>
-            <div class="man-note" style="margin-top:6px;">Wartungsprotokoll stets vollständig führen. Nicht durchgeführte Wartung kann zum Garantieverlust führen.</div>
-          </div>
-
-        </div><!-- /.manual-content -->
-      </div><!-- /.manual-body -->
-    </div><!-- /#manualDoc -->
-
-    <!-- Footer -->
-    <div class="manual-footer" id="manualFooter" style="display:none;">
-      <span class="manual-page-info" id="manPageInfo">Kapitel 1 von 3</span>
-      <div class="manual-footer-btns">
-        <button class="btn-modal-close" onclick="closeManualModal()">Schlie&szlig;en</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- SCAN OVERLAY -->
 <div id="scanOverlay">
   <div class="scan-ui-top">
@@ -2929,85 +2370,6 @@ function confirmConfig() {
   }, 100);
 }
 
-
-// ===== BIOMETRIC QUICK LOGIN =====
-var _bioTimer = null;
-
-function startBiometric() {
-  var modal    = document.getElementById('biometricModal');
-  var iconWrap = document.getElementById('bioIconWrap');
-  var iconBg   = document.getElementById('bioIconBg');
-  var status   = document.getElementById('bioStatus');
-  var s1 = document.getElementById('bioStep1');
-  var s2 = document.getElementById('bioStep2');
-  var s3 = document.getElementById('bioStep3');
-  var cancelBtn = document.getElementById('bioCancelBtn');
-  if (!modal) return;
-
-  // Reset state
-  s1.className = 'bio-step'; s2.className = 'bio-step'; s3.className = 'bio-step';
-  iconWrap.className = 'bio-icon-wrap';
-  iconBg.className   = 'bio-icon-bg';
-  status.className   = 'bio-status';
-  status.textContent = 'Bitte Finger auflegen…';
-  cancelBtn.disabled = false;
-  modal.classList.add('active');
-
-  // Phase 1 – Biometrie lesen (1.4s)
-  _bioTimer = setTimeout(function() {
-    iconBg.classList.add('scanning');
-    s1.className = 'bio-step active';
-    status.textContent = 'Biometrie wird gelesen…';
-
-    // Phase 2 – Identität prüfen (nach 1.6s)
-    _bioTimer = setTimeout(function() {
-      s1.className = 'bio-step done';
-      s2.className = 'bio-step active';
-      status.textContent = 'Identität wird geprüft…';
-
-      // Phase 3 – Sitzung öffnen (nach 1.2s)
-      _bioTimer = setTimeout(function() {
-        s2.className = 'bio-step done';
-        s3.className = 'bio-step active';
-        status.textContent = 'Sitzung wird geöffnet…';
-
-        // Success (nach 0.9s)
-        _bioTimer = setTimeout(function() {
-          s3.className = 'bio-step done';
-          iconWrap.classList.add('success');
-          iconBg.classList.remove('scanning');
-          iconBg.classList.add('success');
-          status.textContent = 'Identität bestätigt ✓';
-          status.classList.add('success');
-          cancelBtn.disabled = true;
-
-          // Login (nach 0.7s)
-          _bioTimer = setTimeout(function() {
-            modal.classList.remove('active');
-            document.getElementById('loginScreen').classList.add('hidden');
-            showPage('home');
-          }, 700);
-        }, 900);
-      }, 1200);
-    }, 1600);
-  }, 600);
-}
-
-function cancelBiometric() {
-  if (_bioTimer) { clearTimeout(_bioTimer); _bioTimer = null; }
-  var modal = document.getElementById('biometricModal');
-  modal.classList.remove('active');
-}
-
-// Close on backdrop click
-// Backdrop-Klick (direkt, kein DOMContentLoaded nötig – Script ist am Seitenende)
-(function() {
-  var m = document.getElementById('biometricModal');
-  if (m) m.addEventListener('click', function(e) {
-    if (e.target === this) cancelBiometric();
-  });
-})();
-
 // ===== LOGIN =====
 function togglePassword() {
   const input = document.getElementById('loginPass');
@@ -3021,14 +2383,43 @@ function togglePassword() {
 }
 
 function doLogin() {
-  var btn = document.getElementById('loginBtn');
+  const emailEl  = document.getElementById('loginEmail');
+  const passEl   = document.getElementById('loginPass');
+  const emailErr = document.getElementById('emailError');
+  const passErr  = document.getElementById('passError');
+  const btn      = document.getElementById('loginBtn');
+
+  // Reset
+  [emailEl, passEl].forEach(el => el.classList.remove('error', 'shake'));
+  if (emailErr) emailErr.classList.remove('show');
+  if (passErr)  passErr.classList.remove('show');
+
+  let valid = true;
+  if (!emailEl.value.trim() || !emailEl.value.includes('@')) {
+    emailEl.classList.add('error');
+    if (emailErr) emailErr.classList.add('show');
+    void emailEl.offsetWidth;
+    emailEl.classList.add('shake');
+    emailEl.addEventListener('animationend', () => emailEl.classList.remove('shake'), {once:true});
+    valid = false;
+  }
+  if (!passEl.value.trim()) {
+    passEl.classList.add('error');
+    if (passErr) passErr.classList.add('show');
+    void passEl.offsetWidth;
+    passEl.classList.add('shake');
+    passEl.addEventListener('animationend', () => passEl.classList.remove('shake'), {once:true});
+    valid = false;
+  }
+  if (!valid) return;
+
+  // Loading state
   if (btn) { btn.classList.add('loading'); btn.disabled = true; }
-  setTimeout(function() {
+  setTimeout(() => {
     if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
-    var ls = document.getElementById('loginScreen');
-    if (ls) ls.classList.add('hidden');
+    document.getElementById('loginScreen').classList.add('hidden');
     showPage('home');
-  }, 800);
+  }, 900);
 }
 
 function doLogout() {
@@ -3213,14 +2604,9 @@ function renderSolution(d, area) {
           <span class="tag blu">${d.machine}</span>
         </div>
         ${erpSection}
-        <button type="button" class="btn-manual" onclick="openManualModal('${machineName.replace(/'/g, \"'\")}')" >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/>
-          </svg>
-          Techn. Handbuch
-        </button>
+        <a href="#" onclick="return false;" class="btn-manual">
+          &#128216; Technisches Handbuch \u00f6ffnen
+        </a>
       </div>
     </div>`;
 }
@@ -3258,77 +2644,9 @@ function closeDrawingModal() {
   document.getElementById('drawingModal').classList.remove('active');
   document.body.style.overflow = '';
 }
-
-// ===== TECHNICAL MANUAL =====
-function openManualModal(machineName) {
-  var modal   = document.getElementById('manualModal');
-  var loading = document.getElementById('manualLoading');
-  var doc     = document.getElementById('manualDoc');
-  var footer  = document.getElementById('manualFooter');
-  var fill    = document.getElementById('manualLoadFill');
-  var hdrSub  = document.getElementById('manualHdrSub');
-  var loadMachine = document.getElementById('manualLoadMachine');
-
-  // Reset to loading state
-  loading.style.display = 'flex';
-  doc.style.display     = 'none';
-  footer.style.display  = 'none';
-  fill.style.width      = '0%';
-  fill.style.animation  = 'none';
-  loadMachine.textContent = machineName || 'Maschine';
-  hdrSub.textContent    = 'Wird geladen\u2026';
-  manualShowChapter(0, document.querySelector('.manual-toc-item'));
-
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
-
-  // Restart fill animation
-  setTimeout(function() { fill.style.animation = 'manualLoad 1.6s ease-out forwards'; }, 30);
-
-  // Show document after 1.7s
-  setTimeout(function() {
-    loading.style.display = 'none';
-    doc.style.display     = 'flex';
-    footer.style.display  = 'flex';
-    hdrSub.textContent    = machineName || '';
-    // Patch doc number with machine info
-    var nr = document.getElementById('manDocNr');
-    if (nr) nr.textContent = 'TM-' + (machineName || '').substring(0,3).toUpperCase() + '-001';
-  }, 1700);
-}
-
-function closeManualModal() {
-  document.getElementById('manualModal').classList.remove('active');
-  document.body.style.overflow = '';
-}
-
-function manualShowChapter(idx, btn) {
-  document.querySelectorAll('.man-chapter').forEach(function(ch, i) {
-    ch.classList.toggle('active', i === idx);
-  });
-  document.querySelectorAll('.manual-toc-item').forEach(function(b) {
-    b.classList.remove('active');
-  });
-  if (btn) btn.classList.add('active');
-  var labels = ['Kapitel 1 von 3 \u2013 Sicherheitshinweise', 'Kapitel 2 von 3 \u2013 Technische Daten', 'Kapitel 3 von 3 \u2013 Wartungsintervalle'];
-  var pi = document.getElementById('manPageInfo');
-  if (pi) pi.textContent = labels[idx] || '';
-}
-
-(function() {
-  var mm = document.getElementById('manualModal');
-  if (mm) mm.addEventListener('click', function(e) {
-    if (e.target === this) closeManualModal();
-  });
-})();
-
-
-(function() {
-  var dm = document.getElementById('drawingModal');
-  if (dm) dm.addEventListener('click', function(e) {
-    if (e.target === this) closeDrawingModal();
-  });
-})();
+document.getElementById('drawingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDrawingModal();
+});
 
 function triggerErp(btn, erpId, artikelnr, bezeichnung, lager) {
   btn.disabled = true;
