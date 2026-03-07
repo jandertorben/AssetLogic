@@ -1741,6 +1741,124 @@ nav.bottom-nav{
 .pin-status.err{color:var(--red);}
 .pin-status.ok{color:var(--green);}
 
+/* ===== KUNDEN & ASSET-VERWALTUNG ===== */
+.cust-layout{display:flex;align-items:flex-start;border-top:1px solid var(--border);}
+.cust-sidebar{
+  width:300px;flex-shrink:0;border-right:1px solid var(--border);
+  background:var(--bg);display:flex;flex-direction:column;
+}
+.cust-main{flex:1;min-width:0;background:#fff;}
+.cust-search-bar{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.cust-search-input{
+  width:100%;height:38px;background:#fff;border:1.5px solid var(--border);
+  border-radius:8px;padding:0 12px 0 34px;font-size:13px;font-family:inherit;outline:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:10px center;
+  transition:border-color .2s;
+}
+.cust-search-input:focus{border-color:var(--accent);}
+.cust-sidebar-label{
+  padding:10px 14px 6px;font-size:10px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);
+}
+.cust-item{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .15s;touch-action:manipulation;
+}
+.cust-item:active,.cust-item:hover{background:rgba(21,101,192,.04);}
+.cust-item.selected{
+  background:var(--accent-lt);
+  border-left:3px solid var(--primary);padding-left:11px;
+}
+.cust-item-avatar{
+  width:40px;height:40px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;
+}
+.cust-item-info{flex:1;min-width:0;}
+.cust-item-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cust-item-contact{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.cust-item-meta{font-size:11px;color:var(--accent);font-weight:600;margin-top:3px;}
+.cust-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.cust-status{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;}
+.cust-status.ok{background:var(--green-bg);color:var(--green);}
+.cust-status.off{background:var(--bg3);color:var(--text-muted);}
+.cust-arr{color:var(--border);font-size:18px;line-height:1;}
+.cust-sidebar-footer{padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0;}
+/* Back button (mobile only) */
+.cust-back-btn{
+  display:none;align-items:center;gap:8px;
+  padding:11px 18px;border-bottom:1px solid var(--border);
+  background:var(--bg);cursor:pointer;touch-action:manipulation;
+  font-size:13px;font-weight:700;color:var(--accent);
+}
+.cust-back-btn svg{width:16px;height:16px;}
+/* Asset panel header */
+.cust-asset-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;gap:10px;
+}
+.cust-asset-avatar{
+  width:44px;height:44px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff;
+}
+.cust-asset-title{font-size:15px;font-weight:800;color:var(--text);}
+.cust-asset-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+/* Asset cards */
+.asset-list{padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
+.asset-card{
+  background:#fff;border:1.5px solid var(--border);border-radius:12px;
+  display:flex;align-items:center;gap:13px;padding:13px 14px;
+  transition:all .18s;touch-action:manipulation;
+  box-shadow:var(--shadow-sm);
+}
+.asset-card:hover{box-shadow:var(--shadow-md);border-color:var(--accent);}
+.asset-type-icon{
+  width:44px;height:44px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.asset-type-icon svg{width:22px;height:22px;}
+.asset-info{flex:1;min-width:0;}
+.asset-name{font-size:13px;font-weight:800;color:var(--text);}
+.asset-model{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.asset-serial{font-size:11px;color:var(--accent);font-family:'Courier New',monospace;margin-top:2px;}
+.asset-type-tag{
+  display:inline-flex;align-items:center;
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-top:4px;
+}
+.asset-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.asset-status-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;}
+.asset-status-badge.ok{background:var(--green-bg);color:var(--green);}
+.asset-status-badge.warn{background:rgba(239,108,0,.12);color:#e65100;}
+.asset-status-badge.err{background:var(--red-bg);color:var(--red);}
+.asset-service{font-size:10px;color:var(--text-muted);text-align:right;}
+.asset-service.due-soon{color:#e65100;font-weight:700;}
+.asset-service.overdue{color:var(--red);font-weight:700;}
+/* Empty states */
+.cust-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 24px;text-align:center;
+}
+.cust-empty-icon{
+  width:60px;height:60px;border-radius:14px;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+}
+.cust-empty-icon svg{width:26px;height:26px;color:var(--text-muted);}
+.cust-empty-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.cust-empty-sub{font-size:12px;color:var(--text-muted);line-height:1.6;}
+/* Mobile responsive */
+@media(max-width:767px){
+  .cust-layout{flex-direction:column;}
+  .cust-sidebar{width:100%;border-right:none;}
+  .cust-layout.show-assets .cust-sidebar{display:none;}
+  .cust-layout.show-assets .cust-main{display:block;}
+  .cust-layout:not(.show-assets) .cust-main{display:none;}
+  .cust-back-btn{display:flex;}
+  .cust-asset-header{padding:12px 14px;}
+  .asset-list{padding:10px 14px;}
+}
 /* ===== SYSTEMEINSTELLUNGEN ===== */
 .sys-card{
   background:#fff;border:1px solid var(--border);border-radius:12px;
@@ -2104,6 +2222,10 @@ nav.bottom-nav{
       <button class="d-nav-item" onclick="setDNav(this,'erp')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         ERP-Anbindung
+      </button>
+      <button class="d-nav-item" onclick="setDNav(this,'kunden')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Kunden &amp; Assets
       </button>
       <button class="d-nav-item" onclick="setDNav(this,'systemeinstellungen')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -2819,6 +2941,63 @@ nav.bottom-nav{
       </div>
     </div><!-- end page-erp -->
 
+    <!-- ==================== KUNDEN & ASSET-VERWALTUNG ==================== -->
+    <div id="page-kunden" class="page">
+      <div class="admin-section">
+        <div class="admin-topbar-row">
+          <div>
+            <div class="admin-page-title">Kunden &amp; Asset-Verwaltung</div>
+            <div class="admin-page-sub">CRM &middot; Asset-Register &middot; Serviceverl&auml;ufe</div>
+          </div>
+          <button class="admin-btn admin-btn-primary" onclick="openAddCustomerModal()" style="touch-action:manipulation;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Neuen Kunden anlegen
+          </button>
+        </div>
+        <div class="admin-stats" style="grid-template-columns:repeat(3,1fr);">
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val" id="custStatTotal">4</div>
+            <div class="admin-stat-lbl">Kunden gesamt</div>
+          </div>
+          <div class="admin-stat-card green">
+            <div class="admin-stat-val" id="custStatActive">3</div>
+            <div class="admin-stat-lbl">Aktive Kunden</div>
+          </div>
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val" id="custStatAssets">5</div>
+            <div class="admin-stat-lbl">Assets gesamt</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cust-layout" id="custLayout">
+        <!-- LEFT: Kundenliste -->
+        <div class="cust-sidebar" id="custSidebar">
+          <div class="cust-search-bar">
+            <input class="cust-search-input" id="custSearchInput" type="search"
+              placeholder="Kunden suchen&hellip;" oninput="onCustSearch(this.value)"
+              autocorrect="off" autocapitalize="none" spellcheck="false">
+          </div>
+          <div class="cust-sidebar-label">Kunden</div>
+          <div id="custList"><!-- rendered by JS --></div>
+          <div class="cust-sidebar-footer">
+            <button class="admin-btn admin-btn-secondary" style="width:100%;justify-content:center;touch-action:manipulation;" onclick="openAddCustomerModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Neuen Kunden anlegen
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Asset-Panel -->
+        <div class="cust-main" id="custMain"><!-- rendered by JS --></div>
+      </div>
+
+      <div class="page-footer">
+        <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+        <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+      </div>
+    </div><!-- end page-kunden -->
+
     <!-- ==================== SYSTEMEINSTELLUNGEN ==================== -->
     <div id="page-systemeinstellungen" class="page">
       <div class="admin-section">
@@ -3257,6 +3436,122 @@ nav.bottom-nav{
         <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
       </div>
     </div><!-- end page-systemeinstellungen -->
+
+<!-- ==================== MODAL: NEUEN KUNDEN ANLEGEN ==================== -->
+<div id="addCustomerModal" class="settings-sheet" style="z-index:9000;align-items:center;justify-content:center;padding:20px;">
+  <div class="cn-card" style="max-width:520px;animation:fadeUp .25s cubic-bezier(.4,0,.2,1);">
+    <div class="cn-header">
+      <div>
+        <div class="cn-header-title">Neuen Kunden anlegen</div>
+        <div class="cn-header-sub">Kundenprofil &amp; Stammdaten erfassen</div>
+      </div>
+      <button class="nm-close" onclick="closeAddCustomerModal()" aria-label="Schlie&szlig;en">&#10005;</button>
+    </div>
+    <div class="nm-body">
+      <div class="nm-section">
+        <form id="acForm" onsubmit="return false;">
+          <div class="cn-form-row">
+            <div class="cn-form-group">
+              <label class="cn-label" for="acName">Firmenname *</label>
+              <input class="cn-input" id="acName" type="text" placeholder="z.B. Mayer Bau GmbH" autocorrect="off">
+              <div class="cn-error" id="acNameErr">Bitte Firmen- und Ansprechpartnername eingeben</div>
+            </div>
+            <div class="cn-form-group">
+              <label class="cn-label" for="acIndustry">Branche</label>
+              <select class="cn-input" id="acIndustry">
+                <option>Baugewerbe</option>
+                <option>Logistik &amp; Transport</option>
+                <option>Erdbau &amp; Tiefbau</option>
+                <option>Infrastruktur</option>
+                <option>Maschinenbau</option>
+                <option>Landwirtschaft</option>
+                <option>Sonstige</option>
+              </select>
+            </div>
+          </div>
+          <div class="cn-form-row">
+            <div class="cn-form-group">
+              <label class="cn-label" for="acContact">Ansprechpartner *</label>
+              <input class="cn-input" id="acContact" type="text" placeholder="Vor- und Nachname">
+            </div>
+            <div class="cn-form-group">
+              <label class="cn-label" for="acEmail">E-Mail</label>
+              <input class="cn-input" id="acEmail" type="email" placeholder="name@firma.de" autocapitalize="none" autocorrect="off" spellcheck="false">
+            </div>
+          </div>
+          <div class="cn-form-group" style="margin-bottom:0;">
+            <label class="cn-label" for="acPhone">Telefon</label>
+            <input class="cn-input" id="acPhone" type="tel" placeholder="+49 &hellip;">
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="cn-footer">
+      <button class="admin-btn admin-btn-secondary" onclick="closeAddCustomerModal()" style="touch-action:manipulation;">Abbrechen</button>
+      <button class="nm-btn-save" onclick="saveNewCustomer()" style="touch-action:manipulation;">Anlegen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: ASSET HINZUFÜGEN ==================== -->
+<div id="addAssetModal" class="settings-sheet" style="z-index:9000;align-items:center;justify-content:center;padding:20px;">
+  <div class="cn-card" style="max-width:520px;animation:fadeUp .25s cubic-bezier(.4,0,.2,1);">
+    <div class="cn-header">
+      <div>
+        <div class="cn-header-title">Asset hinzuf&uuml;gen</div>
+        <div class="cn-header-sub" id="aaCustomerLabel">Ger&auml;t f&uuml;r Kunden erfassen</div>
+      </div>
+      <button class="nm-close" onclick="closeAddAssetModal()" aria-label="Schlie&szlig;en">&#10005;</button>
+    </div>
+    <div class="nm-body">
+      <div class="nm-section">
+        <form id="aaForm" onsubmit="return false;">
+          <div class="cn-form-row">
+            <div class="cn-form-group">
+              <label class="cn-label" for="aaName">Asset-Name *</label>
+              <input class="cn-input" id="aaName" type="text" placeholder="z.B. BlueBagger X200" autocorrect="off">
+              <div class="cn-error" id="aaNameErr">Bitte Name, Modell &amp; Seriennummer angeben</div>
+            </div>
+            <div class="cn-form-group">
+              <label class="cn-label" for="aaType">Asset-Typ</label>
+              <select class="cn-input" id="aaType">
+                <option value="bagger">Bagger</option>
+                <option value="traktor">Traktor</option>
+                <option value="kran">Kran</option>
+                <option value="stapler">Stapler / Hubwagen</option>
+                <option value="sonstige">Sonstige Maschine</option>
+              </select>
+            </div>
+          </div>
+          <div class="cn-form-row">
+            <div class="cn-form-group">
+              <label class="cn-label" for="aaModel">Modell *</label>
+              <input class="cn-input" id="aaModel" type="text" placeholder="z.B. CAT 320 GC" autocorrect="off">
+            </div>
+            <div class="cn-form-group">
+              <label class="cn-label" for="aaSerial">Seriennummer *</label>
+              <input class="cn-input" id="aaSerial" type="text" placeholder="SN-12345" autocapitalize="characters" autocorrect="off" spellcheck="false">
+            </div>
+          </div>
+          <div class="cn-form-row">
+            <div class="cn-form-group">
+              <label class="cn-label" for="aaLocation">Standort</label>
+              <input class="cn-input" id="aaLocation" type="text" placeholder="z.B. Halle 3" autocorrect="off">
+            </div>
+            <div class="cn-form-group">
+              <label class="cn-label" for="aaNextService">N&auml;chster Wartungstermin</label>
+              <input class="cn-input" id="aaNextService" type="date">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="cn-footer">
+      <button class="admin-btn admin-btn-secondary" onclick="closeAddAssetModal()" style="touch-action:manipulation;">Abbrechen</button>
+      <button class="nm-btn-save" onclick="saveNewAsset()" style="touch-action:manipulation;">Hinzuf&uuml;gen</button>
+    </div>
+  </div>
+</div>
 
 <!-- ==================== SHEET: BENACHRICHTIGUNGEN ==================== -->
 <div id="sheet-notifications" class="settings-sheet">
@@ -4080,6 +4375,330 @@ document.getElementById('nutzerModal').addEventListener('click', function(e) {
   if (e.target === this) closeNutzerModal();
 });
 
+// ===== KUNDEN & ASSET-VERWALTUNG =====
+var CUSTOMERS_DB = {
+  'mayer-bau': {
+    name: 'Mayer Bau GmbH', initials: 'MB',
+    grad: 'linear-gradient(135deg,#1565C0,#1976D2)',
+    contact: 'Thomas Mayer', email: 'tmayer@mayer-bau.de', phone: '+49 171 234 5678',
+    status: 'aktiv', since: 'März 2022', industry: 'Baugewerbe'
+  },
+  'schmidt-logistik': {
+    name: 'Schmidt Logistik AG', initials: 'SL',
+    grad: 'linear-gradient(135deg,#2E7D32,#388E3C)',
+    contact: 'Petra Schmidt', email: 'p.schmidt@schmidt-log.de', phone: '+49 172 345 6789',
+    status: 'aktiv', since: 'Juni 2021', industry: 'Logistik & Transport'
+  },
+  'bauer-soehne': {
+    name: 'Bauer & Söhne GmbH', initials: 'BS',
+    grad: 'linear-gradient(135deg,#7B1FA2,#9C27B0)',
+    contact: 'Klaus Bauer', email: 'k.bauer@bauer-soehne.de', phone: '+49 173 456 7890',
+    status: 'aktiv', since: 'Januar 2023', industry: 'Erdbau & Tiefbau'
+  },
+  'kfw-infrastruktur': {
+    name: 'KFW Infrastruktur GmbH', initials: 'KI',
+    grad: 'linear-gradient(135deg,#546E7A,#607D8B)',
+    contact: 'Sandra Kiefer', email: 's.kiefer@kfw-infra.de', phone: '+49 174 567 8901',
+    status: 'inaktiv', since: 'November 2020', industry: 'Infrastruktur & Tiefbau'
+  }
+};
+
+var CUSTOMER_ASSETS_DB = {
+  'mb-bagger-01': {
+    customerId: 'mayer-bau', name: 'BlueBagger X200', type: 'bagger',
+    model: 'CAT 320 GC', serial: 'CAT320-MB-001',
+    nextService: '2026-04-15', status: 'aktiv', location: 'Baustelle Nord'
+  },
+  'mb-kran-01': {
+    customerId: 'mayer-bau', name: 'TowerKran TK-500', type: 'kran',
+    model: 'Liebherr 81K.1', serial: 'LH81K-MB-002',
+    nextService: '2026-03-20', status: 'wartung', location: 'Halle 3'
+  },
+  'sl-traktor-01': {
+    customerId: 'schmidt-logistik', name: 'AgriPro T3000', type: 'traktor',
+    model: 'John Deere 6R 250', serial: 'JD6R-SL-001',
+    nextService: '2026-05-10', status: 'aktiv', location: 'Depot Süd'
+  },
+  'sl-stapler-01': {
+    customerId: 'schmidt-logistik', name: 'FleetLifter FL-2T', type: 'stapler',
+    model: 'Linde E20', serial: 'LE20-SL-002',
+    nextService: '2026-06-01', status: 'aktiv', location: 'Lager West'
+  },
+  'bs-bagger-01': {
+    customerId: 'bauer-soehne', name: 'MiniGrab MG-80', type: 'bagger',
+    model: 'Komatsu PC80MR', serial: 'KPC80-BS-001',
+    nextService: '2026-03-28', status: 'aktiv', location: 'Baustelle Süd'
+  }
+};
+
+var ASSET_TYPE_CFG = {
+  bagger:  { label: 'Bagger',         color: '#e65100', bg: 'rgba(230,81,0,.1)' },
+  traktor: { label: 'Traktor',         color: '#2e7d32', bg: 'rgba(46,125,50,.12)' },
+  kran:    { label: 'Kran',            color: '#1565c0', bg: 'rgba(21,101,192,.1)' },
+  stapler: { label: 'Stapler',         color: '#7B1FA2', bg: 'rgba(123,31,162,.1)' },
+  sonstige:{ label: 'Sonstige',        color: '#546e7a', bg: 'rgba(84,110,122,.1)' }
+};
+
+function getAssetIcon(type) {
+  var icons = {
+    bagger:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 17h20v3H2z"/><path d="M6 17l2-8h8l2 8"/><path d="M8 12l2-3h4l2 3"/><circle cx="6" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>',
+    traktor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="17" r="3.5"/><circle cx="17.5" cy="18" r="2.5"/><path d="M10.5 17V8l5.5 3.5V18"/><path d="M3.5 14h7"/><path d="M15 9h4l1.5 2.5"/></svg>',
+    kran:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="10" y1="3" x2="10" y2="21"/><line x1="10" y1="6" x2="20" y2="10"/><line x1="10" y1="10" x2="20" y2="10"/><line x1="20" y1="10" x2="20" y2="15"/><line x1="7" y1="21" x2="13" y2="21"/></svg>',
+    stapler: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="9" width="9" height="9" rx="1"/><path d="M11 13h7l2 5H11"/><line x1="5" y1="18" x2="5" y2="21"/><line x1="15.5" y1="18" x2="15.5" y2="21"/><path d="M2 9V4h4v5"/></svg>',
+    sonstige:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'
+  };
+  return icons[type] || icons.sonstige;
+}
+
+var _custSelected = null;
+var _custSearchVal = '';
+var _newAssetCustId = null;
+var TODAY_STR = '2026-03-07';
+var WARN_DATE  = '2026-03-28'; // within ~3 weeks
+
+function _fmtDate(s) {
+  if (!s) return '\u2014';
+  var p = s.split('-');
+  return p[2] + '.' + p[1] + '.' + p[0];
+}
+
+function initKundenPage() {
+  _custSelected = null;
+  _custSearchVal = '';
+  var inp = document.getElementById('custSearchInput');
+  if (inp) inp.value = '';
+  renderCustomerList();
+  renderAssetEmpty();
+  var layout = document.getElementById('custLayout');
+  if (layout) layout.classList.remove('show-assets');
+}
+
+function onCustSearch(val) {
+  _custSearchVal = val.toLowerCase();
+  renderCustomerList();
+}
+
+function renderCustomerList() {
+  var list = document.getElementById('custList');
+  if (!list) return;
+
+  var allIds = Object.keys(CUSTOMERS_DB);
+  var ids = allIds.filter(function(id) {
+    if (!_custSearchVal) return true;
+    var c = CUSTOMERS_DB[id];
+    return c.name.toLowerCase().includes(_custSearchVal) ||
+           c.contact.toLowerCase().includes(_custSearchVal) ||
+           c.industry.toLowerCase().includes(_custSearchVal);
+  });
+
+  // Update stats
+  var totalActive = allIds.filter(function(id) { return CUSTOMERS_DB[id].status === 'aktiv'; }).length;
+  var totalAssets = Object.keys(CUSTOMER_ASSETS_DB).length;
+  var el;
+  if ((el = document.getElementById('custStatTotal')))  el.textContent = allIds.length;
+  if ((el = document.getElementById('custStatActive'))) el.textContent = totalActive;
+  if ((el = document.getElementById('custStatAssets'))) el.textContent = totalAssets;
+
+  if (ids.length === 0) {
+    list.innerHTML = '<div style="padding:28px 14px;text-align:center;color:var(--text-muted);font-size:13px;">Keine Kunden gefunden</div>';
+    return;
+  }
+
+  list.innerHTML = ids.map(function(id) {
+    var c = CUSTOMERS_DB[id];
+    var ac = Object.values(CUSTOMER_ASSETS_DB).filter(function(a) { return a.customerId === id; }).length;
+    var sel = _custSelected === id;
+    return '<div class="cust-item' + (sel ? ' selected' : '') + '" onclick="selectCustomer(\'' + id + '\')" style="touch-action:manipulation;">' +
+      '<div class="cust-item-avatar" style="background:' + c.grad + ';">' + c.initials + '</div>' +
+      '<div class="cust-item-info">' +
+        '<div class="cust-item-name">' + c.name + '</div>' +
+        '<div class="cust-item-contact">' + c.contact + '</div>' +
+        '<div class="cust-item-meta">' + ac + (ac === 1 ? ' Asset' : ' Assets') + ' &middot; ' + c.industry + '</div>' +
+      '</div>' +
+      '<div class="cust-item-right">' +
+        '<span class="cust-status ' + (c.status === 'aktiv' ? 'ok' : 'off') + '">' + (c.status === 'aktiv' ? 'Aktiv' : 'Inaktiv') + '</span>' +
+        '<span class="cust-arr">&#8250;</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selectCustomer(id) {
+  _custSelected = id;
+  renderCustomerList();
+  renderAssetPanel(id);
+  // Mobile: switch to asset view
+  var layout = document.getElementById('custLayout');
+  if (layout && window.innerWidth < 768) layout.classList.add('show-assets');
+}
+
+function backToCustomers() {
+  var layout = document.getElementById('custLayout');
+  if (layout) layout.classList.remove('show-assets');
+}
+
+function renderAssetEmpty() {
+  var main = document.getElementById('custMain');
+  if (!main) return;
+  main.innerHTML =
+    '<div class="cust-empty">' +
+      '<div class="cust-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>' +
+      '<div class="cust-empty-title">Kunden ausw&auml;hlen</div>' +
+      '<div class="cust-empty-sub">Klicke links auf einen Kunden,<br>um dessen Assets zu sehen.</div>' +
+    '</div>';
+}
+
+function renderAssetPanel(customerId) {
+  var c = CUSTOMERS_DB[customerId];
+  var assets = Object.entries(CUSTOMER_ASSETS_DB).filter(function(e) { return e[1].customerId === customerId; });
+  var main = document.getElementById('custMain');
+  if (!main) return;
+
+  var html = '';
+
+  // Mobile back button
+  html += '<div class="cust-back-btn" onclick="backToCustomers()" style="touch-action:manipulation;">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>' +
+    'Alle Kunden' +
+  '</div>';
+
+  // Customer header
+  html += '<div class="cust-asset-header">' +
+    '<div class="cust-asset-avatar" style="background:' + c.grad + ';">' + c.initials + '</div>' +
+    '<div style="flex:1;min-width:0;">' +
+      '<div class="cust-asset-title">' + c.name + '</div>' +
+      '<div class="cust-asset-sub">' + c.contact + ' &middot; ' + c.email + ' &middot; Seit ' + c.since + '</div>' +
+    '</div>' +
+    '<button class="admin-btn admin-btn-primary" onclick="openAddAssetModal(\'' + customerId + '\')" style="touch-action:manipulation;flex-shrink:0;">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>' +
+      'Asset hinzuf&uuml;gen' +
+    '</button>' +
+  '</div>';
+
+  if (assets.length === 0) {
+    html += '<div class="cust-empty">' +
+      '<div class="cust-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="12" y1="11" x2="12" y2="11"/></svg></div>' +
+      '<div class="cust-empty-title">Keine Assets vorhanden</div>' +
+      '<div class="cust-empty-sub">F&uuml;ge das erste Ger&auml;t f&uuml;r<br><strong>' + c.name + '</strong> hinzu.</div>' +
+    '</div>';
+  } else {
+    html += '<div class="asset-list">';
+    assets.forEach(function(entry) {
+      var a = entry[1];
+      var tc = ASSET_TYPE_CFG[a.type] || ASSET_TYPE_CFG.sonstige;
+      var overdue  = a.nextService && a.nextService < TODAY_STR;
+      var dueSoon  = !overdue && a.nextService && a.nextService < WARN_DATE;
+      var svcCls   = overdue ? ' overdue' : (dueSoon ? ' due-soon' : '');
+      var svcLabel = overdue ? '&#9888; &Uuml;berf&auml;llig &mdash; ' + _fmtDate(a.nextService)
+                   : dueSoon ? '&#9650; Bald f&auml;llig &mdash; ' + _fmtDate(a.nextService)
+                   : _fmtDate(a.nextService);
+      var stCls = a.status === 'aktiv' ? 'ok' : a.status === 'wartung' ? 'warn' : 'err';
+      var stLabel = a.status === 'aktiv' ? 'Aktiv' : a.status === 'wartung' ? 'Wartung' : 'Defekt';
+
+      html += '<div class="asset-card">' +
+        '<div class="asset-type-icon" style="background:' + tc.bg + ';color:' + tc.color + ';">' + getAssetIcon(a.type) + '</div>' +
+        '<div class="asset-info">' +
+          '<div class="asset-name">' + a.name + '</div>' +
+          '<div class="asset-model">' + a.model + ' &middot; ' + a.location + '</div>' +
+          '<div class="asset-serial">' + a.serial + '</div>' +
+          '<div class="asset-type-tag" style="background:' + tc.bg + ';color:' + tc.color + ';">' + tc.label + '</div>' +
+        '</div>' +
+        '<div class="asset-right">' +
+          '<span class="asset-status-badge ' + stCls + '">' + stLabel + '</span>' +
+          '<div class="asset-service' + svcCls + '">' +
+            '<div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:inherit;opacity:.7;margin-bottom:1px;">Service</div>' +
+            svcLabel +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  main.innerHTML = html;
+}
+
+// --- Kunden Modal ---
+function openAddCustomerModal() {
+  document.getElementById('addCustomerModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeAddCustomerModal() {
+  document.getElementById('addCustomerModal').classList.remove('active');
+  document.body.style.overflow = '';
+  document.getElementById('acForm').reset();
+  document.getElementById('acNameErr').classList.remove('show');
+}
+function saveNewCustomer() {
+  var name    = document.getElementById('acName').value.trim();
+  var contact = document.getElementById('acContact').value.trim();
+  var email   = document.getElementById('acEmail').value.trim();
+  var phone   = document.getElementById('acPhone').value.trim();
+  var industry= document.getElementById('acIndustry').value;
+  if (!name || !contact) {
+    document.getElementById('acNameErr').classList.add('show');
+    return;
+  }
+  document.getElementById('acNameErr').classList.remove('show');
+  var id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString().slice(-4);
+  var initials = name.replace(/[^a-zA-ZÄÖÜäöü\s]/g,'').split(/\s+/).filter(Boolean).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');
+  var grads = [
+    'linear-gradient(135deg,#1565C0,#1976D2)','linear-gradient(135deg,#2E7D32,#388E3C)',
+    'linear-gradient(135deg,#7B1FA2,#9C27B0)','linear-gradient(135deg,#C62828,#D32F2F)',
+    'linear-gradient(135deg,#E65100,#F57C00)','linear-gradient(135deg,#00695C,#00796B)'
+  ];
+  CUSTOMERS_DB[id] = {
+    name: name, initials: initials || name.slice(0,2).toUpperCase(),
+    grad: grads[Object.keys(CUSTOMERS_DB).length % grads.length],
+    contact: contact, email: email, phone: phone,
+    status: 'aktiv', since: 'M\u00e4rz 2026', industry: industry
+  };
+  closeAddCustomerModal();
+  renderCustomerList();
+  selectCustomer(id);
+  showScanLogToast('Kunde \u201e' + name + '\u201c angelegt \u2713');
+}
+document.getElementById('addCustomerModal').addEventListener('click', function(e){ if(e.target===this) closeAddCustomerModal(); });
+
+// --- Asset Modal ---
+function openAddAssetModal(custId) {
+  _newAssetCustId = custId;
+  var c = CUSTOMERS_DB[custId];
+  document.getElementById('aaCustomerLabel').textContent = c ? c.name : '';
+  document.getElementById('addAssetModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeAddAssetModal() {
+  document.getElementById('addAssetModal').classList.remove('active');
+  document.body.style.overflow = '';
+  document.getElementById('aaForm').reset();
+  document.getElementById('aaNameErr').classList.remove('show');
+}
+function saveNewAsset() {
+  var name    = document.getElementById('aaName').value.trim();
+  var type    = document.getElementById('aaType').value;
+  var model   = document.getElementById('aaModel').value.trim();
+  var serial  = document.getElementById('aaSerial').value.trim();
+  var loc     = document.getElementById('aaLocation').value.trim();
+  var svc     = document.getElementById('aaNextService').value;
+  if (!name || !model || !serial) {
+    document.getElementById('aaNameErr').classList.add('show');
+    return;
+  }
+  document.getElementById('aaNameErr').classList.remove('show');
+  var id = _newAssetCustId + '-' + type + '-' + Date.now().toString().slice(-6);
+  CUSTOMER_ASSETS_DB[id] = {
+    customerId: _newAssetCustId, name: name, type: type,
+    model: model, serial: serial, location: loc || '\u2014',
+    nextService: svc, status: 'aktiv'
+  };
+  closeAddAssetModal();
+  renderAssetPanel(_newAssetCustId);
+  renderCustomerList();
+  showScanLogToast('Asset \u201e' + name + '\u201c hinzugef\u00fcgt \u2713');
+}
+document.getElementById('addAssetModal').addEventListener('click', function(e){ if(e.target===this) closeAddAssetModal(); });
+
 // ===== SYSTEMEINSTELLUNGEN =====
 function saveSysSettings() {
   showScanLogToast('Systemeinstellungen gespeichert \u2713');
@@ -4809,6 +5428,7 @@ function setDNav(el, page) {
   else if (page === 'scanlogs') showPage('scanlogs');
   else if (page === 'nutzer') { showPage('nutzer'); renderNutzerList(); }
   else if (page === 'erp') showPage('erp');
+  else if (page === 'kunden') { showPage('kunden'); initKundenPage(); }
   else if (page === 'systemeinstellungen') showPage('systemeinstellungen');
 }
 
