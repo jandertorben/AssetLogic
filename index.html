@@ -1623,6 +1623,124 @@ nav.bottom-nav{
   display:flex;justify-content:flex-end;gap:8px;background:var(--bg);flex-shrink:0;
 }
 
+/* ===== SETTINGS BOTTOM SHEETS ===== */
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.settings-sheet{
+  display:none;position:fixed;inset:0;
+  z-index:8500;background:rgba(0,29,58,.5);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:flex-end;
+}
+.settings-sheet.active{display:flex;}
+@media(min-width:600px){.settings-sheet{align-items:center;justify-content:center;padding:20px;}}
+.sheet-card{
+  background:#fff;border-radius:18px 18px 0 0;
+  width:100%;max-height:88vh;overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 -8px 40px rgba(0,0,0,.18);
+  animation:slideUp .28s cubic-bezier(.4,0,.2,1);
+}
+@media(min-width:600px){.sheet-card{border-radius:16px;max-width:520px;max-height:85vh;animation:fadeUp .25s cubic-bezier(.4,0,.2,1);}}
+.sheet-handle{width:38px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 0;}
+.sheet-header{
+  padding:14px 20px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.sheet-header-icon{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:var(--accent-lt);display:flex;align-items:center;justify-content:center;
+}
+.sheet-header-icon svg{width:18px;height:18px;color:var(--accent);}
+.sheet-title{font-size:16px;font-weight:800;color:var(--text);flex:1;}
+.sheet-close{
+  width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--bg3);color:var(--text-muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;touch-action:manipulation;
+}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:4px 0 20px;}
+.sheet-section{padding:16px 20px 0;}
+.sheet-section-label{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:10px;
+}
+/* Toggle row */
+.toggle-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 20px;border-bottom:1px solid var(--border);
+}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;min-width:0;}
+.toggle-title{font-size:14px;font-weight:600;color:var(--text);}
+.toggle-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.toggle-switch{position:relative;width:44px;height:26px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-slider{
+  position:absolute;cursor:pointer;inset:0;
+  background:#d1d5db;border-radius:26px;transition:.25s;
+}
+.toggle-slider::before{
+  position:absolute;content:'';
+  height:20px;width:20px;left:3px;bottom:3px;
+  background:#fff;border-radius:50%;transition:.25s;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.toggle-switch input:checked + .toggle-slider{background:var(--primary);}
+.toggle-switch input:checked + .toggle-slider::before{transform:translateX(18px);}
+/* Info row (static) */
+.sheet-info-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 20px;border-bottom:1px solid var(--border);
+}
+.sheet-info-row:last-child{border-bottom:none;}
+.sheet-info-key{font-size:13px;font-weight:600;color:var(--text);}
+.sheet-info-val{font-size:13px;color:var(--text-muted);font-family:'Courier New',monospace;}
+/* Action row (clickable) */
+.sheet-action-row{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .15s;touch-action:manipulation;
+}
+.sheet-action-row:last-child{border-bottom:none;}
+.sheet-action-row:active{background:var(--bg);}
+.sheet-action-icon{width:36px;height:36px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.sheet-action-icon svg{width:17px;height:17px;}
+.sheet-action-body{flex:1;min-width:0;}
+.sheet-action-title{font-size:14px;font-weight:600;color:var(--text);}
+.sheet-action-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.sheet-action-arr{font-size:18px;color:var(--border);}
+/* Über card */
+.about-logo{
+  display:flex;flex-direction:column;align-items:center;
+  padding:28px 20px 20px;border-bottom:1px solid var(--border);
+}
+.about-icon{
+  width:72px;height:72px;border-radius:18px;
+  background:linear-gradient(135deg,var(--primary-dk),var(--primary));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(0,45,90,.3);margin-bottom:12px;
+}
+.about-icon svg{width:36px;height:36px;color:#fff;}
+.about-app-name{font-size:22px;font-weight:900;color:var(--text);}
+.about-version{font-size:13px;color:var(--text-muted);margin-top:4px;}
+/* PIN dots */
+.pin-display{display:flex;gap:12px;justify-content:center;padding:20px 0 8px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all .15s;}
+.pin-dot.filled{background:var(--primary);border-color:var(--primary);}
+.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 32px;}
+.pin-key{
+  aspect-ratio:1;border-radius:50%;border:none;background:var(--bg3);
+  font-size:20px;font-weight:700;color:var(--text);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;touch-action:manipulation;
+}
+.pin-key:active{background:var(--accent-lt);color:var(--primary);}
+.pin-key.del{background:none;font-size:15px;color:var(--text-muted);}
+.pin-key.del:active{color:var(--red);}
+.pin-status{text-align:center;font-size:13px;color:var(--text-muted);margin:8px 0 16px;}
+.pin-status.err{color:var(--red);}
+.pin-status.ok{color:var(--green);}
+
 /* ===== ERP CONFIG MODAL ===== */
 #erpConfigModal{
   display:none;position:fixed;
@@ -2634,6 +2752,276 @@ nav.bottom-nav{
       </div>
     </div><!-- end page-erp -->
 
+<!-- ==================== SHEET: BENACHRICHTIGUNGEN ==================== -->
+<div id="sheet-notifications" class="settings-sheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <span class="sheet-title">Benachrichtigungen</span>
+      <button class="sheet-close" onclick="closeSheet('notifications')">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="sheet-section">
+        <div class="sheet-section-label">Allgemein</div>
+      </div>
+      <label class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Push-Benachrichtigungen</div>
+          <div class="toggle-sub">Alle App-Benachrichtigungen aktivieren</div>
+        </div>
+        <div class="toggle-switch"><input type="checkbox" checked onchange="onMasterNotifChange(this)"><span class="toggle-slider"></span></div>
+      </label>
+      <div id="notifSubToggles">
+        <div class="sheet-section" style="padding-top:14px;"><div class="sheet-section-label">Kategorien</div></div>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Aufgaben &amp; Erinnerungen</div>
+            <div class="toggle-sub">F&auml;lligkeiten, neue Aufgaben</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+        </label>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Wartungshinweise</div>
+            <div class="toggle-sub">Geplante &amp; &uuml;berf&auml;llige Wartungen</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+        </label>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">ERP-Meldungen</div>
+            <div class="toggle-sub">Sync-Fehler, Lagerabweichungen</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+        </label>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Wöchentliche Berichte</div>
+            <div class="toggle-sub">Zusammenfassung jeden Montag</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></div>
+        </label>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Systemupdates</div>
+            <div class="toggle-sub">Neue App-Versionen &amp; Changelog</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHEET: ERP-SYNCHRONISATION ==================== -->
+<div id="sheet-erpsync" class="settings-sheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <span class="sheet-title">ERP-Synchronisation</span>
+      <button class="sheet-close" onclick="closeSheet('erpsync')">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="sheet-section"><div class="sheet-section-label">Status</div></div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Verbindung</span>
+        <span style="font-size:13px;color:var(--green);font-weight:700;">&#9679; Verbunden</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">System</span>
+        <span class="sheet-info-val">SAP S/4HANA</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Letzter Sync</span>
+        <span class="sheet-info-val">07.03.2026, 06:31</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Synchronisierte Artikel</span>
+        <span class="sheet-info-val">847</span>
+      </div>
+      <div class="sheet-section" style="padding-top:14px;"><div class="sheet-section-label">Einstellungen</div></div>
+      <label class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Automatische Synchronisation</div>
+          <div class="toggle-sub">T&auml;glich um 06:30 Uhr</div>
+        </div>
+        <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+      </label>
+      <label class="toggle-row">
+        <div class="toggle-info">
+          <div class="toggle-title">Synchronisation &uuml;ber WLAN</div>
+          <div class="toggle-sub">Kein Mobilfunk f&uuml;r gro&szlig;e Sync-Vorg&auml;nge</div>
+        </div>
+        <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+      </label>
+      <div class="sheet-section" style="padding-top:14px;"></div>
+      <div style="padding:0 20px 8px;">
+        <button class="admin-btn admin-btn-primary" style="width:100%;justify-content:center;touch-action:manipulation;" onclick="closeSheet('erpsync');triggerSync();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/><polyline points="21 3 21 10 14 10"/><polyline points="3 21 3 14 10 14"/></svg>
+          Jetzt synchronisieren
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHEET: SICHERHEIT & PIN ==================== -->
+<div id="sheet-security" class="settings-sheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <span class="sheet-title">Sicherheit &amp; PIN</span>
+      <button class="sheet-close" onclick="closeSheet('security')">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <!-- PIN ändern -->
+      <div id="pinChangeView" style="display:none;">
+        <div class="sheet-section"><div class="sheet-section-label" id="pinStepLabel">Aktuellen PIN eingeben</div></div>
+        <div class="pin-display" id="pinDisplay">
+          <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-status" id="pinStatus"></div>
+        <div class="pin-keypad">
+          <button class="pin-key" onclick="pinKey('1')">1</button>
+          <button class="pin-key" onclick="pinKey('2')">2</button>
+          <button class="pin-key" onclick="pinKey('3')">3</button>
+          <button class="pin-key" onclick="pinKey('4')">4</button>
+          <button class="pin-key" onclick="pinKey('5')">5</button>
+          <button class="pin-key" onclick="pinKey('6')">6</button>
+          <button class="pin-key" onclick="pinKey('7')">7</button>
+          <button class="pin-key" onclick="pinKey('8')">8</button>
+          <button class="pin-key" onclick="pinKey('9')">9</button>
+          <button class="pin-key" onclick="pinKey('')"></button>
+          <button class="pin-key" onclick="pinKey('0')">0</button>
+          <button class="pin-key del" onclick="pinDel()">&#9003;</button>
+        </div>
+        <div style="padding:16px 20px 0;"><button class="admin-btn admin-btn-secondary" style="width:100%;justify-content:center;" onclick="showSecurityMain()">Abbrechen</button></div>
+      </div>
+      <!-- Hauptansicht -->
+      <div id="securityMain">
+        <div class="sheet-section"><div class="sheet-section-label">Anmeldung</div></div>
+        <div class="sheet-action-row" onclick="startPinChange()">
+          <div class="sheet-action-icon" style="background:var(--accent-lt);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="sheet-action-body">
+            <div class="sheet-action-title">PIN &auml;ndern</div>
+            <div class="sheet-action-sub">4-stelliger Sicherheitscode</div>
+          </div>
+          <span class="sheet-action-arr">&#8250;</span>
+        </div>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Biometrische Anmeldung</div>
+            <div class="toggle-sub">Face ID / Touch ID verwenden</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+        </label>
+        <div class="sheet-section" style="padding-top:14px;"><div class="sheet-section-label">Sitzung</div></div>
+        <label class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Automatische Abmeldung</div>
+            <div class="toggle-sub">Nach 30 Minuten Inaktivit&auml;t</div>
+          </div>
+          <div class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></div>
+        </label>
+        <div class="sheet-info-row">
+          <span class="sheet-info-key">Aktive Sitzung seit</span>
+          <span class="sheet-info-val">07.03.2026, 07:14</span>
+        </div>
+        <div class="sheet-info-row">
+          <span class="sheet-info-key">Ger&auml;t</span>
+          <span class="sheet-info-val">iPhone 15 Pro</span>
+        </div>
+        <div class="sheet-section" style="padding-top:14px;"></div>
+        <div style="padding:0 20px 8px;">
+          <button class="admin-btn" style="width:100%;justify-content:center;background:var(--red-bg);color:var(--red);border:1.5px solid rgba(198,40,40,.25);touch-action:manipulation;" onclick="closeSheet('security');doLogout();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Jetzt abmelden
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHEET: ÜBER ASSETLOGIC ==================== -->
+<div id="sheet-about" class="settings-sheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <span class="sheet-title">&Uuml;ber AssetLogic</span>
+      <button class="sheet-close" onclick="closeSheet('about')">&#10005;</button>
+    </div>
+    <div class="sheet-body">
+      <div class="about-logo">
+        <div class="about-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 7h2v4H7zM11 7h6M11 11h4"/></svg>
+        </div>
+        <div class="about-app-name">AssetLogic</div>
+        <div class="about-version">Version 1.0 &middot; Field Service Edition</div>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Build</span>
+        <span class="sheet-info-val">2026.03.07-stable</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Plattform</span>
+        <span class="sheet-info-val">Web / PWA</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">ERP-Modul</span>
+        <span class="sheet-info-val">SAP S/4HANA Connector v2</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Entwickler</span>
+        <span class="sheet-info-val">Torben Jander</span>
+      </div>
+      <div class="sheet-info-row">
+        <span class="sheet-info-key">Lizenz</span>
+        <span class="sheet-info-val">Propriet&auml;r &middot; Alle Rechte vorbehalten</span>
+      </div>
+      <div class="sheet-section" style="padding-top:14px;"><div class="sheet-section-label">Support</div></div>
+      <div class="sheet-action-row" onclick="showScanLogToast('support@assetlogic.de')">
+        <div class="sheet-action-icon" style="background:var(--accent-lt);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="sheet-action-body">
+          <div class="sheet-action-title">Support kontaktieren</div>
+          <div class="sheet-action-sub">support@assetlogic.de</div>
+        </div>
+        <span class="sheet-action-arr">&#8250;</span>
+      </div>
+      <div class="sheet-action-row" onclick="showScanLogToast('Changelog wird geladen…')">
+        <div class="sheet-action-icon" style="background:var(--bg3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="sheet-action-body">
+          <div class="sheet-action-title">Changelog</div>
+          <div class="sheet-action-sub">Neue Funktionen &amp; Korrekturen</div>
+        </div>
+        <span class="sheet-action-arr">&#8250;</span>
+      </div>
+      <div style="text-align:center;padding:20px 20px 4px;font-size:12px;color:var(--text-muted);">
+        &copy; 2026 AssetLogic &middot; Torben Jander<br>Alle Rechte vorbehalten.
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== ERP CONFIG MODAL ==================== -->
 <div id="erpConfigModal">
   <div class="erp-modal-card">
@@ -2808,19 +3196,19 @@ nav.bottom-nav{
         </div>
         <div class="sec-label">Einstellungen</div>
         <div class="settings-list">
-          <div class="set-item">
+          <div class="set-item" onclick="openSheet('notifications')" style="touch-action:manipulation;">
             <div class="set-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <span class="set-label">Benachrichtigungen</span><span class="set-arr">&#8250;</span>
           </div>
-          <div class="set-item">
+          <div class="set-item" onclick="openSheet('erpsync')" style="touch-action:manipulation;">
             <div class="set-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
             <span class="set-label">ERP-Synchronisation</span><span class="set-arr">&#8250;</span>
           </div>
-          <div class="set-item">
+          <div class="set-item" onclick="openSheet('security')" style="touch-action:manipulation;">
             <div class="set-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
             <span class="set-label">Sicherheit &amp; PIN</span><span class="set-arr">&#8250;</span>
           </div>
-          <div class="set-item">
+          <div class="set-item" onclick="openSheet('about')" style="touch-action:manipulation;">
             <div class="set-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
             <span class="set-label">&Uuml;ber AssetLogic</span><span class="set-arr">&#8250;</span>
           </div>
@@ -3185,6 +3573,109 @@ function closeNutzerModal() {
 document.getElementById('nutzerModal').addEventListener('click', function(e) {
   if (e.target === this) closeNutzerModal();
 });
+
+// ===== SETTINGS SHEETS =====
+function openSheet(id) {
+  document.getElementById('sheet-' + id).classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(id) {
+  document.getElementById('sheet-' + id).classList.remove('active');
+  document.body.style.overflow = '';
+}
+// Close on backdrop click for all sheets
+['notifications','erpsync','security','about'].forEach(function(id) {
+  var el = document.getElementById('sheet-' + id);
+  if (el) el.addEventListener('click', function(e) { if (e.target === this) closeSheet(id); });
+});
+
+// Benachrichtigungen: master toggle disables sub-toggles
+function onMasterNotifChange(cb) {
+  var sub = document.getElementById('notifSubToggles');
+  sub.style.opacity = cb.checked ? '' : '.4';
+  sub.style.pointerEvents = cb.checked ? '' : 'none';
+}
+
+// Security: PIN flow
+var _pinStep = 'current'; // 'current' | 'new' | 'confirm'
+var _pinCurrent = '1234'; // simulated current PIN
+var _pinNew = '';
+var _pinBuffer = '';
+
+function startPinChange() {
+  _pinStep = 'current';
+  _pinBuffer = '';
+  _pinNew = '';
+  document.getElementById('pinStepLabel').textContent = 'Aktuellen PIN eingeben';
+  document.getElementById('pinStatus').textContent = '';
+  document.getElementById('pinStatus').className = 'pin-status';
+  updatePinDisplay();
+  document.getElementById('securityMain').style.display = 'none';
+  document.getElementById('pinChangeView').style.display = '';
+}
+
+function showSecurityMain() {
+  document.getElementById('pinChangeView').style.display = 'none';
+  document.getElementById('securityMain').style.display = '';
+}
+
+function pinKey(k) {
+  if (!k || _pinBuffer.length >= 4) return;
+  _pinBuffer += k;
+  updatePinDisplay();
+  if (_pinBuffer.length === 4) setTimeout(processPinInput, 200);
+}
+
+function pinDel() {
+  _pinBuffer = _pinBuffer.slice(0, -1);
+  updatePinDisplay();
+}
+
+function updatePinDisplay() {
+  for (var i = 0; i < 4; i++) {
+    document.getElementById('pd' + i).classList.toggle('filled', i < _pinBuffer.length);
+  }
+}
+
+function processPinInput() {
+  var statusEl = document.getElementById('pinStatus');
+  if (_pinStep === 'current') {
+    if (_pinBuffer === _pinCurrent) {
+      _pinStep = 'new';
+      _pinBuffer = '';
+      updatePinDisplay();
+      document.getElementById('pinStepLabel').textContent = 'Neuen PIN eingeben';
+      statusEl.textContent = '';
+    } else {
+      statusEl.textContent = 'Falscher PIN. Erneut versuchen.';
+      statusEl.className = 'pin-status err';
+      _pinBuffer = '';
+      updatePinDisplay();
+    }
+  } else if (_pinStep === 'new') {
+    _pinNew = _pinBuffer;
+    _pinStep = 'confirm';
+    _pinBuffer = '';
+    updatePinDisplay();
+    document.getElementById('pinStepLabel').textContent = 'Neuen PIN best\u00e4tigen';
+    statusEl.textContent = '';
+  } else if (_pinStep === 'confirm') {
+    if (_pinBuffer === _pinNew) {
+      _pinCurrent = _pinNew;
+      statusEl.textContent = 'PIN erfolgreich ge\u00e4ndert \u2713';
+      statusEl.className = 'pin-status ok';
+      setTimeout(showSecurityMain, 1200);
+    } else {
+      statusEl.textContent = 'PINs stimmen nicht \u00fcberein. Erneut versuchen.';
+      statusEl.className = 'pin-status err';
+      _pinStep = 'new';
+      _pinNew = '';
+      _pinBuffer = '';
+      updatePinDisplay();
+      document.getElementById('pinStepLabel').textContent = 'Neuen PIN eingeben';
+    }
+  }
+}
 
 // ===== ERP CONFIG MODAL =====
 var ERP_CONFIG = {
