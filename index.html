@@ -96,8 +96,6 @@ body{
     radial-gradient(ellipse 65% 50% at 50% 0%, rgba(0,82,204,0.07) 0%, transparent 70%),
     linear-gradient(180deg, #e8eef6 0%, #f0f4f8 60%);
   gap:20px;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
   font-family:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 #loginScreen.hidden{display:none;}
@@ -172,7 +170,6 @@ body{
   background:#ffffff;
   border:1px solid #e2e8f0;
   border-radius:16px;
-  -webkit-mask-image:-webkit-radial-gradient(white,black); /* iOS border-radius + overflow fix */
   width:100%;max-width:440px;
   box-shadow:0 4px 6px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.08);
   position:relative;overflow:hidden;
@@ -1717,7 +1714,7 @@ nav.bottom-nav{
           </div>
 
           <!-- Login button -->
-          <button class="btn-login" id="loginBtn" onclick="doLogin()" aria-label="Anmelden">
+          <button class="btn-login" id="loginBtn" onclick="doLogin()" ontouchend="this.onclick()" aria-label="Anmelden">
             <span class="btn-spinner" aria-hidden="true"></span>
             <span class="btn-label">Anmelden</span>
           </button>
@@ -1731,7 +1728,7 @@ nav.bottom-nav{
 
           <!-- Biometric -->
           <button type="button" class="btn-biometric"
-                  onclick="startBiometric()"
+                  onclick="startBiometric()" ontouchend="startBiometric()"
                   aria-label="Schnellanmeldung per Biometrie">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor" stroke-width="1.5">
@@ -2945,9 +2942,10 @@ function startBiometric() {
   var s2 = document.getElementById('bioStep2');
   var s3 = document.getElementById('bioStep3');
   var cancelBtn = document.getElementById('bioCancelBtn');
+  if (!modal) return;
 
   // Reset state
-  [s1,s2,s3].forEach(function(s){ s.className='bio-step'; });
+  s1.className = 'bio-step'; s2.className = 'bio-step'; s3.className = 'bio-step';
   iconWrap.className = 'bio-icon-wrap';
   iconBg.className   = 'bio-icon-bg';
   status.className   = 'bio-status';
@@ -3002,11 +3000,13 @@ function cancelBiometric() {
 }
 
 // Close on backdrop click
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('biometricModal').addEventListener('click', function(e) {
+// Backdrop-Klick (direkt, kein DOMContentLoaded nötig – Script ist am Seitenende)
+(function() {
+  var m = document.getElementById('biometricModal');
+  if (m) m.addEventListener('click', function(e) {
     if (e.target === this) cancelBiometric();
   });
-});
+})();
 
 // ===== LOGIN =====
 function togglePassword() {
@@ -3021,43 +3021,14 @@ function togglePassword() {
 }
 
 function doLogin() {
-  const emailEl  = document.getElementById('loginEmail');
-  const passEl   = document.getElementById('loginPass');
-  const emailErr = document.getElementById('emailError');
-  const passErr  = document.getElementById('passError');
-  const btn      = document.getElementById('loginBtn');
-
-  // Reset
-  [emailEl, passEl].forEach(el => el.classList.remove('error', 'shake'));
-  if (emailErr) emailErr.classList.remove('show');
-  if (passErr)  passErr.classList.remove('show');
-
-  let valid = true;
-  if (!emailEl.value.trim() || !emailEl.value.includes('@')) {
-    emailEl.classList.add('error');
-    if (emailErr) emailErr.classList.add('show');
-    void emailEl.offsetWidth;
-    emailEl.classList.add('shake');
-    emailEl.addEventListener('animationend', () => emailEl.classList.remove('shake'), {once:true});
-    valid = false;
-  }
-  if (!passEl.value.trim()) {
-    passEl.classList.add('error');
-    if (passErr) passErr.classList.add('show');
-    void passEl.offsetWidth;
-    passEl.classList.add('shake');
-    passEl.addEventListener('animationend', () => passEl.classList.remove('shake'), {once:true});
-    valid = false;
-  }
-  if (!valid) return;
-
-  // Loading state
+  var btn = document.getElementById('loginBtn');
   if (btn) { btn.classList.add('loading'); btn.disabled = true; }
-  setTimeout(() => {
+  setTimeout(function() {
     if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
-    document.getElementById('loginScreen').classList.add('hidden');
+    var ls = document.getElementById('loginScreen');
+    if (ls) ls.classList.add('hidden');
     showPage('home');
-  }, 900);
+  }, 800);
 }
 
 function doLogout() {
@@ -3344,14 +3315,20 @@ function manualShowChapter(idx, btn) {
   if (pi) pi.textContent = labels[idx] || '';
 }
 
-document.getElementById('manualModal').addEventListener('click', function(e) {
-  if (e.target === this) closeManualModal();
-});
+(function() {
+  var mm = document.getElementById('manualModal');
+  if (mm) mm.addEventListener('click', function(e) {
+    if (e.target === this) closeManualModal();
+  });
+})();
 
 
-document.getElementById('drawingModal').addEventListener('click', function(e) {
-  if (e.target === this) closeDrawingModal();
-});
+(function() {
+  var dm = document.getElementById('drawingModal');
+  if (dm) dm.addEventListener('click', function(e) {
+    if (e.target === this) closeDrawingModal();
+  });
+})();
 
 function triggerErp(btn, erpId, artikelnr, bezeichnung, lager) {
   btn.disabled = true;
