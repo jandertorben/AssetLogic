@@ -1250,6 +1250,172 @@ nav.bottom-nav{
   .machine-card:hover{transform:translateY(-2px);}
 }
 
+/* ===== ADMIN PAGES (Scan-Logs / Nutzer / ERP) ===== */
+.admin-section{padding:20px 24px 0;}
+.admin-topbar-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;flex-wrap:wrap;gap:12px;
+}
+.admin-page-title{font-size:20px;font-weight:800;color:var(--text);}
+.admin-page-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.admin-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:8px;border:none;cursor:pointer;
+  font-size:13px;font-weight:700;transition:all .2s;
+  touch-action:manipulation;white-space:nowrap;
+}
+.admin-btn-primary{background:var(--primary);color:#fff;}
+.admin-btn-primary:hover{background:var(--primary-lt);}
+.admin-btn-secondary{background:var(--bg);color:var(--text-muted);border:1.5px solid var(--border);}
+.admin-btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.admin-btn svg{width:15px;height:15px;flex-shrink:0;}
+
+/* Admin stats row */
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.admin-stat-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.admin-stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;}
+.admin-stat-card.blue::before{background:var(--accent);}
+.admin-stat-card.green::before{background:var(--green);}
+.admin-stat-card.orange::before{background:var(--warning);}
+.admin-stat-card.red::before{background:var(--red);}
+.admin-stat-val{font-size:28px;font-weight:900;line-height:1;color:var(--text);margin-bottom:4px;}
+.admin-stat-lbl{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+
+/* Scan-Logs table */
+.scan-table-wrap{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;
+}
+.scan-filter-bar{
+  display:flex;gap:10px;align-items:center;padding:14px 18px;
+  border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;
+}
+.scan-filter-select{
+  background:#fff;border:1.5px solid var(--border);color:var(--text);
+  padding:7px 12px;border-radius:7px;font-size:12px;font-weight:600;
+  cursor:pointer;outline:none;transition:border-color .2s;
+}
+.scan-filter-select:focus{border-color:var(--accent);}
+.scan-filter-label{font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:.3px;}
+.scan-table{width:100%;border-collapse:collapse;}
+.scan-table th{
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-muted);font-weight:700;padding:11px 16px;
+  text-align:left;border-bottom:1px solid var(--border);background:var(--bg);
+}
+.scan-table td{
+  padding:12px 16px;font-size:13px;color:var(--text);
+  border-bottom:1px solid var(--border);vertical-align:middle;
+}
+.scan-table tr:last-child td{border-bottom:none;}
+.scan-table tr:hover td{background:#fafbfc;}
+.scan-table .mono{font-family:'Courier New',monospace;font-size:12px;color:var(--accent);font-weight:700;}
+.scan-table .time{font-size:11px;color:var(--text-muted);white-space:nowrap;}
+.scan-action-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;
+  white-space:nowrap;
+}
+.sa-diag{background:var(--red-bg);color:var(--red);border:1px solid rgba(198,40,40,.2);}
+.sa-cfg{background:var(--accent-lt);color:var(--accent);border:1px solid rgba(21,101,192,.2);}
+.sa-erp{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,50,.2);}
+.sa-scan{background:var(--warn-bg);color:var(--warning);border:1px solid rgba(230,81,0,.2);}
+.scan-pagination{
+  padding:11px 18px;background:var(--bg);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--text-muted);font-weight:600;
+}
+.scan-pagination-btns{display:flex;gap:6px;}
+.scan-pg-btn{
+  padding:5px 12px;border-radius:6px;border:1.5px solid var(--border);
+  background:#fff;font-size:12px;font-weight:700;cursor:pointer;
+  color:var(--text-muted);transition:all .2s;touch-action:manipulation;
+}
+.scan-pg-btn:hover{border-color:var(--accent);color:var(--accent);}
+.scan-pg-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+/* Nutzer cards */
+.nutzer-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.nutzer-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:16px;
+  transition:box-shadow .2s;
+}
+.nutzer-card:hover{box-shadow:var(--shadow-md);}
+.nutzer-avatar{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+}
+.nutzer-info{flex:1;min-width:0;}
+.nutzer-name{font-size:14px;font-weight:800;color:var(--text);}
+.nutzer-role{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.nutzer-id{font-size:11px;color:var(--accent);font-family:'Courier New',monospace;margin-top:3px;}
+.nutzer-meta{text-align:right;flex-shrink:0;}
+.nutzer-status{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;
+  margin-bottom:5px;
+}
+.ns-aktiv{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,50,.2);}
+.ns-inaktiv{background:var(--bg3);color:var(--text-muted);border:1px solid var(--border);}
+.nutzer-last{font-size:11px;color:var(--text-muted);}
+.nutzer-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+/* ERP status */
+.erp-status-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px;
+}
+.erp-status-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.erp-status-icon{
+  width:48px;height:48px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+}
+.erp-status-icon svg{width:24px;height:24px;color:#fff;}
+.erp-status-name{font-size:16px;font-weight:800;color:var(--text);}
+.erp-status-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.erp-conn-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--green-bg);color:var(--green);
+  border:1px solid rgba(46,125,50,.22);border-radius:20px;
+  padding:6px 14px;font-size:12px;font-weight:700;
+}
+.erp-conn-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;}
+.erp-config-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  border:1px solid var(--border);border-radius:8px;overflow:hidden;
+}
+.erp-config-row{
+  padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px;
+}
+.erp-config-row:last-child{border-bottom:none;}
+.erp-config-row.full{grid-column:1/-1;}
+.erp-config-key{font-size:12px;color:var(--text-muted);font-weight:600;}
+.erp-config-val{font-size:12px;font-weight:700;color:var(--text);font-family:'Courier New',monospace;}
+.erp-sync-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.erp-sync-item{
+  background:#fff;border:1px solid var(--border);border-radius:9px;
+  padding:13px 16px;box-shadow:var(--shadow);
+  display:flex;align-items:center;gap:12px;
+}
+.erp-sync-icon{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.erp-sync-icon.ok{background:var(--green-bg);}
+.erp-sync-icon.ok svg{color:var(--green);}
+.erp-sync-icon.info{background:var(--accent-lt);}
+.erp-sync-icon.info svg{color:var(--accent);}
+.erp-sync-icon svg{width:16px;height:16px;}
+.erp-sync-body{flex:1;min-width:0;}
+.erp-sync-title{font-size:13px;font-weight:700;color:var(--text);}
+.erp-sync-detail{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.erp-sync-time{font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0;}
+
 /* ===================================================================
    DESKTOP (>= 1024px)
    =================================================================== */
@@ -1865,6 +2031,403 @@ nav.bottom-nav{
         <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
       </div>
     </div><!-- end page-machine -->
+
+    <!-- ==================== SCAN-LOGS ==================== -->
+    <div id="page-scanlogs" class="page">
+      <div class="admin-section">
+
+        <div class="admin-topbar-row">
+          <div>
+            <div class="admin-page-title">Scan-Logs</div>
+            <div class="admin-page-sub">Alle Scan- und Diagnosevorg&auml;nge &middot; Stand: 07.03.2026</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="admin-btn admin-btn-secondary" onclick="showScanLogToast()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV-Export
+            </button>
+          </div>
+        </div>
+
+        <div class="admin-stats">
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val">47</div>
+            <div class="admin-stat-lbl">Scans gesamt (30 Tage)</div>
+          </div>
+          <div class="admin-stat-card green">
+            <div class="admin-stat-val">38</div>
+            <div class="admin-stat-lbl">Diagnosen gestellt</div>
+          </div>
+          <div class="admin-stat-card orange">
+            <div class="admin-stat-val">12</div>
+            <div class="admin-stat-lbl">ERP-Anfragen</div>
+          </div>
+        </div>
+
+        <div class="scan-table-wrap">
+          <div class="scan-filter-bar">
+            <span class="scan-filter-label">Filtern:</span>
+            <select class="scan-filter-select">
+              <option>Alle Zeitr&auml;ume</option>
+              <option selected>Letzte 7 Tage</option>
+              <option>Heute</option>
+              <option>Letzter Monat</option>
+            </select>
+            <select class="scan-filter-select">
+              <option>Alle Maschinen</option>
+              <option>Bagger CAT 320</option>
+              <option>Hydraulikpresse HP-500</option>
+              <option>Kompressor KPD-200</option>
+            </select>
+            <select class="scan-filter-select">
+              <option>Alle Benutzer</option>
+              <option>Marco K&ouml;hler</option>
+              <option>Sarah Weber</option>
+              <option>Thomas Braun</option>
+            </select>
+          </div>
+          <table class="scan-table">
+            <thead>
+              <tr>
+                <th>Zeitpunkt</th>
+                <th>Benutzer</th>
+                <th>Maschine</th>
+                <th>Seriennummer</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="time">07.03.2026<br>08:14 Uhr</td>
+                <td><strong>Marco K&ouml;hler</strong></td>
+                <td>Bagger CAT 320</td>
+                <td class="mono">CAT320-001-2021</td>
+                <td><span class="scan-action-badge sa-diag">&#9888; E-0147 Diagnose</span></td>
+              </tr>
+              <tr>
+                <td class="time">07.03.2026<br>07:58 Uhr</td>
+                <td><strong>Marco K&ouml;hler</strong></td>
+                <td>Hydraulikpresse HP-500</td>
+                <td class="mono">HP500-042-2019</td>
+                <td><span class="scan-action-badge sa-cfg">&#10003; Konfiguration</span></td>
+              </tr>
+              <tr>
+                <td class="time">06.03.2026<br>16:42 Uhr</td>
+                <td><strong>Sarah Weber</strong></td>
+                <td>Kompressor KPD-200</td>
+                <td class="mono">KPD200-018-2020</td>
+                <td><span class="scan-action-badge sa-diag">&#9888; WARN_KPD_07</span></td>
+              </tr>
+              <tr>
+                <td class="time">06.03.2026<br>14:18 Uhr</td>
+                <td><strong>Marco K&ouml;hler</strong></td>
+                <td>Bagger CAT 320</td>
+                <td class="mono">CAT320-001-2021</td>
+                <td><span class="scan-action-badge sa-erp">&#9729; ERP-Anfrage</span></td>
+              </tr>
+              <tr>
+                <td class="time">06.03.2026<br>15:30 Uhr</td>
+                <td><strong>Thomas Braun</strong></td>
+                <td>Schwei&szlig;anlage WS-Pro</td>
+                <td class="mono">WSPRO-007-2022</td>
+                <td><span class="scan-action-badge sa-cfg">&#10003; Wartungscheck</span></td>
+              </tr>
+              <tr>
+                <td class="time">05.03.2026<br>11:25 Uhr</td>
+                <td><strong>Sarah Weber</strong></td>
+                <td>Liebherr LH 566</td>
+                <td class="mono">LH566-034-2020</td>
+                <td><span class="scan-action-badge sa-scan">&#128247; Scan erfasst</span></td>
+              </tr>
+              <tr>
+                <td class="time">05.03.2026<br>09:47 Uhr</td>
+                <td><strong>Thomas Braun</strong></td>
+                <td>Komatsu PC210LC-11</td>
+                <td class="mono">PC210-119-2022</td>
+                <td><span class="scan-action-badge sa-diag">&#9888; WARN_PC210_OIL</span></td>
+              </tr>
+              <tr>
+                <td class="time">04.03.2026<br>17:03 Uhr</td>
+                <td><strong>Anna M&uuml;ller</strong></td>
+                <td>MAN TGS 26.480</td>
+                <td class="mono">MANTGS-003-2022</td>
+                <td><span class="scan-action-badge sa-cfg">&#10003; Wartung gepr&uuml;ft</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="scan-pagination">
+            <span>Zeige 1&ndash;8 von 47 Eintr&auml;gen</span>
+            <div class="scan-pagination-btns">
+              <button class="scan-pg-btn active">1</button>
+              <button class="scan-pg-btn">2</button>
+              <button class="scan-pg-btn">3</button>
+              <button class="scan-pg-btn">&#8250;</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="page-footer">
+        <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+        <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+      </div>
+    </div><!-- end page-scanlogs -->
+
+    <!-- ==================== NUTZER ==================== -->
+    <div id="page-nutzer" class="page">
+      <div class="admin-section">
+
+        <div class="admin-topbar-row">
+          <div>
+            <div class="admin-page-title">Nutzerverwaltung</div>
+            <div class="admin-page-sub">5 aktive Benutzer &middot; Field Service Edition</div>
+          </div>
+          <button class="admin-btn admin-btn-primary" onclick="showScanLogToast('Nutzer einladen')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nutzer einladen
+          </button>
+        </div>
+
+        <div class="admin-stats">
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val">5</div>
+            <div class="admin-stat-lbl">Nutzer gesamt</div>
+          </div>
+          <div class="admin-stat-card green">
+            <div class="admin-stat-val">5</div>
+            <div class="admin-stat-lbl">Aktiv (letzte 30 Tage)</div>
+          </div>
+          <div class="admin-stat-card orange">
+            <div class="admin-stat-val">1</div>
+            <div class="admin-stat-lbl">Administratoren</div>
+          </div>
+        </div>
+
+        <div class="nutzer-list">
+
+          <div class="nutzer-card">
+            <div class="nutzer-avatar" style="background:linear-gradient(135deg,#0052CC,#0072F5);">MK</div>
+            <div class="nutzer-info">
+              <div class="nutzer-name">Marco K&ouml;hler</div>
+              <div class="nutzer-role">Senior Field Service Techniker</div>
+              <div class="nutzer-id">ID: AL-2026-MK-087</div>
+            </div>
+            <div class="nutzer-meta">
+              <div><span class="nutzer-status ns-aktiv"><span class="nutzer-dot"></span>Aktiv</span></div>
+              <div class="nutzer-last">Zuletzt: 07.03.2026, 08:14</div>
+            </div>
+          </div>
+
+          <div class="nutzer-card">
+            <div class="nutzer-avatar" style="background:linear-gradient(135deg,#1565C0,#0098C8);">SW</div>
+            <div class="nutzer-info">
+              <div class="nutzer-name">Sarah Weber</div>
+              <div class="nutzer-role">Field Service Technikerin</div>
+              <div class="nutzer-id">ID: AL-2026-SW-042</div>
+            </div>
+            <div class="nutzer-meta">
+              <div><span class="nutzer-status ns-aktiv"><span class="nutzer-dot"></span>Aktiv</span></div>
+              <div class="nutzer-last">Zuletzt: 06.03.2026, 16:42</div>
+            </div>
+          </div>
+
+          <div class="nutzer-card">
+            <div class="nutzer-avatar" style="background:linear-gradient(135deg,#00695C,#00897B);">TB</div>
+            <div class="nutzer-info">
+              <div class="nutzer-name">Thomas Braun</div>
+              <div class="nutzer-role">Field Service Techniker</div>
+              <div class="nutzer-id">ID: AL-2026-TB-031</div>
+            </div>
+            <div class="nutzer-meta">
+              <div><span class="nutzer-status ns-aktiv"><span class="nutzer-dot"></span>Aktiv</span></div>
+              <div class="nutzer-last">Zuletzt: 06.03.2026, 15:30</div>
+            </div>
+          </div>
+
+          <div class="nutzer-card">
+            <div class="nutzer-avatar" style="background:linear-gradient(135deg,#6A1B9A,#8E24AA);">AM</div>
+            <div class="nutzer-info">
+              <div class="nutzer-name">Anna M&uuml;ller</div>
+              <div class="nutzer-role">Wartungsplanerin</div>
+              <div class="nutzer-id">ID: AL-2026-AM-019</div>
+            </div>
+            <div class="nutzer-meta">
+              <div><span class="nutzer-status ns-aktiv"><span class="nutzer-dot"></span>Aktiv</span></div>
+              <div class="nutzer-last">Zuletzt: 04.03.2026, 17:03</div>
+            </div>
+          </div>
+
+          <div class="nutzer-card">
+            <div class="nutzer-avatar" style="background:linear-gradient(135deg,#C62828,#E53935);">KF</div>
+            <div class="nutzer-info">
+              <div class="nutzer-name">Klaus Fischer</div>
+              <div class="nutzer-role">System-Administrator</div>
+              <div class="nutzer-id">ID: AL-2026-KF-001</div>
+            </div>
+            <div class="nutzer-meta">
+              <div><span class="nutzer-status ns-aktiv"><span class="nutzer-dot"></span>Aktiv</span></div>
+              <div class="nutzer-last">Zuletzt: 03.03.2026, 10:22</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="page-footer">
+        <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+        <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+      </div>
+    </div><!-- end page-nutzer -->
+
+    <!-- ==================== ERP-ANBINDUNG ==================== -->
+    <div id="page-erp" class="page">
+      <div class="admin-section">
+
+        <div class="admin-topbar-row">
+          <div>
+            <div class="admin-page-title">ERP-Anbindung</div>
+            <div class="admin-page-sub">SAP S/4HANA &middot; API v2 &middot; Letzte Synchronisation: heute, 06:31 Uhr</div>
+          </div>
+          <button class="admin-btn admin-btn-primary" onclick="triggerSync()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/><polyline points="21 3 21 10 14 10"/><polyline points="3 21 3 14 10 14"/></svg>
+            Jetzt synchronisieren
+          </button>
+        </div>
+
+        <div class="admin-stats" style="grid-template-columns:repeat(4,1fr);">
+          <div class="admin-stat-card green">
+            <div class="admin-stat-val">847</div>
+            <div class="admin-stat-lbl">Artikel synchronisiert</div>
+          </div>
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val">12</div>
+            <div class="admin-stat-lbl">Anfragen heute</div>
+          </div>
+          <div class="admin-stat-card green">
+            <div class="admin-stat-val">11</div>
+            <div class="admin-stat-lbl">Auf Lager best&auml;tigt</div>
+          </div>
+          <div class="admin-stat-card orange">
+            <div class="admin-stat-val">1</div>
+            <div class="admin-stat-lbl">R&uuml;ckstand gemeldet</div>
+          </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="erp-status-card">
+          <div class="erp-status-header">
+            <div class="erp-status-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div class="erp-status-name">SAP S/4HANA</div>
+              <div class="erp-status-sub">Enterprise Resource Planning &middot; Produktionsinstanz</div>
+            </div>
+            <div class="erp-conn-badge">
+              <span class="erp-conn-dot"></span>
+              Verbunden
+            </div>
+          </div>
+          <div class="erp-config-grid">
+            <div class="erp-config-row">
+              <span class="erp-config-key">API-Endpunkt</span>
+              <span class="erp-config-val">erp.betrieb.local/api/v2</span>
+            </div>
+            <div class="erp-config-row">
+              <span class="erp-config-key">Authentifizierung</span>
+              <span class="erp-config-val">OAuth 2.0 &middot; Bearer</span>
+            </div>
+            <div class="erp-config-row">
+              <span class="erp-config-key">Sync-Intervall</span>
+              <span class="erp-config-val">T&auml;glich, 06:30 Uhr</span>
+            </div>
+            <div class="erp-config-row">
+              <span class="erp-config-key">Letzter Status</span>
+              <span class="erp-config-val" style="color:var(--green);">&#10003; Erfolgreich</span>
+            </div>
+            <div class="erp-config-row full">
+              <span class="erp-config-key">Datenbereiche</span>
+              <span class="erp-config-val">Artikel, Lagerbestand, Lieferzeiten, Wartungspl&auml;ne</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sync Log -->
+        <div class="sec-label" style="margin-bottom:14px;">Synchronisationshistorie &amp; Anfragen</div>
+        <div class="erp-sync-list">
+
+          <div class="erp-sync-item">
+            <div class="erp-sync-icon ok">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="erp-sync-body">
+              <div class="erp-sync-title">Vollsynchronisation abgeschlossen</div>
+              <div class="erp-sync-detail">847 Artikel aktualisiert &middot; 0 Fehler &middot; Dauer: 4,2 Sek.</div>
+            </div>
+            <div class="erp-sync-time">07.03.2026<br>06:31 Uhr</div>
+          </div>
+
+          <div class="erp-sync-item">
+            <div class="erp-sync-icon info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div class="erp-sync-body">
+              <div class="erp-sync-title">ERP-Anfrage: P3-SENS-280BAR</div>
+              <div class="erp-sync-detail">Drucksensor P3, 280 bar &middot; Lager B &ndash; Regal 12A &middot; <strong style="color:var(--green);">Auf Lager &#10003;</strong></div>
+            </div>
+            <div class="erp-sync-time">06.03.2026<br>14:18 Uhr</div>
+          </div>
+
+          <div class="erp-sync-item">
+            <div class="erp-sync-icon ok">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="erp-sync-body">
+              <div class="erp-sync-title">Vollsynchronisation abgeschlossen</div>
+              <div class="erp-sync-detail">847 Artikel aktualisiert &middot; 0 Fehler &middot; Dauer: 3,8 Sek.</div>
+            </div>
+            <div class="erp-sync-time">06.03.2026<br>06:31 Uhr</div>
+          </div>
+
+          <div class="erp-sync-item">
+            <div class="erp-sync-icon info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div class="erp-sync-body">
+              <div class="erp-sync-title">ERP-Anfrage: KOM-OF-PC210</div>
+              <div class="erp-sync-detail">Motorölfilter Komatsu PC210 &middot; Lager A &ndash; Regal 7B &middot; <strong style="color:var(--green);">Auf Lager &#10003;</strong></div>
+            </div>
+            <div class="erp-sync-time">05.03.2026<br>09:47 Uhr</div>
+          </div>
+
+          <div class="erp-sync-item">
+            <div class="erp-sync-icon info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div class="erp-sync-body">
+              <div class="erp-sync-title">ERP-Anfrage: FP-B220</div>
+              <div class="erp-sync-detail">Filterpatrone Typ-B, 220&thinsp;mm &middot; Lager A &ndash; Regal 3C &middot; <strong style="color:var(--green);">Auf Lager &#10003;</strong></div>
+            </div>
+            <div class="erp-sync-time">04.03.2026<br>17:03 Uhr</div>
+          </div>
+
+          <div class="erp-sync-item">
+            <div class="erp-sync-icon ok">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="erp-sync-body">
+              <div class="erp-sync-title">Vollsynchronisation abgeschlossen</div>
+              <div class="erp-sync-detail">847 Artikel aktualisiert &middot; 0 Fehler &middot; Dauer: 4,1 Sek.</div>
+            </div>
+            <div class="erp-sync-time">05.03.2026<br>06:31 Uhr</div>
+          </div>
+
+        </div>
+      </div>
+      <div class="page-footer">
+        <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+        <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+      </div>
+    </div><!-- end page-erp -->
 
     <!-- ==================== AUFGABEN ==================== -->
     <div id="page-aufgaben" class="page">
@@ -2513,6 +3076,20 @@ function setDNav(el, page) {
   el.classList.add('active');
   if (page === 'assets') { showPage('assets'); renderAssetsGrid(); document.getElementById('assetSearchInput').value = ''; }
   else if (page === 'home') showPage('home');
+  else if (page === 'scanlogs') showPage('scanlogs');
+  else if (page === 'nutzer') showPage('nutzer');
+  else if (page === 'erp') showPage('erp');
+}
+
+function showScanLogToast(label) {
+  var text = label === 'Nutzer einladen'
+    ? 'Einladungs-E-Mail wird vorbereitet\u2026'
+    : 'CSV-Export wird generiert\u2026';
+  document.getElementById('syncToastText').textContent = text;
+  var toast = document.getElementById('syncToast');
+  toast.classList.add('show');
+  if (syncToastTimer) clearTimeout(syncToastTimer);
+  syncToastTimer = setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
 // ===== OPEN MACHINE DETAIL =====
