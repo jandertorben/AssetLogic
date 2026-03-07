@@ -54,54 +54,128 @@ body{
 
 /* ===== LOGIN SCREEN ===== */
 #loginScreen{
-  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   position:fixed;inset:0;z-index:9000;
   min-height:100dvh;
-  padding:5vh 24px calc(40px + env(safe-area-inset-bottom, 0px));
-  background:linear-gradient(160deg, var(--primary-dk) 0%, var(--primary) 55%, var(--primary-lt) 100%);
+  padding:env(safe-area-inset-top, 24px) 24px env(safe-area-inset-bottom, 24px);
+  background:linear-gradient(160deg, #000d1a 0%, #001830 45%, #002650 100%);
+  gap:28px;
 }
 #loginScreen.hidden{display:none;}
 .login-logo{text-align:center;flex-shrink:0;}
 .login-logo-img{
-  width:120px;height:auto;
+  width:100px;height:auto;
   object-fit:contain;
   display:block;margin:0 auto;
-  filter:drop-shadow(0 4px 16px rgba(0,0,0,.18));
+  filter:drop-shadow(0 4px 20px rgba(21,101,192,.5));
 }
-.login-brand{font-size:24px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:14px;}
-.login-brand-sub{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.4px;margin-top:4px;}
+.login-brand{font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:12px;}
+.login-brand-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.4px;margin-top:4px;}
 .login-tagline{display:none;}
+
+/* Card – dark glass */
 .login-card{
-  background:#fff;border-radius:16px;padding:32px 28px;
-  width:100%;max-width:380px;
-  box-shadow:0 24px 64px rgba(0,0,0,.35);
-  margin:auto 0;
+  background:rgba(0,20,50,0.72);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-radius:16px;padding:32px 24px 28px;
+  width:100%;max-width:400px;
+  box-shadow:0 24px 64px rgba(0,0,0,.55);
 }
-.login-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:5px;}
-.login-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.5;}
-.form-group{margin-bottom:16px;}
-.form-label{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px;display:block;}
+.login-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;}
+.login-sub{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px;line-height:1.5;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;display:block;}
+
+/* Input wrapper for eye-icon */
+.input-wrapper{position:relative;display:flex;align-items:center;}
+.input-wrapper .form-input{padding-right:44px;}
+
 .form-input{
-  width:100%;background:#F5F7FA;border:1.5px solid var(--border);
-  color:var(--text);padding:12px 14px;border-radius:8px;
-  font-size:14px;font-family:inherit;outline:none;
+  width:100%;
+  min-height:52px;
+  background:rgba(255,255,255,.07);
+  border:1.5px solid rgba(255,255,255,.15);
+  color:#fff;padding:0 14px;border-radius:10px;
+  font-size:15px;font-family:inherit;outline:none;
   transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;
 }
-.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(21,101,192,.12);}
+.form-input::placeholder{color:rgba(255,255,255,.3);}
+.form-input:focus{border-color:#1565C0;box-shadow:0 0 0 3px rgba(21,101,192,.28);}
+
+/* Eye-toggle button */
+.eye-toggle{
+  position:absolute;right:12px;
+  background:none;border:none;cursor:pointer;
+  color:rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;
+  padding:4px;border-radius:6px;
+  transition:color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.eye-toggle:hover,.eye-toggle:focus{color:rgba(255,255,255,.75);outline:none;}
+
+/* Forgot password */
+.btn-forgot{
+  display:block;text-align:right;
+  font-size:12px;color:rgba(255,255,255,.45);
+  background:none;border:none;cursor:pointer;
+  margin-top:6px;padding:0;font-family:inherit;
+  letter-spacing:.2px;
+  transition:color .2s;
+}
+.btn-forgot:hover{color:rgba(255,255,255,.75);}
+
+/* Primary login button */
 .btn-login{
-  width:100%;background:var(--primary);color:#fff;border:none;
-  border-radius:8px;padding:14px;font-size:15px;font-weight:700;
-  cursor:pointer;letter-spacing:.4px;margin-top:8px;
-  transition:background .2s,transform .1s;
+  width:100%;
+  min-height:52px;
+  background:#1565C0;color:#fff;border:none;
+  border-radius:10px;padding:0 14px;font-size:15px;font-weight:700;
+  cursor:pointer;letter-spacing:.4px;margin-top:16px;
+  transition:background .2s,transform .1s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(21,101,192,.45);
+  -webkit-tap-highlight-color:transparent;
 }
-.btn-login:hover{background:var(--primary-lt);}
-.btn-login:active{transform:scale(.99);}
+.btn-login:hover{background:#1976D2;box-shadow:0 6px 24px rgba(21,101,192,.55);}
+.btn-login:active{transform:scale(.98);}
+
+/* Biometric quick-login */
+.btn-biometric{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  margin-top:18px;
+  background:none;border:none;cursor:pointer;width:100%;
+  color:rgba(255,255,255,.4);font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-biometric svg{width:28px;height:28px;color:rgba(255,255,255,.35);transition:color .2s;}
+.btn-biometric:hover svg,.btn-biometric:focus svg{color:rgba(255,255,255,.7);}
+.btn-biometric span{font-size:11px;letter-spacing:.4px;text-transform:uppercase;transition:color .2s;}
+.btn-biometric:hover span,.btn-biometric:focus span{color:rgba(255,255,255,.65);}
+
+/* Demo hint */
 .login-demo{
-  margin-top:18px;padding:12px 14px;background:#F5F7FA;
-  border-radius:8px;font-size:12px;color:var(--text-muted);
-  line-height:1.85;border:1px solid var(--border);
+  margin-top:20px;padding:11px 14px;
+  background:rgba(255,255,255,.05);
+  border-radius:8px;font-size:12px;color:rgba(255,255,255,.38);
+  line-height:1.85;border:1px solid rgba(255,255,255,.08);
 }
-.login-demo strong{color:var(--accent);}
+.login-demo strong{color:rgba(100,160,255,.75);}
+
+/* Offline indicator */
+.login-offline{
+  display:flex;align-items:center;gap:7px;
+  font-size:11px;color:rgba(255,255,255,.4);
+  letter-spacing:.3px;flex-shrink:0;
+}
+.offline-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#4CAF50;
+  box-shadow:0 0 6px rgba(76,175,80,.7);
+  animation:livePulse 2.4s ease-in-out infinite;
+  flex-shrink:0;
+}
 
 /* ===== HEADER ===== */
 header{
@@ -947,15 +1021,8 @@ nav.bottom-nav{
 .page-footer p{font-size:11px;color:#A0ADBF;letter-spacing:.3px;line-height:1.8;}
 .page-footer strong{color:var(--accent);font-weight:700;}
 .page-footer .footer-name{color:var(--text-muted);}
-/* Login footer */
-.login-footer{
-  text-align:center;flex-shrink:0;
-  font-size:11px;color:rgba(255,255,255,.38);
-  line-height:1.8;letter-spacing:.3px;
-  padding-bottom:20px;margin-bottom:20px;
-  width:100%;max-width:380px;
-}
-.login-footer strong{color:rgba(255,255,255,.6);font-weight:700;}
+/* Login footer (legacy, kept for safety) */
+.login-footer{display:none;}
 
 /* hide sync label on very small screens */
 @media(max-width:767px){
@@ -1010,31 +1077,76 @@ nav.bottom-nav{
 
 <!-- ===== LOGIN SCREEN ===== -->
 <div id="loginScreen">
+  <!-- Logo -->
   <div class="login-logo">
     <img src="img/as_logo.png" alt="AssetLogic" class="login-logo-img">
     <div class="login-brand">ASSET LOGIC</div>
-    <div class="login-brand-sub">by Torben Jander</div>
+    <div class="login-brand-sub">Field Service Management</div>
   </div>
+
+  <!-- Form Card -->
   <div class="login-card">
-    <div class="login-title">Anmelden</div>
-    <div class="login-sub">Geben Sie Ihre Zugangsdaten ein, um fortzufahren.</div>
+    <div class="login-title">Willkommen</div>
+    <div class="login-sub">Melden Sie sich mit Ihren Zugangsdaten an.</div>
+
+    <!-- Email -->
     <div class="form-group">
-      <label class="form-label">E-Mail-Adresse</label>
-      <input type="email" class="form-input" id="loginEmail" value="m.koehler@betrieb.de" placeholder="name@firma.de">
+      <label class="form-label" for="loginEmail">E-Mail-Adresse</label>
+      <input type="email" class="form-input" id="loginEmail"
+             value="m.koehler@betrieb.de" placeholder="name@firma.de"
+             autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false">
     </div>
+
+    <!-- Password with eye toggle -->
     <div class="form-group">
-      <label class="form-label">Passwort</label>
-      <input type="password" class="form-input" id="loginPass" value="Demo1234" placeholder="Passwort eingeben">
+      <label class="form-label" for="loginPass">Passwort</label>
+      <div class="input-wrapper">
+        <input type="password" class="form-input" id="loginPass"
+               value="Demo1234" placeholder="Passwort eingeben"
+               autocomplete="current-password">
+        <button type="button" class="eye-toggle" id="eyeToggle"
+                aria-label="Passwort anzeigen" onclick="togglePassword()">
+          <!-- Eye icon (default: show) -->
+          <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+      </div>
+      <button type="button" class="btn-forgot" onclick="alert('Bitte kontaktieren Sie Ihren Administrator.')">
+        Passwort vergessen?
+      </button>
     </div>
+
+    <!-- Login Button -->
     <button class="btn-login" onclick="doLogin()">Anmelden</button>
+
+    <!-- Biometric -->
+    <button type="button" class="btn-biometric" onclick="alert('Biometrie-Anmeldung wird eingerichtet.')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M7 11.5a5 5 0 019.9-.9M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9S16.97 3 12 3z"/>
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 12a3 3 0 106 0M12 7v1m0 8v1"/>
+      </svg>
+      <span>Schnellanmeldung</span>
+    </button>
+
+    <!-- Demo hint -->
     <div class="login-demo">
       <strong>Demo-Zugangsdaten</strong><br>
       E-Mail: m.koehler@betrieb.de &nbsp;&middot;&nbsp; Passwort: beliebig
     </div>
   </div>
-  <div class="login-footer">
-    <strong>AssetLogic v1.0</strong> &mdash; Developed by Torben Jander<br>
-    Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv
+
+  <!-- Offline indicator -->
+  <div class="login-offline">
+    <span class="offline-dot"></span>
+    Offline-Modus bereit
   </div>
 </div>
 
@@ -2005,6 +2117,17 @@ function confirmConfig() {
 }
 
 // ===== LOGIN =====
+function togglePassword() {
+  const input = document.getElementById('loginPass');
+  const icon  = document.getElementById('eyeIcon');
+  const show  = input.type === 'password';
+  input.type  = show ? 'text' : 'password';
+  // Swap between open-eye and crossed-eye SVG path
+  icon.innerHTML = show
+    ? `<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`
+    : `<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+}
+
 function doLogin() {
   document.getElementById('loginScreen').classList.add('hidden');
   showPage('home');
