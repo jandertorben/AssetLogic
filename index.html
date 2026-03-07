@@ -62,12 +62,13 @@ body{
   gap:28px;
 }
 #loginScreen.hidden{display:none;}
-.login-logo{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:14px;flex-shrink:0;width:100%;max-width:400px;}
 .login-logo-img{
   width:60px;height:60px;
   object-fit:contain;
   flex-shrink:0;
-  filter:drop-shadow(0 4px 20px rgba(21,101,192,.5));
+  background:none;
+  mix-blend-mode:normal;
 }
 .login-logo-text{display:flex;flex-direction:column;justify-content:center;}
 .login-brand{font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:0;}
