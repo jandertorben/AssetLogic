@@ -62,14 +62,15 @@ body{
   gap:28px;
 }
 #loginScreen.hidden{display:none;}
-.login-logo{text-align:center;flex-shrink:0;}
+.login-logo{display:flex;align-items:center;gap:14px;flex-shrink:0;}
 .login-logo-img{
-  width:100px;height:auto;
+  width:60px;height:60px;
   object-fit:contain;
-  display:block;margin:0 auto;
+  flex-shrink:0;
   filter:drop-shadow(0 4px 20px rgba(21,101,192,.5));
 }
-.login-brand{font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:12px;}
+.login-logo-text{display:flex;flex-direction:column;justify-content:center;}
+.login-brand{font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:0;}
 .login-brand-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.4px;margin-top:4px;}
 .login-tagline{display:none;}
 
@@ -1080,8 +1081,10 @@ nav.bottom-nav{
   <!-- Logo -->
   <div class="login-logo">
     <img src="img/as_logo.png" alt="AssetLogic" class="login-logo-img">
-    <div class="login-brand">ASSET LOGIC</div>
-    <div class="login-brand-sub">Field Service Management</div>
+    <div class="login-logo-text">
+      <div class="login-brand">ASSET LOGIC</div>
+      <div class="login-brand-sub">Field Service Management</div>
+    </div>
   </div>
 
   <!-- Form Card -->
