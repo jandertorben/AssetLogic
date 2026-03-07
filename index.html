@@ -1542,6 +1542,144 @@ nav.bottom-nav{
   margin-top:4px;
 }
 
+/* ===== PERMISSIONS MATRIX ===== */
+.perm-table{width:100%;border-collapse:collapse;margin-top:4px;}
+.perm-table th{
+  font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-muted);font-weight:700;padding:7px 10px;
+  text-align:center;border-bottom:1px solid var(--border);background:var(--bg);
+}
+.perm-table th:first-child{text-align:left;}
+.perm-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.perm-table tr:last-child td{border-bottom:none;}
+.perm-module{font-size:13px;font-weight:600;color:var(--text);}
+.perm-levels{display:flex;gap:4px;justify-content:center;}
+.perm-btn{
+  font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;
+  border:1.5px solid var(--border);background:#fff;color:var(--text-muted);
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+  touch-action:manipulation;
+}
+.perm-btn:hover{border-color:var(--accent);color:var(--accent);}
+.perm-btn.active{border-color:var(--primary);background:var(--primary);color:#fff;}
+.perm-btn.locked{opacity:.5;cursor:not-allowed;pointer-events:none;}
+.perm-hint{font-size:11px;color:var(--text-muted);margin-top:10px;font-style:italic;}
+
+/* ===== CREATE USER MODAL ===== */
+#createNutzerModal{
+  display:none;position:fixed;
+  top:0;right:0;bottom:0;left:0;inset:0;
+  z-index:9000;
+  background:rgba(0,29,58,.55);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;padding:20px;
+}
+#createNutzerModal.active{display:flex;}
+.cn-card{
+  background:#fff;border-radius:16px;
+  width:100%;max-width:540px;max-height:90vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 24px 60px rgba(0,0,0,.28);
+  animation:fadeUp .25s cubic-bezier(.4,0,.2,1);
+}
+.cn-header{
+  background:linear-gradient(135deg,var(--primary-dk),var(--primary));
+  padding:18px 22px;display:flex;align-items:center;justify-content:space-between;
+}
+.cn-header-title{font-size:16px;font-weight:800;color:#fff;}
+.cn-header-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px;}
+.cn-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;padding:22px;}
+.cn-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.cn-form-group{margin-bottom:16px;}
+.cn-label{
+  display:block;font-size:11px;font-weight:700;color:var(--primary);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;
+  font-family:'Courier New',monospace;
+}
+.cn-input{
+  width:100%;min-height:46px;background:var(--bg);
+  border:1.5px solid var(--border);color:var(--text);
+  padding:0 13px;border-radius:8px;font-size:15px;
+  font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;touch-action:manipulation;
+}
+.cn-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(21,101,192,.1);background:#fff;}
+.cn-input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(198,40,40,.1);}
+.cn-error{font-size:11px;color:var(--red);margin-top:4px;display:none;}
+.cn-error.show{display:block;}
+.cn-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.cn-role-opt{
+  border:2px solid var(--border);border-radius:8px;padding:10px 12px;
+  cursor:pointer;transition:all .15s;touch-action:manipulation;
+  display:flex;align-items:center;gap:9px;
+}
+.cn-role-opt:hover{border-color:var(--accent);}
+.cn-role-opt.selected{border-color:var(--primary);background:var(--accent-lt);}
+.cn-role-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .15s;}
+.cn-role-opt.selected .cn-role-dot{background:var(--primary);border-color:var(--primary);}
+.cn-role-opt-label{font-size:13px;font-weight:700;color:var(--text);}
+.cn-footer{
+  padding:14px 22px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;background:var(--bg);flex-shrink:0;
+}
+
+/* ===== ERP CONFIG MODAL ===== */
+#erpConfigModal{
+  display:none;position:fixed;
+  top:0;right:0;bottom:0;left:0;inset:0;
+  z-index:8500;
+  background:rgba(0,29,58,.55);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+  padding:20px;
+}
+#erpConfigModal.active{display:flex;}
+.erp-modal-card{
+  background:#fff;border-radius:16px;
+  width:100%;max-width:600px;max-height:90vh;
+  overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 24px 60px rgba(0,0,0,.28);
+  animation:fadeUp .25s cubic-bezier(.4,0,.2,1);
+}
+.erp-chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+.erp-chk-item{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);
+  cursor:pointer;transition:all .15s;touch-action:manipulation;background:#fff;
+}
+.erp-chk-item:hover{border-color:var(--accent);}
+.erp-chk-item.checked{border-color:var(--primary);background:var(--accent-lt);}
+.erp-chk-box{
+  width:17px;height:17px;border-radius:4px;border:2px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.erp-chk-item.checked .erp-chk-box{background:var(--primary);border-color:var(--primary);}
+.erp-chk-box svg{width:10px;height:10px;color:#fff;display:none;}
+.erp-chk-item.checked .erp-chk-box svg{display:block;}
+.erp-chk-label{font-size:13px;font-weight:600;color:var(--text);}
+.erp-test-btn{
+  font-size:12px;font-weight:700;color:var(--accent);background:none;
+  border:1.5px solid rgba(21,101,192,.3);border-radius:7px;
+  padding:8px 14px;cursor:pointer;transition:all .2s;touch-action:manipulation;
+  display:flex;align-items:center;gap:6px;
+}
+.erp-test-btn:hover{background:var(--accent-lt);border-color:var(--accent);}
+.erp-test-btn svg{width:14px;height:14px;}
+
+/* Delete confirmation */
+.nm-btn-delete{
+  font-size:12px;font-weight:700;color:var(--red);background:none;
+  border:1.5px solid rgba(198,40,40,.25);border-radius:7px;
+  padding:8px 14px;cursor:pointer;transition:all .2s;touch-action:manipulation;
+}
+.nm-btn-delete:hover{background:var(--red-bg);border-color:var(--red);}
+.nm-btn-delete-confirm{
+  font-size:12px;font-weight:700;color:#fff;background:var(--red);
+  border:none;border-radius:7px;padding:8px 14px;cursor:pointer;
+  transition:all .2s;touch-action:manipulation;animation:loginCardIn .2s ease;
+}
+.nm-delete-row{display:flex;align-items:center;gap:8px;}
+
 /* ===================================================================
    DESKTOP (>= 1024px)
    =================================================================== */
@@ -2380,8 +2518,8 @@ nav.bottom-nav{
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </div>
             <div style="flex:1;">
-              <div class="erp-status-name">SAP S/4HANA</div>
-              <div class="erp-status-sub">Enterprise Resource Planning &middot; Produktionsinstanz</div>
+              <div class="erp-status-name" id="erpCfgSystem">SAP S/4HANA</div>
+              <div class="erp-status-sub" id="erpCfgSub">Enterprise Resource Planning &middot; Produktionsinstanz</div>
             </div>
             <div class="erp-conn-badge">
               <span class="erp-conn-dot"></span>
@@ -2391,15 +2529,15 @@ nav.bottom-nav{
           <div class="erp-config-grid">
             <div class="erp-config-row">
               <span class="erp-config-key">API-Endpunkt</span>
-              <span class="erp-config-val">erp.betrieb.local/api/v2</span>
+              <span class="erp-config-val" id="erpCfgEndpoint">erp.betrieb.local/api/v2</span>
             </div>
             <div class="erp-config-row">
               <span class="erp-config-key">Authentifizierung</span>
-              <span class="erp-config-val">OAuth 2.0 &middot; Bearer</span>
+              <span class="erp-config-val" id="erpCfgAuth">OAuth 2.0 &middot; Bearer</span>
             </div>
             <div class="erp-config-row">
               <span class="erp-config-key">Sync-Intervall</span>
-              <span class="erp-config-val">T&auml;glich, 06:30 Uhr</span>
+              <span class="erp-config-val" id="erpCfgInterval">T&auml;glich, 06:30 Uhr</span>
             </div>
             <div class="erp-config-row">
               <span class="erp-config-key">Letzter Status</span>
@@ -2407,8 +2545,14 @@ nav.bottom-nav{
             </div>
             <div class="erp-config-row full">
               <span class="erp-config-key">Datenbereiche</span>
-              <span class="erp-config-val">Artikel, Lagerbestand, Lieferzeiten, Wartungspl&auml;ne</span>
+              <span class="erp-config-val" id="erpCfgScopes">Artikel, Lagerbestand, Lieferzeiten, Wartungspl&auml;ne</span>
             </div>
+          </div>
+          <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+            <button class="admin-btn admin-btn-secondary" onclick="openErpConfigModal()" touch-action="manipulation" style="touch-action:manipulation;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Konfigurieren
+            </button>
           </div>
         </div>
 
@@ -2489,6 +2633,135 @@ nav.bottom-nav{
         <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
       </div>
     </div><!-- end page-erp -->
+
+<!-- ==================== ERP CONFIG MODAL ==================== -->
+<div id="erpConfigModal">
+  <div class="erp-modal-card">
+    <div class="nm-header">
+      <div class="erp-status-icon" style="width:46px;height:46px;border-radius:10px;flex-shrink:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="nm-header-info">
+        <div class="nm-header-name">ERP-Anbindung konfigurieren</div>
+        <div class="nm-header-sub">Verbindung, Authentifizierung &amp; Synchronisation</div>
+      </div>
+      <button class="nm-close" onclick="closeErpConfigModal()" aria-label="Schlie&szlig;en">&#10005;</button>
+    </div>
+
+    <div class="nm-body">
+
+      <!-- System & Endpunkt -->
+      <div class="nm-section">
+        <div class="nm-section-title">Verbindung</div>
+        <div class="cn-form-row">
+          <div class="cn-form-group" style="margin-bottom:0;">
+            <label class="cn-label" for="ecSystem">ERP-System</label>
+            <select class="cn-input" id="ecSystem" onchange="onErpSystemChange()">
+              <option value="sap">SAP S/4HANA</option>
+              <option value="dynamics">Microsoft Dynamics 365</option>
+              <option value="oracle">Oracle ERP Cloud</option>
+              <option value="infor">Infor M3</option>
+              <option value="custom">Eigenentwicklung / REST-API</option>
+            </select>
+          </div>
+          <div class="cn-form-group" style="margin-bottom:0;">
+            <label class="cn-label" for="ecEnv">Instanz</label>
+            <select class="cn-input" id="ecEnv">
+              <option value="prod">Produktionsinstanz</option>
+              <option value="test">Testinstanz</option>
+              <option value="dev">Entwicklungsinstanz</option>
+            </select>
+          </div>
+        </div>
+        <div class="cn-form-group" style="margin-top:14px;margin-bottom:0;">
+          <label class="cn-label" for="ecEndpoint">API-Endpunkt</label>
+          <input class="cn-input" id="ecEndpoint" type="text" value="erp.betrieb.local/api/v2"
+            placeholder="z.B. erp.firma.de/api/v2" autocorrect="off" autocapitalize="none" spellcheck="false">
+        </div>
+      </div>
+
+      <!-- Authentifizierung -->
+      <div class="nm-section">
+        <div class="nm-section-title">Authentifizierung</div>
+        <div class="cn-form-group">
+          <label class="cn-label" for="ecAuthType">Methode</label>
+          <select class="cn-input" id="ecAuthType" onchange="onErpAuthChange()">
+            <option value="oauth2">OAuth 2.0 &middot; Bearer Token</option>
+            <option value="apikey">API-Key</option>
+            <option value="basic">Basic Auth (Benutzername / Passwort)</option>
+          </select>
+        </div>
+        <div class="cn-form-row">
+          <div class="cn-form-group" style="margin-bottom:0;">
+            <label class="cn-label" id="ecKeyLabel" for="ecClientId">Client ID</label>
+            <input class="cn-input" id="ecClientId" type="text" value="fieldfix-prod-client"
+              autocorrect="off" autocapitalize="none" spellcheck="false">
+          </div>
+          <div class="cn-form-group" style="margin-bottom:0;" id="ecSecretGroup">
+            <label class="cn-label" id="ecSecretLabel" for="ecClientSecret">Client Secret</label>
+            <input class="cn-input" id="ecClientSecret" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Synchronisation -->
+      <div class="nm-section">
+        <div class="nm-section-title">Synchronisation</div>
+        <div class="cn-form-group">
+          <label class="cn-label" for="ecInterval">Sync-Intervall</label>
+          <select class="cn-input" id="ecInterval">
+            <option value="daily-0630">T&auml;glich, 06:30 Uhr</option>
+            <option value="daily-1200">T&auml;glich, 12:00 Uhr</option>
+            <option value="hourly">St&uuml;ndlich</option>
+            <option value="every4h">Alle 4 Stunden</option>
+            <option value="manual">Nur manuell</option>
+          </select>
+        </div>
+        <div class="cn-form-group" style="margin-bottom:0;">
+          <label class="cn-label">Datenbereiche</label>
+          <div class="erp-chk-grid">
+            <div class="erp-chk-item checked" data-scope="artikel" onclick="toggleErpScope(this)">
+              <div class="erp-chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="erp-chk-label">Artikel</span>
+            </div>
+            <div class="erp-chk-item checked" data-scope="lager" onclick="toggleErpScope(this)">
+              <div class="erp-chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="erp-chk-label">Lagerbestand</span>
+            </div>
+            <div class="erp-chk-item checked" data-scope="lieferzeiten" onclick="toggleErpScope(this)">
+              <div class="erp-chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="erp-chk-label">Lieferzeiten</span>
+            </div>
+            <div class="erp-chk-item checked" data-scope="wartung" onclick="toggleErpScope(this)">
+              <div class="erp-chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="erp-chk-label">Wartungspl&auml;ne</span>
+            </div>
+            <div class="erp-chk-item" data-scope="kosten" onclick="toggleErpScope(this)">
+              <div class="erp-chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="erp-chk-label">Kostenstellen</span>
+            </div>
+            <div class="erp-chk-item" data-scope="personal" onclick="toggleErpScope(this)">
+              <div class="erp-chk-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span class="erp-chk-label">Personaldaten</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end nm-body -->
+
+    <div class="nm-footer">
+      <button class="erp-test-btn" onclick="testErpConnection()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Verbindung testen
+      </button>
+      <div style="display:flex;gap:8px;">
+        <button class="admin-btn admin-btn-secondary" onclick="closeErpConfigModal()" style="touch-action:manipulation;">Abbrechen</button>
+        <button class="nm-btn-save" onclick="saveErpConfig()" style="touch-action:manipulation;">Speichern</button>
+      </div>
+    </div>
+  </div>
+</div><!-- end erpConfigModal -->
 
     <!-- ==================== AUFGABEN ==================== -->
     <div id="page-aufgaben" class="page">
@@ -2911,6 +3184,130 @@ function closeNutzerModal() {
 // Close on backdrop click
 document.getElementById('nutzerModal').addEventListener('click', function(e) {
   if (e.target === this) closeNutzerModal();
+});
+
+// ===== ERP CONFIG MODAL =====
+var ERP_CONFIG = {
+  system: 'sap', env: 'prod',
+  endpoint: 'erp.betrieb.local/api/v2',
+  authType: 'oauth2',
+  interval: 'daily-0630',
+  scopes: ['artikel','lager','lieferzeiten','wartung']
+};
+
+var ERP_SYSTEM_LABELS = {
+  sap: 'SAP S/4HANA', dynamics: 'Microsoft Dynamics 365',
+  oracle: 'Oracle ERP Cloud', infor: 'Infor M3', custom: 'Eigenentwicklung / REST-API'
+};
+var ERP_AUTH_LABELS = {
+  oauth2: 'OAuth\u00a02.0 \u00b7 Bearer', apikey: 'API-Key', basic: 'Basic Auth'
+};
+var ERP_INTERVAL_LABELS = {
+  'daily-0630': 'T\u00e4glich, 06:30\u00a0Uhr',
+  'daily-1200': 'T\u00e4glich, 12:00\u00a0Uhr',
+  'hourly': 'St\u00fcndlich',
+  'every4h': 'Alle 4\u00a0Stunden',
+  'manual': 'Nur manuell'
+};
+var ERP_SCOPE_LABELS = {
+  artikel:'Artikel', lager:'Lagerbestand', lieferzeiten:'Lieferzeiten',
+  wartung:'Wartungspl\u00e4ne', kosten:'Kostenstellen', personal:'Personaldaten'
+};
+var ERP_ENV_LABELS = {prod:'Produktionsinstanz',test:'Testinstanz',dev:'Entwicklungsinstanz'};
+
+function openErpConfigModal() {
+  // Populate form from current config
+  document.getElementById('ecSystem').value = ERP_CONFIG.system;
+  document.getElementById('ecEnv').value = ERP_CONFIG.env;
+  document.getElementById('ecEndpoint').value = ERP_CONFIG.endpoint;
+  document.getElementById('ecAuthType').value = ERP_CONFIG.authType;
+  document.getElementById('ecInterval').value = ERP_CONFIG.interval;
+  // Checkboxes
+  document.querySelectorAll('.erp-chk-item').forEach(function(el) {
+    var scope = el.dataset.scope;
+    if (ERP_CONFIG.scopes.indexOf(scope) > -1) el.classList.add('checked');
+    else el.classList.remove('checked');
+  });
+  onErpAuthChange();
+  document.getElementById('erpConfigModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeErpConfigModal() {
+  document.getElementById('erpConfigModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function toggleErpScope(el) {
+  el.classList.toggle('checked');
+}
+
+function onErpAuthChange() {
+  var auth = document.getElementById('ecAuthType').value;
+  var keyLabel = document.getElementById('ecKeyLabel');
+  var secretLabel = document.getElementById('ecSecretLabel');
+  var secretGroup = document.getElementById('ecSecretGroup');
+  if (auth === 'oauth2') {
+    keyLabel.textContent = 'Client ID';
+    secretLabel.textContent = 'Client Secret';
+    secretGroup.style.display = '';
+  } else if (auth === 'apikey') {
+    keyLabel.textContent = 'API-Key';
+    secretGroup.style.display = 'none';
+  } else {
+    keyLabel.textContent = 'Benutzername';
+    secretLabel.textContent = 'Passwort';
+    secretGroup.style.display = '';
+  }
+}
+
+function onErpSystemChange() {
+  // nothing extra needed currently
+}
+
+function saveErpConfig() {
+  ERP_CONFIG.system = document.getElementById('ecSystem').value;
+  ERP_CONFIG.env = document.getElementById('ecEnv').value;
+  ERP_CONFIG.endpoint = document.getElementById('ecEndpoint').value;
+  ERP_CONFIG.authType = document.getElementById('ecAuthType').value;
+  ERP_CONFIG.interval = document.getElementById('ecInterval').value;
+  ERP_CONFIG.scopes = [];
+  document.querySelectorAll('.erp-chk-item.checked').forEach(function(el) {
+    ERP_CONFIG.scopes.push(el.dataset.scope);
+  });
+
+  // Update display
+  document.getElementById('erpCfgSystem').textContent = ERP_SYSTEM_LABELS[ERP_CONFIG.system] || ERP_CONFIG.system;
+  document.getElementById('erpCfgSub').textContent = ERP_SYSTEM_LABELS[ERP_CONFIG.system] + ' \u00b7 ' + (ERP_ENV_LABELS[ERP_CONFIG.env] || ERP_CONFIG.env);
+  document.getElementById('erpCfgEndpoint').textContent = ERP_CONFIG.endpoint;
+  document.getElementById('erpCfgAuth').textContent = ERP_AUTH_LABELS[ERP_CONFIG.authType] || ERP_CONFIG.authType;
+  document.getElementById('erpCfgInterval').textContent = ERP_INTERVAL_LABELS[ERP_CONFIG.interval] || ERP_CONFIG.interval;
+  document.getElementById('erpCfgScopes').textContent = ERP_CONFIG.scopes.map(function(s){ return ERP_SCOPE_LABELS[s] || s; }).join(', ') || '\u2014';
+
+  closeErpConfigModal();
+  showScanLogToast('ERP-Konfiguration gespeichert');
+}
+
+function testErpConnection() {
+  var btn = document.querySelector('.erp-test-btn');
+  var orig = btn.innerHTML;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg> Verbinde\u2026';
+  btn.disabled = true;
+  setTimeout(function() {
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Verbindung erfolgreich';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(46,125,50,.4)';
+    setTimeout(function() {
+      btn.innerHTML = orig;
+      btn.disabled = false;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2500);
+  }, 1400);
+}
+
+document.getElementById('erpConfigModal').addEventListener('click', function(e) {
+  if (e.target === this) closeErpConfigModal();
 });
 
 // ===== MACHINE DATABASE =====
