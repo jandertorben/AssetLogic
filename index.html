@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>AssetLogic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ===== RESET & VARS ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -57,126 +60,294 @@ body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   position:fixed;inset:0;z-index:9000;
   min-height:100dvh;
-  padding:env(safe-area-inset-top, 24px) 24px env(safe-area-inset-bottom, 24px);
-  background:linear-gradient(160deg, #000d1a 0%, #001830 45%, #002650 100%);
-  gap:28px;
+  padding:max(env(safe-area-inset-top),20px) 16px max(env(safe-area-inset-bottom),20px);
+  background-color:#0B1F3A;
+  background-image:
+    radial-gradient(ellipse 70% 55% at 50% 35%, rgba(0,82,204,0.18) 0%, transparent 70%),
+    linear-gradient(rgba(0,82,204,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,82,204,0.06) 1px, transparent 1px);
+  background-size:100% 100%, 32px 32px, 32px 32px;
+  gap:20px;
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
 }
 #loginScreen.hidden{display:none;}
-.login-logo{display:flex;align-items:center;justify-content:center;gap:14px;flex-shrink:0;width:100%;max-width:400px;}
-.login-logo-img{
-  width:60px;height:60px;
-  object-fit:contain;
-  flex-shrink:0;
-  background:none;
-  mix-blend-mode:normal;
+
+/* ── Layout wrapper (col on mobile, row on desktop) ── */
+.login-layout{
+  display:flex;flex-direction:column;
+  align-items:center;
+  width:100%;max-width:440px;
+  gap:20px;
 }
+
+/* ── Left panel (desktop only) ── */
+.login-left{display:none;}
+.login-claim-title{
+  font-size:clamp(34px,3.5vw,52px);font-weight:800;
+  color:#fff;line-height:1.1;letter-spacing:-0.02em;
+}
+.login-claim-title .grad{
+  background:linear-gradient(90deg,#1A4FCC 0%,#0098C8 50%,#22B04A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.login-claim-sub{
+  font-size:17px;color:rgba(91,173,255,0.65);
+  line-height:1.65;max-width:500px;margin-top:14px;
+}
+.login-kpis{display:flex;gap:14px;flex-wrap:wrap;margin-top:40px;}
+.login-kpi{
+  background:#0D2545;border:1px solid rgba(91,173,255,0.15);border-radius:12px;
+  padding:20px 24px;flex:1;min-width:110px;
+  display:flex;flex-direction:column;gap:6px;
+  position:relative;overflow:hidden;
+}
+.login-kpi::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#0052CC,#00D4F5,#36B37E);
+}
+.login-kpi-val{font-size:28px;font-weight:800;color:#5BADFF;font-family:'Plus Jakarta Sans',sans-serif;}
+.login-kpi-label{font-size:11px;color:rgba(255,255,255,0.45);font-family:'IBM Plex Mono',monospace;letter-spacing:0.05em;text-transform:uppercase;}
+
+/* ── Right panel ── */
+.login-right{
+  display:flex;flex-direction:column;
+  align-items:center;
+  width:100%;gap:20px;
+}
+
+/* ── Logo (mobile, hidden on desktop) ── */
+.login-logo{
+  display:flex;align-items:center;justify-content:center;
+  gap:14px;flex-shrink:0;width:100%;max-width:440px;
+}
+.login-logo-img{width:52px;height:52px;object-fit:contain;flex-shrink:0;background:none;}
 .login-logo-text{display:flex;flex-direction:column;justify-content:center;}
-.login-brand{font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;text-transform:uppercase;margin-top:0;}
-.login-brand-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.4px;margin-top:4px;}
+.login-brand{
+  font-size:20px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-top:0;
+  background:linear-gradient(90deg,#1A4FCC 0%,#0098C8 50%,#22B04A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.login-brand-sub{
+  font-size:11px;color:rgba(91,173,255,0.5);letter-spacing:0.08em;margin-top:3px;
+  font-family:'IBM Plex Mono',monospace;
+}
 .login-tagline{display:none;}
 
-/* Card – dark glass */
+/* ── Card ── */
 .login-card{
-  background:rgba(0,20,50,0.72);
-  border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-radius:16px;padding:32px 24px 28px;
-  width:100%;max-width:400px;
-  box-shadow:0 24px 64px rgba(0,0,0,.55);
+  background:#0D2545;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(91,173,255,0.15);
+  border-radius:16px;
+  width:100%;max-width:440px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.55),0 0 0 1px rgba(91,173,255,0.04);
+  position:relative;overflow:hidden;
+  animation:loginCardIn 0.5s ease-out both;
 }
-.login-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;}
-.login-sub{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px;line-height:1.5;}
-.form-group{margin-bottom:14px;}
-.form-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;display:block;}
+.login-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#0052CC 0%,#00D4F5 50%,#22B04A 100%);
+}
+.login-card-inner{padding:36px 28px 28px;}
+@keyframes loginCardIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
-/* Input wrapper for eye-icon */
+/* ── Card header ── */
+.login-title{
+  font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.login-sub{font-size:13px;color:rgba(91,173,255,0.55);margin-bottom:26px;line-height:1.55;}
+
+/* ── Form groups ── */
+.form-group{margin-bottom:16px;animation:loginCardIn 0.5s ease-out both;}
+.form-group:nth-child(1){animation-delay:0.05s;}
+.form-group:nth-child(2){animation-delay:0.12s;}
+.form-group:nth-child(3){animation-delay:0.19s;}
+
+.form-label{
+  font-size:11px;font-weight:500;
+  color:#5BADFF;
+  text-transform:uppercase;letter-spacing:0.1em;
+  margin-bottom:8px;display:block;
+  font-family:'IBM Plex Mono',monospace;
+}
+
+/* ── Input wrapper ── */
 .input-wrapper{position:relative;display:flex;align-items:center;}
-.input-wrapper .form-input{padding-right:44px;}
+.input-wrapper .form-input{padding-right:46px;}
 
 .form-input{
-  width:100%;
-  min-height:52px;
-  background:rgba(255,255,255,.07);
-  border:1.5px solid rgba(255,255,255,.15);
+  width:100%;min-height:52px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(91,173,255,0.2);
   color:#fff;padding:0 14px;border-radius:10px;
-  font-size:15px;font-family:inherit;outline:none;
-  transition:border-color .2s,box-shadow .2s;
+  font-size:15px;font-family:'Plus Jakarta Sans',inherit;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
   -webkit-appearance:none;
 }
-.form-input::placeholder{color:rgba(255,255,255,.3);}
-.form-input:focus{border-color:#1565C0;box-shadow:0 0 0 3px rgba(21,101,192,.28);}
+.form-input::placeholder{color:rgba(255,255,255,0.2);}
+.form-input:focus{
+  border-color:#0052CC;
+  background:rgba(0,82,204,0.08);
+  box-shadow:0 0 0 3px rgba(0,82,204,0.25);
+}
+.form-input.error{
+  border-color:#DE350B !important;
+  box-shadow:0 0 0 3px rgba(222,53,11,0.2) !important;
+}
+@keyframes loginShake{
+  0%,100%{transform:translateX(0);}
+  20%{transform:translateX(-7px);}
+  40%{transform:translateX(7px);}
+  60%{transform:translateX(-4px);}
+  80%{transform:translateX(4px);}
+}
+.shake{animation:loginShake 0.4s ease;}
+.field-error{
+  display:none;font-size:11px;color:#DE350B;
+  margin-top:5px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.04em;
+}
+.field-error.show{display:block;}
 
-/* Eye-toggle button */
+/* ── Eye toggle ── */
 .eye-toggle{
   position:absolute;right:12px;
   background:none;border:none;cursor:pointer;
-  color:rgba(255,255,255,.4);
+  color:rgba(91,173,255,0.4);
   display:flex;align-items:center;justify-content:center;
-  padding:4px;border-radius:6px;
-  transition:color .2s;
+  padding:4px;border-radius:6px;transition:color 0.2s;
   -webkit-tap-highlight-color:transparent;
 }
-.eye-toggle:hover,.eye-toggle:focus{color:rgba(255,255,255,.75);outline:none;}
+.eye-toggle:hover,.eye-toggle:focus{color:#5BADFF;outline:none;}
 
-/* Forgot password */
+/* ── Forgot password ── */
 .btn-forgot{
   display:block;text-align:right;
-  font-size:12px;color:rgba(255,255,255,.45);
+  font-size:11px;color:rgba(91,173,255,0.45);
   background:none;border:none;cursor:pointer;
-  margin-top:6px;padding:0;font-family:inherit;
-  letter-spacing:.2px;
-  transition:color .2s;
+  margin-top:6px;padding:0;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:0.05em;
+  transition:color 0.2s;
 }
-.btn-forgot:hover{color:rgba(255,255,255,.75);}
+.btn-forgot:hover{color:#5BADFF;}
 
-/* Primary login button */
+/* ── Primary login button ── */
 .btn-login{
-  width:100%;
-  min-height:52px;
-  background:#1565C0;color:#fff;border:none;
-  border-radius:10px;padding:0 14px;font-size:15px;font-weight:700;
-  cursor:pointer;letter-spacing:.4px;margin-top:16px;
-  transition:background .2s,transform .1s,box-shadow .2s;
-  box-shadow:0 4px 20px rgba(21,101,192,.45);
+  width:100%;min-height:52px;
+  background:linear-gradient(135deg,#0052CC 0%,#0072F5 100%);
+  color:#fff;border:none;
+  border-radius:10px;padding:0 20px;font-size:15px;font-weight:700;
+  cursor:pointer;letter-spacing:0.3px;margin-top:8px;
+  transition:transform 0.15s,box-shadow 0.2s,opacity 0.2s;
+  box-shadow:0 4px 20px rgba(0,82,204,0.45);
+  font-family:'Plus Jakarta Sans',sans-serif;
   -webkit-tap-highlight-color:transparent;
+  display:flex;align-items:center;justify-content:center;gap:9px;
 }
-.btn-login:hover{background:#1976D2;box-shadow:0 6px 24px rgba(21,101,192,.55);}
-.btn-login:active{transform:scale(.98);}
+.btn-login:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,82,204,0.55);}
+.btn-login:active:not(:disabled){transform:translateY(0) scale(0.99);}
+.btn-login:disabled{opacity:0.65;cursor:not-allowed;}
+.btn-spinner{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;
+  animation:spin 0.7s linear infinite;
+  display:none;flex-shrink:0;
+}
+.btn-login.loading .btn-spinner{display:block;}
+.btn-login.loading .btn-label{opacity:0.7;}
 
-/* Biometric quick-login */
+/* ── Divider ── */
+.login-divider{display:flex;align-items:center;gap:12px;margin:16px 0 12px;}
+.login-divider-line{flex:1;height:1px;background:rgba(91,173,255,0.1);}
+.login-divider-text{font-size:11px;color:rgba(255,255,255,0.25);font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em;}
+
+/* ── Biometric ── */
 .btn-biometric{
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  margin-top:18px;
-  background:none;border:none;cursor:pointer;width:100%;
-  color:rgba(255,255,255,.4);font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;min-height:46px;
+  background:rgba(91,173,255,0.07);
+  border:1px solid rgba(91,173,255,0.15);
+  border-radius:10px;padding:0 16px;
+  cursor:pointer;color:rgba(91,173,255,0.55);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;
+  transition:background 0.2s,border-color 0.2s,color 0.2s;
   -webkit-tap-highlight-color:transparent;
 }
-.btn-biometric svg{width:28px;height:28px;color:rgba(255,255,255,.35);transition:color .2s;}
-.btn-biometric:hover svg,.btn-biometric:focus svg{color:rgba(255,255,255,.7);}
-.btn-biometric span{font-size:11px;letter-spacing:.4px;text-transform:uppercase;transition:color .2s;}
-.btn-biometric:hover span,.btn-biometric:focus span{color:rgba(255,255,255,.65);}
-
-/* Demo hint */
-.login-demo{
-  margin-top:20px;padding:11px 14px;
-  background:rgba(255,255,255,.05);
-  border-radius:8px;font-size:12px;color:rgba(255,255,255,.38);
-  line-height:1.85;border:1px solid rgba(255,255,255,.08);
+.btn-biometric:hover,.btn-biometric:focus{
+  background:rgba(91,173,255,0.13);border-color:rgba(91,173,255,0.3);color:#5BADFF;outline:none;
 }
-.login-demo strong{color:rgba(100,160,255,.75);}
+.btn-biometric svg{width:20px;height:20px;flex-shrink:0;}
 
-/* Offline indicator */
+/* ── Demo hint ── */
+.login-demo{
+  margin-top:18px;padding:12px 16px;
+  background:rgba(0,212,245,0.05);
+  border-radius:8px;font-size:12px;color:rgba(255,255,255,0.32);
+  line-height:1.9;border:1px solid rgba(0,212,245,0.1);
+  font-family:'IBM Plex Mono',monospace;letter-spacing:0.02em;
+}
+.login-demo strong{color:#00D4F5;font-weight:500;}
+
+/* ── Offline indicator ── */
 .login-offline{
-  display:flex;align-items:center;gap:7px;
-  font-size:11px;color:rgba(255,255,255,.4);
-  letter-spacing:.3px;flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;color:rgba(255,255,255,0.32);
+  letter-spacing:0.06em;flex-shrink:0;
+  font-family:'IBM Plex Mono',monospace;
 }
 .offline-dot{
   width:7px;height:7px;border-radius:50%;
-  background:#4CAF50;
-  box-shadow:0 0 6px rgba(76,175,80,.7);
-  animation:livePulse 2.4s ease-in-out infinite;
+  background:#36B37E;
+  box-shadow:0 0 8px rgba(54,179,126,0.65);
+  animation:offlinePulse 2s ease-in-out infinite;
   flex-shrink:0;
+}
+@keyframes offlinePulse{
+  0%,100%{opacity:1;box-shadow:0 0 8px rgba(54,179,126,0.65);}
+  50%{opacity:0.45;box-shadow:0 0 3px rgba(54,179,126,0.2);}
+}
+
+/* ── Login footer (legacy) ── */
+.login-footer{display:none;}
+
+/* ── Responsive < 480px: no grid ── */
+@media(max-width:479px){
+  #loginScreen{
+    background-image:radial-gradient(ellipse 90% 50% at 50% 25%, rgba(0,82,204,0.22) 0%, transparent 70%);
+    background-size:100% 100%;
+    padding:max(env(safe-area-inset-top),16px) 16px max(env(safe-area-inset-bottom),16px);
+  }
+  .login-card{border-radius:12px;}
+  .login-card-inner{padding:28px 18px 22px;}
+}
+
+/* ── Responsive ≥ 1200px: two-column ── */
+@media(min-width:1200px){
+  #loginScreen{
+    padding:0;
+    justify-content:stretch;align-items:stretch;flex-direction:row;
+  }
+  .login-layout{
+    flex-direction:row;max-width:none;
+    width:100%;height:100%;
+    gap:0;align-items:stretch;
+  }
+  .login-left{
+    display:flex;flex-direction:column;justify-content:center;
+    flex:0 0 58%;
+    padding:72px 80px;
+    border-right:1px solid rgba(91,173,255,0.08);
+  }
+  .login-right{
+    flex:1;justify-content:center;
+    padding:48px 40px;gap:24px;
+  }
+  .login-logo{display:none;}
+  .login-card{max-width:420px;}
 }
 
 /* ===== HEADER ===== */
@@ -1078,82 +1249,138 @@ nav.bottom-nav{
 <body>
 
 <!-- ===== LOGIN SCREEN ===== -->
-<div id="loginScreen">
-  <!-- Logo -->
-  <div class="login-logo">
-    <img src="img/as_logo.png" alt="AssetLogic" class="login-logo-img">
-    <div class="login-logo-text">
-      <div class="login-brand">ASSET LOGIC</div>
-      <div class="login-brand-sub">Field Service Management</div>
-    </div>
-  </div>
+<div id="loginScreen" role="main">
+  <div class="login-layout">
 
-  <!-- Form Card -->
-  <div class="login-card">
-    <div class="login-title">Willkommen</div>
-    <div class="login-sub">Melden Sie sich mit Ihren Zugangsdaten an.</div>
-
-    <!-- Email -->
-    <div class="form-group">
-      <label class="form-label" for="loginEmail">E-Mail-Adresse</label>
-      <input type="email" class="form-input" id="loginEmail"
-             value="m.koehler@betrieb.de" placeholder="name@firma.de"
-             autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false">
-    </div>
-
-    <!-- Password with eye toggle -->
-    <div class="form-group">
-      <label class="form-label" for="loginPass">Passwort</label>
-      <div class="input-wrapper">
-        <input type="password" class="form-input" id="loginPass"
-               value="Demo1234" placeholder="Passwort eingeben"
-               autocomplete="current-password">
-        <button type="button" class="eye-toggle" id="eyeToggle"
-                aria-label="Passwort anzeigen" onclick="togglePassword()">
-          <!-- Eye icon (default: show) -->
-          <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
-        </button>
+    <!-- ── Left panel (desktop only) ── -->
+    <div class="login-left" aria-hidden="true">
+      <div>
+        <!-- Desktop logo -->
+        <div class="login-logo" style="justify-content:flex-start;margin-bottom:44px;">
+          <img src="img/as_logo.png" alt="AssetLogic" class="login-logo-img">
+          <div class="login-logo-text">
+            <div class="login-brand">ASSET LOGIC</div>
+            <div class="login-brand-sub">Field Service Management</div>
+          </div>
+        </div>
+        <div class="login-claim-title">
+          Smarter<br>
+          <span class="grad">Field Service</span><br>
+          beginnt hier.
+        </div>
+        <div class="login-claim-sub">
+          AssetLogic verbindet Ihre Au&szlig;endienstteams mit Echtzeit-Maschinendaten &mdash; nahtlos und auch ohne Netz.
+        </div>
       </div>
-      <button type="button" class="btn-forgot" onclick="alert('Bitte kontaktieren Sie Ihren Administrator.')">
-        Passwort vergessen?
-      </button>
+      <div class="login-kpis">
+        <div class="login-kpi">
+          <div class="login-kpi-val">&ndash;30%</div>
+          <div class="login-kpi-label">Diagnosezeit</div>
+        </div>
+        <div class="login-kpi">
+          <div class="login-kpi-val">&ndash;40%</div>
+          <div class="login-kpi-label">Fehlbestellungen</div>
+        </div>
+        <div class="login-kpi">
+          <div class="login-kpi-val">100%</div>
+          <div class="login-kpi-label">Offline-f&auml;hig</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Login Button -->
-    <button class="btn-login" onclick="doLogin()">Anmelden</button>
+    <!-- ── Right panel ── -->
+    <div class="login-right">
 
-    <!-- Biometric -->
-    <button type="button" class="btn-biometric" onclick="alert('Biometrie-Anmeldung wird eingerichtet.')">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M7 11.5a5 5 0 019.9-.9M12 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9S16.97 3 12 3z"/>
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M9 12a3 3 0 106 0M12 7v1m0 8v1"/>
-      </svg>
-      <span>Schnellanmeldung</span>
-    </button>
+      <!-- Logo (mobile only, hidden on desktop) -->
+      <div class="login-logo">
+        <img src="img/as_logo.png" alt="AssetLogic" class="login-logo-img">
+        <div class="login-logo-text">
+          <div class="login-brand">ASSET LOGIC</div>
+          <div class="login-brand-sub">Field Service Management</div>
+        </div>
+      </div>
 
-    <!-- Demo hint -->
-    <div class="login-demo">
-      <strong>Demo-Zugangsdaten</strong><br>
-      E-Mail: m.koehler@betrieb.de &nbsp;&middot;&nbsp; Passwort: beliebig
-    </div>
-  </div>
+      <!-- Card -->
+      <div class="login-card">
+        <div class="login-card-inner">
+          <div class="login-title">Willkommen zur&uuml;ck</div>
+          <div class="login-sub">Melden Sie sich mit Ihren Zugangsdaten an.</div>
 
-  <!-- Offline indicator -->
-  <div class="login-offline">
-    <span class="offline-dot"></span>
-    Offline-Modus bereit
-  </div>
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">E-Mail-Adresse</label>
+            <input type="email" class="form-input" id="loginEmail"
+                   value="m.koehler@betrieb.de" placeholder="name@firma.de"
+                   aria-label="E-Mail-Adresse"
+                   autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false">
+            <div class="field-error" id="emailError" role="alert">Bitte geben Sie eine g&uuml;ltige E-Mail-Adresse ein.</div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="loginPass">Passwort</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="loginPass"
+                     value="Demo1234" placeholder="Passwort eingeben"
+                     aria-label="Passwort"
+                     autocomplete="current-password">
+              <button type="button" class="eye-toggle" id="eyeToggle"
+                      aria-label="Passwort anzeigen" onclick="togglePassword()">
+                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="field-error" id="passError" role="alert">Bitte geben Sie Ihr Passwort ein.</div>
+            <button type="button" class="btn-forgot" onclick="alert('Bitte kontaktieren Sie Ihren Administrator.')">
+              Passwort vergessen?
+            </button>
+          </div>
+
+          <!-- Login button -->
+          <button class="btn-login" id="loginBtn" onclick="doLogin()" aria-label="Anmelden">
+            <span class="btn-spinner" aria-hidden="true"></span>
+            <span class="btn-label">Anmelden</span>
+          </button>
+
+          <!-- Divider -->
+          <div class="login-divider" aria-hidden="true">
+            <div class="login-divider-line"></div>
+            <span class="login-divider-text">oder</span>
+            <div class="login-divider-line"></div>
+          </div>
+
+          <!-- Biometric -->
+          <button type="button" class="btn-biometric"
+                  onclick="alert('Biometrie-Anmeldung wird eingerichtet.')"
+                  aria-label="Schnellanmeldung per Biometrie">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 11c0-1.1.9-2 2-2s2 .9 2 2v1M8 11c0-1.1.9-2 2-2M7 16a5 5 0 0010 0M5 12a7 7 0 1114 0"/>
+            </svg>
+            Schnellanmeldung
+          </button>
+
+          <!-- Demo hint -->
+          <div class="login-demo">
+            <strong>Demo-Zugangsdaten</strong><br>
+            E-Mail: m.koehler@betrieb.de &nbsp;&middot;&nbsp; Passwort: beliebig
+          </div>
+        </div>
+      </div>
+
+      <!-- Offline indicator -->
+      <div class="login-offline">
+        <span class="offline-dot"></span>
+        Offline-Modus bereit
+      </div>
+
+    </div><!-- /.login-right -->
+  </div><!-- /.login-layout -->
 </div>
-
 <!-- ===== SHARED HEADER ===== -->
 <header>
   <div class="hdr-logo">
@@ -2133,8 +2360,43 @@ function togglePassword() {
 }
 
 function doLogin() {
-  document.getElementById('loginScreen').classList.add('hidden');
-  showPage('home');
+  const emailEl  = document.getElementById('loginEmail');
+  const passEl   = document.getElementById('loginPass');
+  const emailErr = document.getElementById('emailError');
+  const passErr  = document.getElementById('passError');
+  const btn      = document.getElementById('loginBtn');
+
+  // Reset
+  [emailEl, passEl].forEach(el => el.classList.remove('error', 'shake'));
+  if (emailErr) emailErr.classList.remove('show');
+  if (passErr)  passErr.classList.remove('show');
+
+  let valid = true;
+  if (!emailEl.value.trim() || !emailEl.value.includes('@')) {
+    emailEl.classList.add('error');
+    if (emailErr) emailErr.classList.add('show');
+    void emailEl.offsetWidth;
+    emailEl.classList.add('shake');
+    emailEl.addEventListener('animationend', () => emailEl.classList.remove('shake'), {once:true});
+    valid = false;
+  }
+  if (!passEl.value.trim()) {
+    passEl.classList.add('error');
+    if (passErr) passErr.classList.add('show');
+    void passEl.offsetWidth;
+    passEl.classList.add('shake');
+    passEl.addEventListener('animationend', () => passEl.classList.remove('shake'), {once:true});
+    valid = false;
+  }
+  if (!valid) return;
+
+  // Loading state
+  if (btn) { btn.classList.add('loading'); btn.disabled = true; }
+  setTimeout(() => {
+    if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+    document.getElementById('loginScreen').classList.add('hidden');
+    showPage('home');
+  }, 900);
 }
 
 function doLogout() {
