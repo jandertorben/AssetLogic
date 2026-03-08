@@ -2785,6 +2785,22 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 }
 .mhc-hint{font-size:10px;color:#94a3b8;margin-top:6px;font-style:italic;}
 
+/* ── Nested machine sub-items under technician ── */
+.sl-filter-sub-item{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 8px 5px 18px;border-radius:9px;
+  cursor:pointer;transition:background .15s;margin-bottom:1px;
+}
+.sl-filter-sub-item:hover{background:var(--accent-lt);}
+.sl-filter-sub-item.active{background:#EBF0FF;}
+.sl-filter-sub-item.active .sl-filter-item-name{color:#0052CC;font-weight:700;}
+.sl-filter-sub-item.active .sl-filter-dot{background:#0052CC!important;animation:none!important;box-shadow:0 0 0 3px rgba(0,82,204,.18);}
+.sl-filter-sub-indent{
+  width:14px;flex-shrink:0;
+  border-left:2px solid #cbd5e1;border-bottom:2px solid #cbd5e1;
+  height:14px;border-radius:0 0 0 5px;align-self:flex-start;margin-top:6px;
+}
+
 /* ── Sidebar filter-reset strip ── */
 .sl-filter-reset{
   display:flex;align-items:center;gap:7px;
@@ -7464,8 +7480,10 @@ var _selectedMarkerId = null;
 var _mapInitAttempts = 0;
 
 function renderKarte() {
+  _filteredIds     = null;
+  _activeTechId    = null;
+  _activeMachineId = null;
   renderSlFilter('');
-  _filteredIds = null;
   _mapInitAttempts = 0;
   // Retry loop: try up to 5 times with increasing delays
   function tryInit() {
@@ -7695,19 +7713,20 @@ function _filterMarkers(ids) {
 }
 
 function _clearMarkerFilter() {
-  _filteredIds = null;
+  _filteredIds     = null;
+  _activeTechId    = null;
+  _activeMachineId = null;
   Object.keys(_leafletMarkers).forEach(function(mid) {
     _leafletMarkers[mid].setOpacity(1);
     var el = _leafletMarkers[mid].getElement();
     if (el) el.style.pointerEvents = '';
   });
-  // clear active sidebar + selected marker
-  document.querySelectorAll('.sl-filter-item').forEach(function(el){ el.classList.remove('active'); });
   if (_selectedMarkerId && _leafletMarkers[_selectedMarkerId]) {
     _leafletMarkers[_selectedMarkerId].setIcon(_buildMarkerIcon(_selectedMarkerId, false));
   }
   _selectedMarkerId = null;
   _updateSidebarResetBtn();
+  renderSlFilter('');
 }
 
 function _updateSidebarResetBtn() {
@@ -7755,31 +7774,42 @@ function openMachineFromMap(id) {
   openMachine(id);
 }
 
+var _activeTechId    = null;
+var _activeMachineId = null;
+
 function flyToMachine(id) {
   var m = MACHINES[id];
   if (!m || !m.latlng || !_leafletMap) return;
+  // Highlight owning technician + expand in sidebar
+  _activeTechId    = m.technicianId || null;
+  _activeMachineId = id;
+  renderSlFilter('');
   _setSelectedMarker(id);
-  _setActiveSlItem('mid', id);
   _filterMarkers([id]);
   _leafletMap.flyTo(m.latlng, 14, { duration: 1.1 });
 }
 
 function flyToTech(techId) {
-  _setActiveSlItem('tid', techId);
+  // Toggle: second click on same tech collapses
+  if (_activeTechId === techId && _activeMachineId === null) {
+    _activeTechId    = null;
+    _activeMachineId = null;
+    _clearMarkerFilter();
+    return;
+  }
+  _activeTechId    = techId;
+  _activeMachineId = null;
   var machineIds = Object.keys(MACHINES).filter(function(mid){ return MACHINES[mid].technicianId === techId; });
-  if (!machineIds.length) return;
-  _filterMarkers(machineIds);
-  // Select & fly to first machine of this tech
+  renderSlFilter('');
+  _filterMarkers(machineIds.length ? machineIds : null);
+  if (!machineIds.length || !_leafletMap) return;
   var first = machineIds[0];
   _setSelectedMarker(first);
-  var m = MACHINES[first];
-  if (m.latlng) {
-    if (machineIds.length === 1) {
-      _leafletMap.flyTo(m.latlng, 14, { duration: 1.1 });
-    } else {
-      var bounds = L.latLngBounds(machineIds.map(function(mid){ return MACHINES[mid].latlng; }).filter(Boolean));
-      _leafletMap.flyToBounds(bounds, { padding: [60, 60], duration: 1.0 });
-    }
+  if (machineIds.length === 1) {
+    _leafletMap.flyTo(MACHINES[first].latlng, 14, { duration: 1.1 });
+  } else {
+    var bounds = L.latLngBounds(machineIds.map(function(mid){ return MACHINES[mid].latlng; }).filter(Boolean));
+    _leafletMap.flyToBounds(bounds, { padding: [60, 60], duration: 1.0 });
   }
 }
 
@@ -7788,25 +7818,50 @@ function renderSlFilter(query) {
   if (!el) return;
   var q = (query || '').toLowerCase();
   var html = '<div class="sl-filter-label">Techniker</div>';
+
   Object.keys(MONTEURE_DB).forEach(function(tid) {
     var t = MONTEURE_DB[tid];
     if (q && !t.name.toLowerCase().includes(q)) return;
-    var isBusy = t.status === 'im-einsatz';
-    var activeMachine = '';
-    Object.keys(MACHINES).forEach(function(mid){ if (MACHINES[mid].technicianId === tid && isBusy) activeMachine = MACHINES[mid].name.split(' ').slice(0,3).join(' '); });
-    html += '<div class="sl-filter-item" data-tid="' + tid + '" onclick="flyToTech(\'' + tid + '\')">' +
+    var isBusy    = t.status === 'im-einsatz';
+    var isActive  = _activeTechId === tid;
+    var techMachines = Object.keys(MACHINES).filter(function(mid){ return MACHINES[mid].technicianId === tid; });
+
+    html += '<div class="sl-filter-item' + (isActive ? ' active' : '') + '" data-tid="' + tid + '" onclick="flyToTech(\'' + tid + '\')">' +
       '<div class="sl-filter-item-av" style="background:' + t.grad + '">' + t.initials + '</div>' +
-      '<div class="sl-filter-item-body"><div class="sl-filter-item-name">' + t.name + '</div>' +
-        '<div class="sl-filter-item-sub">' + (isBusy && activeMachine ? activeMachine : 'Verfügbar') + '</div></div>' +
+      '<div class="sl-filter-item-body">' +
+        '<div class="sl-filter-item-name">' + t.name + '</div>' +
+        '<div class="sl-filter-item-sub">' + (isBusy ? 'Im Einsatz' : 'Verfügbar') + ' &middot; ' + techMachines.length + ' Asset' + (techMachines.length !== 1 ? 's' : '') + '</div>' +
+      '</div>' +
       '<div class="sl-filter-dot ' + (isBusy ? 'busy' : 'idle') + '"></div>' +
     '</div>';
+
+    // Expanded machine list under the active technician
+    if (isActive) {
+      techMachines.forEach(function(mid) {
+        var m = MACHINES[mid];
+        var icon = MACHINE_ICONS[m.type] || '🔧';
+        var isMachineActive = _activeMachineId === mid;
+        html += '<div class="sl-filter-sub-item' + (isMachineActive ? ' active' : '') + '" data-mid="' + mid + '"' +
+          ' onclick="event.stopPropagation();flyToMachine(\'' + mid + '\')">' +
+          '<div class="sl-filter-sub-indent"></div>' +
+          '<div class="sl-filter-item-icon" style="width:22px;height:22px;font-size:11px;">' + icon + '</div>' +
+          '<div class="sl-filter-item-body">' +
+            '<div class="sl-filter-item-name" style="font-size:12px;">' + m.name + '</div>' +
+            '<div class="sl-filter-item-sub">' + m.location.split(',')[0] + '</div>' +
+          '</div>' +
+          '<div class="sl-filter-dot ' + m.status + '"></div>' +
+        '</div>';
+      });
+    }
   });
+
   html += '<div class="sl-filter-divider"></div><div class="sl-filter-label">Maschinen</div>';
   Object.keys(MACHINES).forEach(function(mid) {
     var m = MACHINES[mid];
     if (q && !m.name.toLowerCase().includes(q) && !m.location.toLowerCase().includes(q)) return;
     var icon = MACHINE_ICONS[m.type] || '🔧';
-    html += '<div class="sl-filter-item" data-mid="' + mid + '" onclick="flyToMachine(\'' + mid + '\')">' +
+    var isMachineActive = _activeMachineId === mid;
+    html += '<div class="sl-filter-item' + (isMachineActive ? ' active' : '') + '" data-mid="' + mid + '" onclick="flyToMachine(\'' + mid + '\')">' +
       '<div class="sl-filter-item-icon">' + icon + '</div>' +
       '<div class="sl-filter-item-body"><div class="sl-filter-item-name">' + m.name + '</div>' +
         '<div class="sl-filter-item-sub">' + m.location + '</div></div>' +
@@ -7817,7 +7872,10 @@ function renderSlFilter(query) {
 }
 
 function filterSlItems(q) {
-  if (q) { _clearMarkerFilter(); }
+  if (q) {
+    _activeTechId = null; _activeMachineId = null;
+    _clearMarkerFilter();
+  }
   renderSlFilter(q);
 }
 
