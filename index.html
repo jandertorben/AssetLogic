@@ -2606,6 +2606,10 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 .sl-filter-dot.err{background:#E53935;animation:livePulse 1.8s infinite;}
 .sl-filter-dot.busy{background:#4CAF50;animation:livePulse 2s infinite;}
 .sl-filter-dot.idle{background:#90A4AE;}
+.sl-filter-item.active{background:#EBF0FF;border-left:3px solid #0052CC;padding-left:5px;}
+.sl-filter-item.active .sl-filter-item-name{color:#0052CC;font-weight:700;}
+@keyframes pin-pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.85;transform:scale(1.4)}}
+@keyframes pin-pulse-sel{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.75;transform:scale(1.65)}}
 .sl-filter-divider{height:1px;background:var(--border);margin:10px 0 4px;}
 
 /* Leaflet container — MUST use flex:1 1 0 + min-height:0 so percentage children work */
@@ -7176,6 +7180,7 @@ function applyRole(user) {
 // ===== SERVICELEITER MAP (LEAFLET) =====
 var _leafletMap = null;
 var _leafletMarkers = {};
+var _selectedMarkerId = null;
 var _mapInitAttempts = 0;
 
 function renderKarte() {
@@ -7297,21 +7302,47 @@ function _renderStaticFallback() {
 // Fallback for static map — directly open machine detail
 function showPinInfoStatic(id) { openMachine(id); }
 
+function _buildMarkerIcon(id, isSelected) {
+  var m      = MACHINES[id];
+  var color  = m.status === 'err' ? '#E53935' : m.status === 'mnt' ? '#FB8C00' : '#43A047';
+  var border = isSelected ? '#0052CC' : '#fff';
+  var shadow = m.status === 'err'
+    ? '0 0 0 5px rgba(229,57,53,.22),0 4px 16px rgba(0,0,0,.35)'
+    : isSelected ? '0 0 0 4px rgba(0,82,204,.28),0 4px 16px rgba(0,0,0,.32)'
+    : '0 4px 16px rgba(0,0,0,.28)';
+  var errPulse = m.status === 'err'
+    ? '<div style="position:absolute;inset:-5px;border-radius:50%;background:rgba(229,57,53,.18);animation:pin-pulse 1.8s ease-in-out infinite;"></div>' : '';
+  var selPulse = isSelected
+    ? '<div style="position:absolute;inset:-9px;border-radius:50%;border:2.5px solid rgba(0,82,204,.55);animation:pin-pulse-sel 1.6s ease-in-out infinite;"></div>' : '';
+  var icon = MACHINE_ICONS[m.type] || '🔧';
+  var html =
+    '<div style="position:relative;width:36px;height:44px;">' + errPulse + selPulse +
+      '<div style="width:36px;height:36px;background:' + color + ';border-radius:50%;border:3px solid ' + border + ';box-shadow:' + shadow + ';display:flex;align-items:center;justify-content:center;font-size:17px;position:relative;z-index:1;">' + icon + '</div>' +
+      '<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid ' + color + ';z-index:1;"></div>' +
+    '</div>';
+  return L.divIcon({ html: html, iconSize: [36, 44], iconAnchor: [18, 44], popupAnchor: [0, -48], className: '' });
+}
+
+function _setSelectedMarker(id) {
+  if (_selectedMarkerId && _leafletMarkers[_selectedMarkerId]) {
+    _leafletMarkers[_selectedMarkerId].setIcon(_buildMarkerIcon(_selectedMarkerId, false));
+  }
+  _selectedMarkerId = id;
+  if (id && _leafletMarkers[id]) {
+    _leafletMarkers[id].setIcon(_buildMarkerIcon(id, true));
+  }
+}
+
+function _setActiveSlItem(type, id) {
+  document.querySelectorAll('.sl-filter-item').forEach(function(el){ el.classList.remove('active'); });
+  var el = document.querySelector('.sl-filter-item[data-' + type + '="' + id + '"]');
+  if (el) { el.classList.add('active'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+}
+
 function _addLeafletMarker(id) {
   var m = MACHINES[id];
   if (!m.latlng || !_leafletMap) return;
-  var color  = m.status === 'err' ? '#E53935' : m.status === 'mnt' ? '#FB8C00' : '#43A047';
-  var shadow = m.status === 'err' ? '0 0 0 5px rgba(229,57,53,.22),0 4px 16px rgba(0,0,0,.35)' : '0 4px 16px rgba(0,0,0,.28)';
-  var pulse  = m.status === 'err'
-    ? '<div style="position:absolute;inset:-5px;border-radius:50%;background:rgba(229,57,53,.18);animation:pin-pulse 1.8s ease-in-out infinite;"></div>' : '';
-  var icon   = MACHINE_ICONS[m.type] || '🔧';
-  var markerHtml =
-    '<div style="position:relative;width:36px;height:44px;">' + pulse +
-      '<div style="width:36px;height:36px;background:' + color + ';border-radius:50%;border:3px solid #fff;box-shadow:' + shadow + ';display:flex;align-items:center;justify-content:center;font-size:17px;position:relative;z-index:1;">' + icon + '</div>' +
-      '<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid ' + color + ';z-index:1;"></div>' +
-    '</div>';
-  var divIcon = L.divIcon({ html: markerHtml, iconSize: [36, 44], iconAnchor: [18, 44], popupAnchor: [0, -48], className: '' });
-  var marker  = L.marker(m.latlng, { icon: divIcon }).addTo(_leafletMap);
+  var marker = L.marker(m.latlng, { icon: _buildMarkerIcon(id, false) }).addTo(_leafletMap);
   marker.bindPopup(_buildLeafletPopup(id), { maxWidth: 300, className: '' });
   _leafletMarkers[id] = marker;
 }
@@ -7342,12 +7373,12 @@ function _buildLeafletPopup(id) {
     '<div><div class="sl-pop-row-lbl">&#127970; Kunde &amp; Ansprechpartner</div><div class="sl-pop-row-val">' + (cust.name || '—') + '</div>' +
       '<div class="sl-pop-row-sub">' + (cust.contact || '—') + ' &nbsp;&middot;&nbsp; <a href="tel:' + (cust.phone || '') + '" style="color:#0052CC;text-decoration:none;font-weight:600;">' + (cust.phone || '—') + '</a></div></div>' +
     '<div class="sl-pop-divider"></div>' +
-    '<div><div class="sl-pop-row-lbl">&#128373; Zuständiger Techniker</div><div class="sl-pop-row-val">' +
+    '<div><div class="sl-pop-row-lbl">&#128373; Letzter Techniker vor Ort</div><div class="sl-pop-row-val">' +
       (tech ? tech.name : 'Nicht zugewiesen') +
       (tech && tech.status === 'im-einsatz' ? '&nbsp;<span style="color:#2E7D32;font-size:10px;font-weight:700;background:#E8F5E9;padding:1px 6px;border-radius:8px;">&#9679; Im Einsatz</span>' : '') +
     '</div>' +
     (tech ? '<div class="sl-pop-row-sub">' + tech.rolle + '</div>' : '') + '</div>' +
-    '<button class="sl-pop-btn" onclick="openMachineFromMap(\'' + id + '\')">Details &amp; Maschinenakte &#8594;</button>' +
+    '<button class="sl-pop-btn" onclick="openMachineFromMap(\'' + id + '\')">Wartungshistorie &amp; Maschinenakte &#8594;</button>' +
   '</div>';
 }
 
@@ -7359,11 +7390,14 @@ function openMachineFromMap(id) {
 function flyToMachine(id) {
   var m = MACHINES[id];
   if (!m || !m.latlng || !_leafletMap) return;
+  _setSelectedMarker(id);
+  _setActiveSlItem('mid', id);
   _leafletMap.flyTo(m.latlng, 14, { duration: 1.1 });
   setTimeout(function() { if (_leafletMarkers[id]) _leafletMarkers[id].openPopup(); }, 1250);
 }
 
 function flyToTech(techId) {
+  _setActiveSlItem('tid', techId);
   var ids = Object.keys(MACHINES).filter(function(mid){ return MACHINES[mid].technicianId === techId; });
   if (ids.length) flyToMachine(ids[0]);
 }
@@ -7379,7 +7413,7 @@ function renderSlFilter(query) {
     var isBusy = t.status === 'im-einsatz';
     var activeMachine = '';
     Object.keys(MACHINES).forEach(function(mid){ if (MACHINES[mid].technicianId === tid && isBusy) activeMachine = MACHINES[mid].name.split(' ').slice(0,3).join(' '); });
-    html += '<div class="sl-filter-item" onclick="flyToTech(\'' + tid + '\')">' +
+    html += '<div class="sl-filter-item" data-tid="' + tid + '" onclick="flyToTech(\'' + tid + '\')">' +
       '<div class="sl-filter-item-av" style="background:' + t.grad + '">' + t.initials + '</div>' +
       '<div class="sl-filter-item-body"><div class="sl-filter-item-name">' + t.name + '</div>' +
         '<div class="sl-filter-item-sub">' + (isBusy && activeMachine ? activeMachine : 'Verfügbar') + '</div></div>' +
@@ -7391,7 +7425,7 @@ function renderSlFilter(query) {
     var m = MACHINES[mid];
     if (q && !m.name.toLowerCase().includes(q) && !m.location.toLowerCase().includes(q)) return;
     var icon = MACHINE_ICONS[m.type] || '🔧';
-    html += '<div class="sl-filter-item" onclick="flyToMachine(\'' + mid + '\')">' +
+    html += '<div class="sl-filter-item" data-mid="' + mid + '" onclick="flyToMachine(\'' + mid + '\')">' +
       '<div class="sl-filter-item-icon">' + icon + '</div>' +
       '<div class="sl-filter-item-body"><div class="sl-filter-item-name">' + m.name + '</div>' +
         '<div class="sl-filter-item-sub">' + m.location + '</div></div>' +
