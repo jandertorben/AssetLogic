@@ -1105,6 +1105,13 @@ header{
   padding:2px 7px;display:inline-block;margin-bottom:8px;
 }
 .asset-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.asset-mb-divider{height:1px;background:var(--border);margin:10px 0 8px;}
+.asset-mb-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;}
+.asset-mb-rows{display:flex;flex-direction:column;gap:5px;}
+.asset-mb-row{display:flex;align-items:center;gap:8px;}
+.asset-mb-row-id{font-size:11px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.asset-mb-row-date{font-size:10px;color:var(--text-muted);white-space:nowrap;}
+.asset-mb-empty{font-size:11px;color:var(--text-muted);font-style:italic;}
 .asset-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;flex-shrink:0;}
 .as-ok{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,50,.2);}
 .as-mnt{background:var(--warn-bg);color:var(--warning);border:1px solid rgba(230,81,0,.2);}
@@ -5254,12 +5261,14 @@ function renderMontageberichte(machineId) {
   var section = document.getElementById('montageberichteSection');
   var list = document.getElementById('montageberichteList');
   if (!section || !list) return;
-  var reports = _montageberichte[machineId] || [];
+  // Only show reports that are NOT yet synced to ERP
+  var reports = (_montageberichte[machineId] || []).filter(function(r) {
+    return (r.syncStatus || 'pending') !== 'synced';
+  });
   if (reports.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   list.innerHTML = reports.map(function(r) {
-    var archived = r.syncStatus === 'synced' ? ' archived' : '';
-    return '<div class="mb-report-item' + archived + '" id="mb-item-' + r.id + '">' +
+    return '<div class="mb-report-item" id="mb-item-' + r.id + '">' +
       '<div class="mb-report-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
       '<div class="mb-report-info">' +
         '<div class="mb-report-name">' + r.id + '</div>' +
@@ -5377,8 +5386,9 @@ function startErpMbSync() {
         _erpSyncing = false;
         renderErpMbSection();
 
-        // Refresh machine detail if it's open
+        // Refresh machine detail and assets grid
         if (_currentMachineId) renderMontageberichte(_currentMachineId);
+        if (document.getElementById('assetsGrid')) renderAssetsGrid();
 
         var now = new Date();
         var lastSync = document.getElementById('erpMbLastSync');
@@ -6129,6 +6139,22 @@ function renderAssetsGrid() {
     const icon = MACHINE_ICONS[m.type] || '\uD83D\uDD27';
     const statusLabel = m.status === 'err' ? 'Fehler aktiv' : m.status === 'mnt' ? 'Wartung f\u00e4llig' : 'Betrieb OK';
     const statusCls = m.status === 'err' ? 'as-err' : m.status === 'mnt' ? 'as-mnt' : 'as-ok';
+
+    const reports = _montageberichte[id] || [];
+    let mbHtml = '';
+    if (reports.length > 0) {
+      const rows = reports.map(r => {
+        return '<div class="asset-mb-row">' +
+          '<div class="asset-mb-row-id">' + r.id + '</div>' +
+          '<div class="asset-mb-row-date">' + r.date.split(' ')[0] + '</div>' +
+          mbSyncBadgeHtml(r.syncStatus || 'pending') +
+        '</div>';
+      }).join('');
+      mbHtml = '<div class="asset-mb-divider"></div>' +
+        '<div class="asset-mb-label">Montageberichte</div>' +
+        '<div class="asset-mb-rows">' + rows + '</div>';
+    }
+
     html += `<div class="asset-card ${m.status}" data-id="${id}" data-search="${(m.name + ' ' + m.type + ' ' + m.serial + ' ' + m.location).toLowerCase()}">
       <div class="asset-thumb">${icon}</div>
       <div class="asset-info">
@@ -6143,6 +6169,7 @@ function renderAssetsGrid() {
           <span class="asset-status ${statusCls}">${statusLabel}</span>
           <button class="btn-asset-detail" onclick="openMachine('${id}')">Konfiguration \u00f6ffnen</button>
         </div>
+        ${mbHtml}
       </div>
     </div>`;
   });
