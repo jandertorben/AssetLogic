@@ -3523,49 +3523,6 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
           <div id="montageberichteList"></div>
         </div>
 
-        <!-- Accordion: Diagnose starten -->
-        <div class="acc-section" id="acc-diagnose">
-          <button class="acc-header" onclick="toggleAcc('diagnose')" style="touch-action:manipulation;">
-            <div class="acc-header-left">
-              <div class="acc-icon" style="background:#EEF2FF;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-              </div>
-              <div>
-                <div class="acc-title">Diagnose starten</div>
-                <div class="acc-sub" id="accDiagSub">Fehlercode eingeben &amp; L&ouml;sung anfordern</div>
-              </div>
-            </div>
-            <svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="acc-body">
-            <div class="acc-body-inner">
-              <div class="error-section locked" id="diagnosisSection">
-                <div class="diag-lock-overlay" id="diagLockOverlay">
-                  <div class="diag-lock-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  </div>
-                  <div class="diag-lock-text">Diagnose gesperrt</div>
-                  <div class="diag-lock-sub">Bitte zuerst Asset-Konfiguration best&auml;tigen</div>
-                </div>
-                <div class="search-row">
-                  <div class="search-field-wrap">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                    <input type="text" id="errorInput"
-                      placeholder="z. B. E-0147 oder WARN_KPD_07"
-                      autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text">
-                  </div>
-                  <button class="btn-search" onclick="searchCode()">Diagnose anfordern</button>
-                </div>
-                <div id="solutionArea"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Accordion: Asset-Konfiguration -->
         <div class="acc-section" id="acc-config">
           <button class="acc-header" onclick="toggleAcc('config')" style="touch-action:manipulation;">
@@ -3616,6 +3573,49 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 Konfiguration best&auml;tigen &amp; Diagnose starten
               </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion: Diagnose starten -->
+        <div class="acc-section" id="acc-diagnose">
+          <button class="acc-header" onclick="toggleAcc('diagnose')" style="touch-action:manipulation;">
+            <div class="acc-header-left">
+              <div class="acc-icon" style="background:#EEF2FF;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </div>
+              <div>
+                <div class="acc-title">Diagnose starten</div>
+                <div class="acc-sub" id="accDiagSub">Fehlercode eingeben &amp; L&ouml;sung anfordern</div>
+              </div>
+            </div>
+            <svg class="acc-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="acc-body">
+            <div class="acc-body-inner">
+              <div class="error-section locked" id="diagnosisSection">
+                <div class="diag-lock-overlay" id="diagLockOverlay">
+                  <div class="diag-lock-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <div class="diag-lock-text">Diagnose gesperrt</div>
+                  <div class="diag-lock-sub">Bitte zuerst Asset-Konfiguration best&auml;tigen</div>
+                </div>
+                <div class="search-row">
+                  <div class="search-field-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="errorInput"
+                      placeholder="z. B. E-0147 oder WARN_KPD_07"
+                      autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text">
+                  </div>
+                  <button class="btn-search" onclick="searchCode()">Diagnose anfordern</button>
+                </div>
+                <div id="solutionArea"></div>
+              </div>
             </div>
           </div>
         </div>
