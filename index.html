@@ -1219,6 +1219,49 @@ header{
 .task-pri{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase;flex-shrink:0;}
 .pri-high{background:var(--red-bg);color:var(--red);border:1px solid rgba(198,40,40,.2);}
 .pri-mid{background:var(--warn-bg);color:var(--warning);border:1px solid rgba(230,81,0,.2);}
+/* Aufgaben – Maschinenkarten */
+.aufg-card{
+  background:#fff;border:1.5px solid var(--border);border-radius:12px;
+  display:flex;align-items:center;gap:12px;
+  padding:14px 15px;margin-bottom:10px;
+  cursor:pointer;box-shadow:var(--shadow);
+  transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:hidden;
+}
+.aufg-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;}
+.aufg-card.err::before{background:var(--red);}
+.aufg-card.mnt::before{background:var(--warning);}
+.aufg-card.ok::before{background:var(--green);}
+.aufg-card:active{transform:scale(.98);box-shadow:none;}
+.aufg-card-icon{font-size:24px;flex-shrink:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:10px;border:1px solid var(--border);}
+.aufg-card-body{flex:1;min-width:0;}
+.aufg-card-name{font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.aufg-card-sub{font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.aufg-card-badges{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.aufg-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;}
+.aufg-badge.err{background:var(--red-bg);color:var(--red);}
+.aufg-badge.mnt{background:var(--warn-bg);color:var(--warning);}
+.aufg-badge.ok{background:var(--green-bg);color:var(--green);}
+.aufg-badge.code{background:var(--bg3);color:var(--text-muted);font-family:'Courier New',monospace;}
+.aufg-card-arr{font-size:20px;color:var(--border);flex-shrink:0;}
+.aufg-empty{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;}
+.aufg-tech-header{
+  display:flex;align-items:center;gap:10px;
+  background:#fff;border:1.5px solid var(--border);border-radius:12px;
+  padding:13px 15px;margin-bottom:14px;
+}
+.aufg-tech-avatar{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,#1565C0,#1976D2);
+}
+.aufg-tech-name{font-size:13px;font-weight:800;color:var(--text);}
+.aufg-tech-role{font-size:11px;color:var(--text-muted);}
+.aufg-stats{display:flex;gap:8px;margin-bottom:14px;}
+.aufg-stat{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center;}
+.aufg-stat-val{font-size:20px;font-weight:900;color:var(--text);}
+.aufg-stat-lbl{font-size:10px;color:var(--text-muted);margin-top:2px;}
 .pri-low{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,50,.2);}
 
 /* ===== PROFIL ===== */
@@ -2721,28 +2764,6 @@ nav.bottom-nav{
             </div>
           </div>
           <div class="scan-section" style="display:none;"></div>
-
-          <!-- ERP-Sync tile (mobile only) -->
-          <div class="erp-tile" onclick="triggerSync()">
-            <div class="erp-tile-icon">
-              <svg id="syncIconMobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/>
-                <polyline points="21 3 21 10 14 10"/>
-                <polyline points="3 21 3 14 10 14"/>
-              </svg>
-              <span class="erp-tile-dot"></span>
-            </div>
-            <div class="erp-tile-text">
-              <div class="erp-tile-label">ERP-Sync: Aktiv</div>
-              <div class="erp-tile-sub">Tippen zum manuellen Synchronisieren</div>
-            </div>
-            <span class="erp-tile-arr">&#8250;</span>
-          </div>
-
-          <!-- Compact task list (mobile) -->
-          <div class="tasks-compact" id="tasksCompactSection">
-            <!-- filled by JS -->
-          </div>
 
           <!-- Machine list -->
           <div class="machines-section">
@@ -4439,27 +4460,8 @@ nav.bottom-nav{
     <div id="page-aufgaben" class="page">
       <div class="tasks-section">
         <div style="height:4px;"></div>
-        <div class="sec-label">Offene Aufgaben</div>
-        <div class="task-item" onclick="toggleTask(this)">
-          <div class="task-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="task-body"><div class="task-title">Sensor P3 kalibrieren &ndash; CAT 320</div><div class="task-sub">Baustelle Nord &middot; F&auml;llig heute</div></div>
-          <div class="task-pri pri-high">Hoch</div>
-        </div>
-        <div class="task-item" onclick="toggleTask(this)">
-          <div class="task-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="task-body"><div class="task-title">Filterpatrone Typ-B wechseln &ndash; HP-500</div><div class="task-sub">Halle 4, Block C &middot; F&auml;llig 06.03.2026</div></div>
-          <div class="task-pri pri-mid">Mittel</div>
-        </div>
-        <div class="task-item" onclick="toggleTask(this)">
-          <div class="task-check done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="task-body"><div class="task-title done">Druckpr&uuml;fung KPD-200 durchgef&uuml;hrt</div><div class="task-sub">Keller, Technikraum &middot; Erledigt 03.03.2026</div></div>
-          <div class="task-pri pri-low">Erledigt</div>
-        </div>
-        <div class="task-item" onclick="toggleTask(this)">
-          <div class="task-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="task-body"><div class="task-title">Jahreswartung WS-Pro einplanen</div><div class="task-sub">Halle 2, Station 7 &middot; F&auml;llig 15.03.2026</div></div>
-          <div class="task-pri pri-low">Niedrig</div>
-        </div>
+        <div class="sec-label" id="aufgabenLabel">Meine Maschinen</div>
+        <div id="aufgabenList"><!-- filled by JS --></div>
       </div>
       <div class="page-footer">
         <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
@@ -5416,6 +5418,69 @@ function renderDashboardMobile() {
     tasksEl.innerHTML = '<div class="tasks-compact-label">Weitere Maschinen</div>' +
       '<div class="task-list">' + rows + '</div>' + showAllBtn;
   }
+}
+
+// ===== AUFGABEN PAGE =====
+// Logged-in technician
+var CURRENT_TECH = { id:'mo-001', name:'Marco K\u00f6hler', initials:'MK', rolle:'Senior Techniker', customerId:'mayer-bau' };
+
+function renderAufgaben() {
+  var listEl = document.getElementById('aufgabenList');
+  if (!listEl) return;
+
+  // All machines assigned to this technician's customer
+  var myMachines = Object.keys(MACHINES).filter(function(id) {
+    return MACHINES[id].customerId === CURRENT_TECH.customerId;
+  });
+
+  // Sort: err first, then mnt, then ok
+  myMachines.sort(function(a, b) {
+    var order = { err: 0, mnt: 1, ok: 2 };
+    return (order[MACHINES[a].status] || 2) - (order[MACHINES[b].status] || 2);
+  });
+
+  var errCount = myMachines.filter(function(id){ return MACHINES[id].status === 'err'; }).length;
+  var mntCount = myMachines.filter(function(id){ return MACHINES[id].status === 'mnt'; }).length;
+
+  // Header: tech info + stats
+  var header = '<div class="aufg-tech-header">' +
+    '<div class="aufg-tech-avatar">' + CURRENT_TECH.initials + '</div>' +
+    '<div><div class="aufg-tech-name">' + CURRENT_TECH.name + '</div>' +
+    '<div class="aufg-tech-role">' + CURRENT_TECH.rolle + '</div></div>' +
+  '</div>' +
+  '<div class="aufg-stats">' +
+    '<div class="aufg-stat"><div class="aufg-stat-val" style="color:var(--red);">' + errCount + '</div><div class="aufg-stat-lbl">Kritisch</div></div>' +
+    '<div class="aufg-stat"><div class="aufg-stat-val" style="color:var(--warning);">' + mntCount + '</div><div class="aufg-stat-lbl">Wartung f\u00e4llig</div></div>' +
+    '<div class="aufg-stat"><div class="aufg-stat-val">' + myMachines.length + '</div><div class="aufg-stat-lbl">Maschinen gesamt</div></div>' +
+  '</div>';
+
+  if (myMachines.length === 0) {
+    listEl.innerHTML = header + '<div class="aufg-empty">Keine Maschinen zugewiesen.</div>';
+    return;
+  }
+
+  var cards = myMachines.map(function(id) {
+    var m = MACHINES[id];
+    var icon = (typeof MACHINE_ICONS !== 'undefined' && MACHINE_ICONS[m.type]) || '\uD83D\uDD27';
+    var statusLabel = m.status === 'err' ? 'Fehler aktiv' : m.status === 'mnt' ? 'Wartung f\u00e4llig' : 'Betrieb OK';
+    var codeBadge = m.activeCode
+      ? '<span class="aufg-badge code">' + m.activeCode + '</span>'
+      : '';
+    return '<div class="aufg-card ' + m.status + '" onclick="openMachine(\'' + id + '\')">' +
+      '<div class="aufg-card-icon">' + icon + '</div>' +
+      '<div class="aufg-card-body">' +
+        '<div class="aufg-card-name">' + m.name + '</div>' +
+        '<div class="aufg-card-sub">\uD83D\uDCCD ' + m.location + '</div>' +
+        '<div class="aufg-card-badges">' +
+          '<span class="aufg-badge ' + m.status + '">' + statusLabel + '</span>' +
+          codeBadge +
+        '</div>' +
+      '</div>' +
+      '<div class="aufg-card-arr">\u203A</div>' +
+    '</div>';
+  }).join('');
+
+  listEl.innerHTML = header + cards;
 }
 
 function showEinsatzEnd() {
@@ -6656,6 +6721,7 @@ function showPage(name) {
   else document.getElementById('nav-home').classList.add('active');
   document.querySelector('.app-body').scrollTop = 0;
   if (name === 'home') { _tasksExpanded = false; renderDashboardMobile(); }
+  if (name === 'aufgaben') renderAufgaben();
   if (name !== 'machine') {
     document.getElementById('solutionArea').style.display = 'none';
     document.getElementById('solutionArea').innerHTML = '';
