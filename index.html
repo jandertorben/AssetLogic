@@ -1848,7 +1848,9 @@ nav.bottom-nav{
 #einsatzEndModal.active{display:flex;}
 .einsatz-end-card{
   background:#fff;border-radius:18px 18px 0 0;
-  width:100%;max-width:520px;padding:22px 22px 36px;
+  width:100%;max-width:520px;
+  padding:22px 22px calc(36px + env(safe-area-inset-bottom,0px));
+  max-height:90dvh;overflow-y:auto;
   animation:slideUp .28s cubic-bezier(.4,0,.2,1);
 }
 .einsatz-end-icon{
@@ -1873,6 +1875,34 @@ nav.bottom-nav{
   font-size:12px;color:#e65100;font-weight:600;line-height:1.4;
 }
 .offline-save-note svg{width:18px;height:18px;color:#ff9800;flex-shrink:0;margin-top:1px;}
+/* Montageberichte Section */
+.montageberichte-section{margin-top:4px;margin-bottom:4px;}
+.montageberichte-title{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:10px;
+}
+.mb-report-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:12px;
+  background:var(--bg);border:1.5px solid var(--border);
+  margin-bottom:8px;
+}
+.mb-report-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:#FFEBEE;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.mb-report-icon svg{width:18px;height:18px;color:var(--red);}
+.mb-report-info{flex:1;min-width:0;}
+.mb-report-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mb-report-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.mb-report-btn{
+  padding:7px 13px;border-radius:8px;border:1.5px solid var(--border);
+  background:#fff;color:var(--text);font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;
+  touch-action:manipulation;
+}
+.mb-report-btn:active{background:var(--accent-lt);}
+.mb-report-btn svg{width:13px;height:13px;}
 /* Monteure section */
 .monteur-section{padding:14px 18px 4px;border-top:1px solid var(--border);margin-top:4px;}
 .monteur-sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
@@ -2714,6 +2744,12 @@ nav.bottom-nav{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 10 11 15 8 12"/></svg>
             Einsatz beenden
           </button>
+        </div>
+
+        <!-- Montageberichte -->
+        <div class="montageberichte-section" id="montageberichteSection" style="display:none;">
+          <div class="montageberichte-title">Montageberichte</div>
+          <div id="montageberichteList"></div>
         </div>
 
         <!-- Config Card -->
@@ -3625,43 +3661,6 @@ nav.bottom-nav{
   <div class="offline-banner-dot"></div>
   <span class="offline-banner-text">Offline-Modus &mdash; <span id="offlineBannerQueue">Daten werden lokal gespeichert</span></span>
   <span class="offline-banner-x" onclick="document.getElementById('offlineBanner').classList.remove('show')">&#10005;</span>
-</div>
-
-<!-- ==================== EINSATZ BEENDEN MODAL ==================== -->
-<div id="einsatzEndModal">
-  <div class="einsatz-end-card">
-    <div class="einsatz-end-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div class="einsatz-end-title">Einsatz beenden</div>
-    <div class="einsatz-end-sub">Zusammenfassung des Wartungseinsatzes</div>
-    <div class="einsatz-summary">
-      <div class="einsatz-sum-row">
-        <span class="einsatz-sum-key">Maschine</span>
-        <span class="einsatz-sum-val" id="einsatzMaschine">&mdash;</span>
-      </div>
-      <div class="einsatz-sum-row">
-        <span class="einsatz-sum-key">Einsatzdauer</span>
-        <span class="einsatz-sum-val" id="einsatzDauer">&mdash;</span>
-      </div>
-      <div class="einsatz-sum-row">
-        <span class="einsatz-sum-key">Techniker</span>
-        <span class="einsatz-sum-val">Marco K&ouml;hler</span>
-      </div>
-      <div class="einsatz-sum-row">
-        <span class="einsatz-sum-key">Status</span>
-        <span class="einsatz-sum-val" style="color:var(--green);">&#10003; Abgeschlossen</span>
-      </div>
-    </div>
-    <div class="offline-save-note" id="offlineSaveNote" style="display:none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      Daten lokal gespeichert &ndash; Sync erfolgt bei n&auml;chster Verbindung
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button class="admin-btn admin-btn-secondary" style="flex:1;justify-content:center;touch-action:manipulation;" onclick="closeEinsatzEndModal()">Abbrechen</button>
-      <button class="nm-btn-save" style="flex:1;touch-action:manipulation;" onclick="confirmEndEinsatz()">Best&auml;tigen &amp; speichern</button>
-    </div>
-  </div>
 </div>
 
 <!-- ==================== MODAL: NEUEN KUNDEN ANLEGEN ==================== -->
@@ -5035,6 +5034,15 @@ function renderTechCockpit(machineId) {
 var _einsatzActive  = false;
 var _einsatzStart   = null;
 var _einsatzInterval= null;
+var _montageberichte = {
+  'CAT-320': [
+    { id:'MB-2026-0305-0814', name:'Montagebericht 05.03.2026', date:'05.03.2026 08:14 Uhr', dauer:'47 Min. 22 Sek.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320' },
+    { id:'MB-2026-0218-1330', name:'Montagebericht 18.02.2026', date:'18.02.2026 13:30 Uhr', dauer:'1 Std. 12 Min.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320' }
+  ],
+  'HP-500': [
+    { id:'MB-2026-0301-0955', name:'Montagebericht 01.03.2026', date:'01.03.2026 09:55 Uhr', dauer:'2 Std. 05 Min.', techniker:'Lisa Wagner', maschine:'Hydraulikpresse HP-500', machineId:'HP-500' }
+  ]
+};
 
 function startWartung() {
   if (_einsatzActive) { showScanLogToast('Einsatz l\u00e4uft bereits'); return; }
@@ -5080,7 +5088,10 @@ function closeEinsatzEndModal() {
 }
 
 function confirmEndEinsatz() {
-  var count = _isOffline ? 1 : 0;
+  var sec = Math.floor((Date.now() - (_einsatzStart || Date.now())) / 1000);
+  var m = Math.floor(sec / 60), s = sec % 60;
+  var dauerText = m + ' Min. ' + s + ' Sek.';
+
   clearInterval(_einsatzInterval);
   _einsatzActive = false;
   _einsatzStart  = null;
@@ -5095,13 +5106,106 @@ function confirmEndEinsatz() {
     btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>Wartung starten';
   }
 
+  // Montagebericht erstellen
+  if (_currentMachineId) {
+    var now = new Date();
+    var dateStr = now.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+    var timeStr = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+    var mn = MACHINES[_currentMachineId] ? MACHINES[_currentMachineId].name : _currentMachineId;
+    var report = {
+      id: 'MB-' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0'),
+      name: 'Montagebericht ' + dateStr,
+      date: dateStr + ' ' + timeStr + ' Uhr',
+      dauer: dauerText,
+      techniker: 'Marco K\u00f6hler',
+      maschine: mn,
+      machineId: _currentMachineId
+    };
+    if (!_montageberichte[_currentMachineId]) _montageberichte[_currentMachineId] = [];
+    _montageberichte[_currentMachineId].unshift(report);
+    renderMontageberichte(_currentMachineId);
+  }
+
   closeEinsatzEndModal();
   if (_isOffline) {
     queueOfflineAction({ type: 'end_wartung', machineId: _currentMachineId });
     showScanLogToast('Lokal gespeichert \u2013 Sync bei n\u00e4chster Verbindung');
   } else {
-    showScanLogToast('Einsatz erfolgreich abgeschlossen \u2713');
+    showScanLogToast('Montagebericht erstellt \u2713');
   }
+}
+
+function renderMontageberichte(machineId) {
+  var section = document.getElementById('montageberichteSection');
+  var list = document.getElementById('montageberichteList');
+  if (!section || !list) return;
+  var reports = _montageberichte[machineId] || [];
+  if (reports.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = reports.map(function(r) {
+    return '<div class="mb-report-item">' +
+      '<div class="mb-report-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
+      '<div class="mb-report-info">' +
+        '<div class="mb-report-name">' + r.id + '</div>' +
+        '<div class="mb-report-meta">' + r.date + ' &middot; ' + r.dauer + '</div>' +
+      '</div>' +
+      '<button class="mb-report-btn" onclick="openMontageberichtPdf(' + JSON.stringify(r) + ')">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+        'PDF &ouml;ffnen' +
+      '</button>' +
+    '</div>';
+  }).join('');
+}
+
+function openMontageberichtPdf(r) {
+  var m = MACHINES[r.machineId] || {};
+  var cfg = m.config || {};
+  var komp = (cfg.komp || []).map(function(k){ return '<li>' + k + '</li>'; }).join('');
+  var html = '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">' +
+    '<title>' + r.id + '</title>' +
+    '<style>' +
+      'body{font-family:system-ui,sans-serif;margin:0;padding:40px;color:#1A2B4A;background:#fff;}' +
+      'h1{font-size:22px;font-weight:800;color:#002D5A;margin-bottom:4px;}' +
+      '.sub{font-size:13px;color:#6B7A99;margin-bottom:28px;}' +
+      '.badge{display:inline-block;background:#E8F5E9;color:#2E7D32;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;margin-bottom:24px;}' +
+      'table{width:100%;border-collapse:collapse;margin-bottom:28px;}' +
+      'th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6B7A99;padding:8px 12px;background:#F0F4F8;border-bottom:2px solid #D0D9E8;}' +
+      'td{padding:10px 12px;border-bottom:1px solid #E4EAF2;font-size:13px;}' +
+      'td:first-child{font-weight:600;width:40%;}' +
+      '.section-title{font-size:14px;font-weight:700;color:#002D5A;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #002D5A;}' +
+      'ul{margin:0;padding-left:18px;}li{font-size:13px;margin-bottom:4px;}' +
+      '.footer{margin-top:40px;padding-top:16px;border-top:1px solid #D0D9E8;font-size:11px;color:#6B7A99;display:flex;justify-content:space-between;}' +
+      '@media print{body{padding:20px;}}' +
+      '.print-btn{display:block;margin:0 auto 28px;padding:10px 24px;background:#002D5A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}' +
+      '@media print{.print-btn{display:none;}}' +
+    '</style></head><body>' +
+    '<button class="print-btn" onclick="window.print()">Als PDF speichern / Drucken</button>' +
+    '<h1>Montagebericht</h1>' +
+    '<div class="sub">AssetLogic &ndash; Field Service Edition &middot; ' + r.id + '</div>' +
+    '<div class="badge">&#10003; Abgeschlossen</div>' +
+    '<div class="section-title">Einsatz-Zusammenfassung</div>' +
+    '<table><thead><tr><th>Feld</th><th>Wert</th></tr></thead><tbody>' +
+    '<tr><td>Bericht-Nr.</td><td>' + r.id + '</td></tr>' +
+    '<tr><td>Datum &amp; Uhrzeit</td><td>' + r.date + '</td></tr>' +
+    '<tr><td>Einsatzdauer</td><td>' + r.dauer + '</td></tr>' +
+    '<tr><td>Techniker</td><td>' + r.techniker + '</td></tr>' +
+    '<tr><td>Maschine</td><td>' + r.maschine + '</td></tr>' +
+    '<tr><td>Seriennummer</td><td>' + (m.serial || '&mdash;') + '</td></tr>' +
+    '<tr><td>Standort</td><td>' + (m.location || '&mdash;') + '</td></tr>' +
+    '<tr><td>Status nach Einsatz</td><td>Abgeschlossen</td></tr>' +
+    '</tbody></table>' +
+    (cfg.baujahr ? '<div class="section-title">Maschinendaten</div>' +
+    '<table><thead><tr><th>Parameter</th><th>Wert</th></tr></thead><tbody>' +
+    '<tr><td>Baujahr</td><td>' + cfg.baujahr + '</td></tr>' +
+    '<tr><td>Motortyp</td><td>' + (cfg.motor || '&mdash;') + '</td></tr>' +
+    '<tr><td>Betriebsstunden</td><td>' + (cfg.hours || '&mdash;') + '</td></tr>' +
+    '<tr><td>Softwarestand</td><td>' + (cfg.sw || '&mdash;') + '</td></tr>' +
+    '</tbody></table>' : '') +
+    (komp ? '<div class="section-title">Verbaute Komponenten</div><ul>' + komp + '</ul>' : '') +
+    '<div class="footer"><span>AssetLogic v1.0 &mdash; Developed by Torben Jander</span><span>' + r.date + '</span></div>' +
+    '</body></html>';
+  var w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); }
 }
 
 // ===== OFFLINE LOGIC =====
@@ -6056,6 +6160,7 @@ function openMachine(id) {
 
   _currentMachineId = id;
   renderTechCockpit(id);
+  renderMontageberichte(id);
   showPage('machine');
 
   // If there's an active error, auto-confirm config and show diagnosis
@@ -6276,5 +6381,42 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
 // ===== INIT =====
 renderNutzerList();
 </script>
+
+<!-- ==================== EINSATZ BEENDEN MODAL ==================== -->
+<div id="einsatzEndModal">
+  <div class="einsatz-end-card">
+    <div class="einsatz-end-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="einsatz-end-title">Einsatz beenden</div>
+    <div class="einsatz-end-sub">Zusammenfassung des Wartungseinsatzes</div>
+    <div class="einsatz-summary">
+      <div class="einsatz-sum-row">
+        <span class="einsatz-sum-key">Maschine</span>
+        <span class="einsatz-sum-val" id="einsatzMaschine">&mdash;</span>
+      </div>
+      <div class="einsatz-sum-row">
+        <span class="einsatz-sum-key">Einsatzdauer</span>
+        <span class="einsatz-sum-val" id="einsatzDauer">&mdash;</span>
+      </div>
+      <div class="einsatz-sum-row">
+        <span class="einsatz-sum-key">Techniker</span>
+        <span class="einsatz-sum-val">Marco K&ouml;hler</span>
+      </div>
+      <div class="einsatz-sum-row">
+        <span class="einsatz-sum-key">Status</span>
+        <span class="einsatz-sum-val" style="color:var(--green);">&#10003; Abgeschlossen</span>
+      </div>
+    </div>
+    <div class="offline-save-note" id="offlineSaveNote" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Daten lokal gespeichert &ndash; Sync erfolgt bei n&auml;chster Verbindung
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="admin-btn admin-btn-secondary" style="flex:1;justify-content:center;touch-action:manipulation;" onclick="closeEinsatzEndModal()">Abbrechen</button>
+      <button class="nm-btn-save" style="flex:1;touch-action:manipulation;" onclick="confirmEndEinsatz()">Best&auml;tigen &amp; speichern</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
