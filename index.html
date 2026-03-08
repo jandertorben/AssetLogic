@@ -176,6 +176,23 @@ body{
   font-family:'Plus Jakarta Sans',sans-serif;
 }
 .login-sub{font-size:13px;color:#64748b;margin-bottom:26px;line-height:1.55;}
+.login-context-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;margin-bottom:14px;
+  font-family:'IBM Plex Mono',monospace;
+}
+.login-context-badge.tech{background:#E8F5E9;color:#2E7D32;border:1px solid rgba(46,125,50,.2);}
+.login-context-badge.admin{background:#E8EAF6;color:#3949AB;border:1px solid rgba(57,73,171,.2);}
+.login-context-badge svg{width:11px;height:11px;flex-shrink:0;}
+.login-role-error{
+  display:none;align-items:center;gap:8px;
+  padding:10px 13px;border-radius:9px;margin-top:10px;
+  background:#FFF3E0;border:1.5px solid rgba(251,140,0,.35);
+  font-size:12px;color:#E65100;font-weight:600;line-height:1.4;
+}
+.login-role-error.show{display:flex;}
+.login-role-error svg{flex-shrink:0;width:15px;height:15px;}
 
 /* ── Form groups ── */
 .form-group{margin-bottom:16px;animation:loginCardIn 0.5s ease-out both;}
@@ -2854,8 +2871,13 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
       <!-- Card -->
       <div class="login-card">
         <div class="login-card-inner">
-          <div class="login-title">Willkommen zur&uuml;ck</div>
-          <div class="login-sub">Melden Sie sich mit Ihren Zugangsdaten an.</div>
+          <div class="login-context-badge" id="loginContextBadge"></div>
+          <div class="login-title" id="loginTitle">Willkommen zur&uuml;ck</div>
+          <div class="login-sub" id="loginSubtitle">Melden Sie sich mit Ihren Zugangsdaten an.</div>
+          <div class="login-role-error" id="loginRoleError">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <span id="loginRoleErrorText"></span>
+          </div>
 
           <form id="loginForm" onsubmit="doLogin(event)" novalidate>
 
@@ -7682,6 +7704,45 @@ function showLoginInfo(msg) {
   showLoginInfo._t = setTimeout(function() { el.classList.remove('show'); }, 4000);
 }
 
+// ===== LOGIN KONTEXT (Mobile = Techniker / Desktop = Serviceleiter) =====
+var _loginExpectedRole = null;
+
+function setupLoginContext() {
+  var isMobile = window.innerWidth < 1024;
+  _loginExpectedRole = isMobile ? 'TECHNICIAN' : 'SERVICE_LEADER';
+
+  var badge    = document.getElementById('loginContextBadge');
+  var title    = document.getElementById('loginTitle');
+  var subtitle = document.getElementById('loginSubtitle');
+  var emailEl  = document.getElementById('loginEmail');
+  var techCard = document.querySelector('.login-demo-card[aria-label="Demo als Techniker anmelden"]');
+  var slCard   = document.querySelector('.login-demo-card[aria-label="Demo als Serviceleiter anmelden"]');
+
+  if (isMobile) {
+    // ── Techniker-Portal ──
+    if (badge) {
+      badge.className = 'login-context-badge tech';
+      badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2v-2a4 4 0 00-8 0v2a2 2 0 002 2zM12 3a4 4 0 100 8 4 4 0 000-8z"/></svg>Techniker-App';
+    }
+    if (title)    title.textContent    = 'Techniker-Login';
+    if (subtitle) subtitle.textContent = 'Melden Sie sich mit Ihrem Techniker-Account an.';
+    if (emailEl)  emailEl.value = 'm.koehler@betrieb.de';
+    if (slCard)   slCard.style.display  = 'none';
+    if (techCard) techCard.style.display = '';
+  } else {
+    // ── Admin-Portal ──
+    if (badge) {
+      badge.className = 'login-context-badge admin';
+      badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Admin-Portal';
+    }
+    if (title)    title.textContent    = 'Serviceleiter-Login';
+    if (subtitle) subtitle.textContent = 'Zugang zur Serviceleiter-Zentrale und zum Archiv.';
+    if (emailEl)  emailEl.value = 's.baumann@betrieb.de';
+    if (techCard) techCard.style.display = 'none';
+    if (slCard)   slCard.style.display   = '';
+  }
+}
+
 function demoLogin(email) {
   var emailEl = document.getElementById('loginEmail');
   var passEl  = document.getElementById('loginPass');
@@ -7740,10 +7801,29 @@ function doLogin(e) {
   setTimeout(function() {
     try {
       if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
+
+      var userRecord = USERS_DB[email.toLowerCase()];
+
+      // ── Rollentrennung: falscher Account für dieses Portal ──
+      if (_loginExpectedRole && userRecord && userRecord.role !== _loginExpectedRole) {
+        var errEl   = document.getElementById('loginRoleError');
+        var errText = document.getElementById('loginRoleErrorText');
+        var isMobile = window.innerWidth < 1024;
+        var msg = isMobile
+          ? 'Serviceleiter-Accounts sind nur im Admin-Portal (Desktop) verfügbar.'
+          : 'Techniker-Accounts sind nur in der mobilen Techniker-App verfügbar.';
+        if (errText) errText.textContent = msg;
+        if (errEl)   errEl.classList.add('show');
+        return;
+      }
+
+      // Unbekannter Account → Fallback auf Techniker
+      if (!userRecord) userRecord = USERS_DB['m.koehler@betrieb.de'];
+
       var ls = document.getElementById('loginScreen');
       if (ls) ls.classList.add('hidden');
-      // Role-based redirect
-      var userRecord = USERS_DB[email.toLowerCase()] || USERS_DB['m.koehler@betrieb.de'];
+      var errEl = document.getElementById('loginRoleError');
+      if (errEl) errEl.classList.remove('show');
       applyRole(userRecord);
     } catch(err) {
       if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
@@ -7761,6 +7841,9 @@ function doLogout() {
   if (pass) pass.value = '';
   var toast = document.getElementById('loginInfoToast');
   if (toast) toast.classList.remove('show');
+  var errEl = document.getElementById('loginRoleError');
+  if (errEl) errEl.classList.remove('show');
+  setupLoginContext();
   showPage('home');
 }
 
@@ -8108,6 +8191,16 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
 // ===== INIT =====
 renderNutzerList();
 renderDashboardMobile();
+setupLoginContext();
+
+// Fehler-Banner beim Tippen wieder ausblenden
+(function() {
+  var emailEl = document.getElementById('loginEmail');
+  if (emailEl) emailEl.addEventListener('input', function() {
+    var errEl = document.getElementById('loginRoleError');
+    if (errEl) errEl.classList.remove('show');
+  });
+})();
 </script>
 
 <!-- ==================== WARTUNG STARTEN BESTÄTIGUNG (DESKTOP) ==================== -->
