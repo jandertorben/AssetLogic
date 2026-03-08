@@ -2750,6 +2750,63 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 }
 .sl-pop-btn:hover{background:#004aaf;}
 
+/* ── Map Hover-Card (Glassmorphism) ── */
+.map-hover-card{
+  position:fixed;z-index:9999;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:16px;overflow:hidden;
+  min-width:230px;max-width:270px;
+  box-shadow:0 8px 40px rgba(0,20,60,.18),0 1px 4px rgba(0,0,0,.07);
+  pointer-events:none;
+  opacity:0;transform:translateY(8px) scale(.97);
+  transition:opacity .18s ease,transform .18s ease;
+}
+.map-hover-card.visible{opacity:1;transform:translateY(0) scale(1);}
+.mhc-preview{
+  height:72px;display:flex;align-items:center;justify-content:center;
+  font-size:34px;position:relative;
+}
+.mhc-preview-bg{
+  position:absolute;inset:0;opacity:.12;
+}
+.mhc-preview-icon{position:relative;z-index:1;}
+.mhc-body{padding:10px 14px 13px;}
+.mhc-name{font-size:13.5px;font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:2px;}
+.mhc-serial{font-size:10px;color:#94a3b8;font-family:'IBM Plex Mono',monospace;margin-bottom:7px;}
+.mhc-status-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;margin-bottom:8px;}
+.mhc-status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.mhc-tech{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#374151;}
+.mhc-tech-av{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:7.5px;font-weight:800;color:#fff;
+}
+.mhc-hint{font-size:10px;color:#94a3b8;margin-top:6px;font-style:italic;}
+
+/* ── Sidebar filter-reset strip ── */
+.sl-filter-reset{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 10px;border-radius:8px;margin-bottom:8px;
+  background:#EBF0FF;border:1px solid rgba(0,82,204,.2);
+  font-size:11.5px;font-weight:600;color:#0052CC;
+  cursor:pointer;transition:background .15s;
+}
+.sl-filter-reset:hover{background:#dde8ff;}
+.sl-filter-reset svg{width:12px;height:12px;flex-shrink:0;}
+.sl-filter-reset-label{flex:1;}
+
+/* ── Active sidebar item improvements ── */
+.sl-filter-item.active{
+  background:#EBF0FF;border-left:3px solid #0052CC;padding-left:5px;
+}
+.sl-filter-item.active .sl-filter-item-name{color:#0052CC;font-weight:700;}
+.sl-filter-item.active .sl-filter-dot{
+  background:#0052CC!important;animation:none!important;
+  box-shadow:0 0 0 3px rgba(0,82,204,.18);
+}
+
 /* Mobile: hide sidebar, show only map */
 @media(max-width:1023px){.sl-map-sidebar{display:none;}}
 /* Legend chips in sidebar footer */
@@ -4771,6 +4828,12 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
         placeholder="Maschine oder Techniker…"
         oninput="filterSlItems(this.value)">
     </div>
+    <div class="sl-filter-reset" id="slFilterReset" style="display:none;margin:8px 14px 0;"
+         onclick="_clearMarkerFilter()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+      <span class="sl-filter-reset-label">Filter zurücksetzen</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
     <div class="sl-filter-section" id="slFilterContent"></div>
     <div class="sl-legend-bar">
       <span class="sl-legend-chip"><span class="sl-legend-chip-dot" style="background:#4CAF50;"></span>Betrieb OK</span>
@@ -4781,6 +4844,26 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
   <!-- Leaflet map -->
   <div class="sl-leaflet-container">
     <div id="slLeafletMap"></div>
+    <!-- Hover-Card (Glassmorphism) -->
+    <div class="map-hover-card" id="mapHoverCard">
+      <div class="mhc-preview" id="mhcPreview">
+        <div class="mhc-preview-bg" id="mhcPreviewBg"></div>
+        <div class="mhc-preview-icon" id="mhcPreviewIcon"></div>
+      </div>
+      <div class="mhc-body">
+        <div class="mhc-name" id="mhcName"></div>
+        <div class="mhc-serial" id="mhcSerial"></div>
+        <div class="mhc-status-chip" id="mhcStatus">
+          <span class="mhc-status-dot"></span>
+          <span id="mhcStatusLabel"></span>
+        </div>
+        <div class="mhc-tech" id="mhcTech">
+          <div class="mhc-tech-av" id="mhcTechAv"></div>
+          <span id="mhcTechName"></span>
+        </div>
+        <div class="mhc-hint">Klicken für Details &rarr;</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -7382,6 +7465,7 @@ var _mapInitAttempts = 0;
 
 function renderKarte() {
   renderSlFilter('');
+  _filteredIds = null;
   _mapInitAttempts = 0;
   // Retry loop: try up to 5 times with increasing delays
   function tryInit() {
@@ -7540,8 +7624,95 @@ function _addLeafletMarker(id) {
   var m = MACHINES[id];
   if (!m.latlng || !_leafletMap) return;
   var marker = L.marker(m.latlng, { icon: _buildMarkerIcon(id, false) }).addTo(_leafletMap);
-  marker.bindPopup(_buildLeafletPopup(id), { maxWidth: 300, className: '' });
+  marker.on('mouseover', function(e) { _showMapHoverCard(id, e.originalEvent); });
+  marker.on('mouseout',  function()  { _hideMapHoverCard(); });
+  marker.on('click',     function()  { _hideMapHoverCard(); openMachineFromMap(id); });
   _leafletMarkers[id] = marker;
+}
+
+// ── Hover-Card ──────────────────────────────────────────────────────────────
+var _hoverCardTimeout = null;
+
+function _showMapHoverCard(id, evt) {
+  var m    = MACHINES[id];
+  var tech = m.technicianId ? MONTEURE_DB[m.technicianId] : null;
+  var icon = MACHINE_ICONS[m.type] || '🔧';
+  var color = m.status === 'err' ? '#E53935' : m.status === 'mnt' ? '#FB8C00' : '#43A047';
+  var statusLabel = m.status === 'err' ? 'Kritischer Fehler' : m.status === 'mnt' ? 'Wartung fällig' : 'Betrieb OK';
+  var sBg  = m.status === 'err' ? '#FFEBEE' : m.status === 'mnt' ? '#FFF3E0' : '#E8F5E9';
+
+  document.getElementById('mhcPreviewBg').style.background = color;
+  document.getElementById('mhcPreviewIcon').textContent = icon;
+  document.getElementById('mhcName').textContent = m.name;
+  document.getElementById('mhcSerial').textContent = m.serial;
+
+  var chip = document.getElementById('mhcStatus');
+  chip.style.background = sBg;
+  chip.style.color = color;
+  chip.querySelector('.mhc-status-dot').style.background = color;
+  document.getElementById('mhcStatusLabel').textContent = statusLabel + (m.activeCode ? ' · ' + m.activeCode : '');
+
+  var techRow = document.getElementById('mhcTech');
+  if (tech) {
+    document.getElementById('mhcTechAv').textContent = tech.initials;
+    document.getElementById('mhcTechAv').style.background = tech.grad;
+    document.getElementById('mhcTechName').textContent = tech.name;
+    techRow.style.display = 'flex';
+  } else {
+    techRow.style.display = 'none';
+  }
+
+  var card = document.getElementById('mapHoverCard');
+  // Position: follow cursor, clamp to viewport
+  var x = evt.clientX + 18;
+  var y = evt.clientY - 40;
+  var cw = 270, ch = 200;
+  if (x + cw > window.innerWidth  - 10) x = evt.clientX - cw - 14;
+  if (y + ch > window.innerHeight - 10) y = window.innerHeight - ch - 10;
+  card.style.left = x + 'px';
+  card.style.top  = y + 'px';
+  card.classList.add('visible');
+}
+
+function _hideMapHoverCard() {
+  var card = document.getElementById('mapHoverCard');
+  if (card) card.classList.remove('visible');
+}
+
+// ── Marker-Filter ────────────────────────────────────────────────────────────
+var _filteredIds = null; // null = alle sichtbar
+
+function _filterMarkers(ids) {
+  _filteredIds = ids;
+  Object.keys(_leafletMarkers).forEach(function(mid) {
+    var show = !ids || ids.indexOf(mid) !== -1;
+    var mk = _leafletMarkers[mid];
+    mk.setOpacity(show ? 1 : 0.12);
+    var el = mk.getElement();
+    if (el) el.style.pointerEvents = show ? '' : 'none';
+  });
+  _updateSidebarResetBtn();
+}
+
+function _clearMarkerFilter() {
+  _filteredIds = null;
+  Object.keys(_leafletMarkers).forEach(function(mid) {
+    _leafletMarkers[mid].setOpacity(1);
+    var el = _leafletMarkers[mid].getElement();
+    if (el) el.style.pointerEvents = '';
+  });
+  // clear active sidebar + selected marker
+  document.querySelectorAll('.sl-filter-item').forEach(function(el){ el.classList.remove('active'); });
+  if (_selectedMarkerId && _leafletMarkers[_selectedMarkerId]) {
+    _leafletMarkers[_selectedMarkerId].setIcon(_buildMarkerIcon(_selectedMarkerId, false));
+  }
+  _selectedMarkerId = null;
+  _updateSidebarResetBtn();
+}
+
+function _updateSidebarResetBtn() {
+  var btn = document.getElementById('slFilterReset');
+  if (btn) btn.style.display = _filteredIds ? 'flex' : 'none';
 }
 
 function _buildLeafletPopup(id) {
@@ -7589,14 +7760,27 @@ function flyToMachine(id) {
   if (!m || !m.latlng || !_leafletMap) return;
   _setSelectedMarker(id);
   _setActiveSlItem('mid', id);
+  _filterMarkers([id]);
   _leafletMap.flyTo(m.latlng, 14, { duration: 1.1 });
-  setTimeout(function() { if (_leafletMarkers[id]) _leafletMarkers[id].openPopup(); }, 1250);
 }
 
 function flyToTech(techId) {
   _setActiveSlItem('tid', techId);
-  var ids = Object.keys(MACHINES).filter(function(mid){ return MACHINES[mid].technicianId === techId; });
-  if (ids.length) flyToMachine(ids[0]);
+  var machineIds = Object.keys(MACHINES).filter(function(mid){ return MACHINES[mid].technicianId === techId; });
+  if (!machineIds.length) return;
+  _filterMarkers(machineIds);
+  // Select & fly to first machine of this tech
+  var first = machineIds[0];
+  _setSelectedMarker(first);
+  var m = MACHINES[first];
+  if (m.latlng) {
+    if (machineIds.length === 1) {
+      _leafletMap.flyTo(m.latlng, 14, { duration: 1.1 });
+    } else {
+      var bounds = L.latLngBounds(machineIds.map(function(mid){ return MACHINES[mid].latlng; }).filter(Boolean));
+      _leafletMap.flyToBounds(bounds, { padding: [60, 60], duration: 1.0 });
+    }
+  }
 }
 
 function renderSlFilter(query) {
@@ -7632,7 +7816,10 @@ function renderSlFilter(query) {
   el.innerHTML = html;
 }
 
-function filterSlItems(q) { renderSlFilter(q); }
+function filterSlItems(q) {
+  if (q) { _clearMarkerFilter(); }
+  renderSlFilter(q);
+}
 
 // ===== TECHNIKER ÜBERSICHT =====
 function renderTechnikerUebersicht() {
