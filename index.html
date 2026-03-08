@@ -1877,6 +1877,70 @@ nav.bottom-nav{
 .offline-save-note svg{width:18px;height:18px;color:#ff9800;flex-shrink:0;margin-top:1px;}
 /* Montageberichte Section */
 .montageberichte-section{margin-top:4px;margin-bottom:4px;}
+/* Sync-Status Badges */
+.mb-sync-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;border-radius:20px;padding:3px 9px;
+  white-space:nowrap;flex-shrink:0;
+}
+.mb-sync-badge.pending{background:#FFF8E1;color:#F57F17;border:1.5px solid rgba(245,127,23,.25);}
+.mb-sync-badge.syncing{background:#E3F2FD;color:#1565C0;border:1.5px solid rgba(21,101,192,.25);}
+.mb-sync-badge.synced{background:#E8F5E9;color:#2E7D32;border:1.5px solid rgba(46,125,50,.25);}
+.mb-sync-badge svg{width:11px;height:11px;flex-shrink:0;}
+.mb-sync-badge.pending svg{animation:none;}
+.mb-sync-badge.syncing svg{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* Archived report item */
+.mb-report-item.archived{opacity:.45;background:var(--bg3);border-color:transparent;}
+.mb-report-item.archived .mb-report-btn{opacity:.4;pointer-events:none;}
+/* ERP Sync in ERP-Page */
+.erp-mb-section{
+  border:1.5px solid var(--border);border-radius:12px;
+  background:#fff;overflow:hidden;margin-bottom:20px;
+}
+.erp-mb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 12px;border-bottom:1px solid var(--border);
+}
+.erp-mb-title{font-size:14px;font-weight:800;color:var(--text);}
+.erp-mb-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.erp-mb-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;padding:0 6px;border-radius:11px;
+  background:rgba(245,127,23,.15);color:#F57F17;
+  font-size:11px;font-weight:800;flex-shrink:0;
+}
+.erp-mb-list{padding:10px 16px;}
+.erp-mb-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;border-bottom:1px solid var(--border);
+}
+.erp-mb-row:last-child{border-bottom:none;}
+.erp-mb-row-id{font-size:12px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.erp-mb-row-meta{font-size:11px;color:var(--text-muted);}
+/* Progress Bar */
+.erp-sync-progress{padding:12px 16px 16px;border-top:1px solid var(--border);display:none;}
+.erp-sync-progress.active{display:block;}
+.erp-progress-label{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.erp-progress-bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.erp-progress-fill{
+  height:100%;width:0%;border-radius:4px;
+  background:linear-gradient(90deg,var(--accent),#42A5F5);
+  transition:width .4s cubic-bezier(.4,0,.2,1);
+}
+.erp-progress-steps{margin-top:10px;display:flex;flex-direction:column;gap:4px;}
+.erp-step{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);opacity:0;transition:opacity .3s;}
+.erp-step.show{opacity:1;}
+.erp-step-dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s;}
+.erp-step.done .erp-step-dot{background:var(--green);}
+.erp-step.active .erp-step-dot{background:var(--accent);}
+.erp-sync-done{
+  display:none;align-items:center;gap:10px;
+  padding:12px 16px;background:var(--green-bg);border-top:1px solid rgba(46,125,50,.2);
+  font-size:13px;font-weight:700;color:var(--green);
+}
+.erp-sync-done.show{display:flex;}
+.erp-sync-done svg{width:16px;height:16px;}
 .montageberichte-title{
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
   color:var(--text-muted);margin-bottom:10px;
@@ -3079,6 +3143,40 @@ nav.bottom-nav{
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               Konfigurieren
             </button>
+          </div>
+        </div>
+
+        <!-- Montageberichte ERP-Abgleich -->
+        <div class="sec-label" style="margin-bottom:14px;">Montageberichte &ndash; ERP-Abgleich</div>
+        <div class="erp-mb-section" id="erpMbSection">
+          <div class="erp-mb-header">
+            <div>
+              <div class="erp-mb-title">Ausstehende Berichte</div>
+              <div class="erp-mb-sub" id="erpMbSubText">Werden an SAP S/4HANA &uuml;bertragen</div>
+            </div>
+            <span class="erp-mb-count" id="erpMbCount">0</span>
+          </div>
+          <div class="erp-mb-list" id="erpMbList">
+            <div style="font-size:12px;color:var(--text-muted);padding:8px 0;">Keine ausstehenden Berichte.</div>
+          </div>
+          <div style="padding:10px 16px 14px;display:flex;gap:10px;align-items:center;" id="erpMbBtnRow">
+            <button class="admin-btn admin-btn-primary" id="btnErpMbSync" onclick="startErpMbSync()" style="touch-action:manipulation;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/><polyline points="21 3 21 10 14 10"/><polyline points="3 21 3 14 10 14"/></svg>
+              ERP-Abgleich starten
+            </button>
+            <span style="font-size:11px;color:var(--text-muted);" id="erpMbLastSync"></span>
+          </div>
+          <div class="erp-sync-progress" id="erpSyncProgress">
+            <div class="erp-progress-label">
+              <span id="erpProgressText">Verbinde mit SAP S/4HANA&hellip;</span>
+              <span id="erpProgressPct">0%</span>
+            </div>
+            <div class="erp-progress-bar"><div class="erp-progress-fill" id="erpProgressFill"></div></div>
+            <div class="erp-progress-steps" id="erpProgressSteps"></div>
+          </div>
+          <div class="erp-sync-done" id="erpSyncDone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Alle Berichte erfolgreich im ERP archiviert.
           </div>
         </div>
 
@@ -5036,11 +5134,11 @@ var _einsatzStart   = null;
 var _einsatzInterval= null;
 var _montageberichte = {
   'CAT-320': [
-    { id:'MB-2026-0305-0814', name:'Montagebericht 05.03.2026', date:'05.03.2026 08:14 Uhr', dauer:'47 Min. 22 Sek.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320' },
-    { id:'MB-2026-0218-1330', name:'Montagebericht 18.02.2026', date:'18.02.2026 13:30 Uhr', dauer:'1 Std. 12 Min.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320' }
+    { id:'MB-2026-0305-0814', name:'Montagebericht 05.03.2026', date:'05.03.2026 08:14 Uhr', dauer:'47 Min. 22 Sek.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320', syncStatus:'pending' },
+    { id:'MB-2026-0218-1330', name:'Montagebericht 18.02.2026', date:'18.02.2026 13:30 Uhr', dauer:'1 Std. 12 Min.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320', syncStatus:'synced' }
   ],
   'HP-500': [
-    { id:'MB-2026-0301-0955', name:'Montagebericht 01.03.2026', date:'01.03.2026 09:55 Uhr', dauer:'2 Std. 05 Min.', techniker:'Lisa Wagner', maschine:'Hydraulikpresse HP-500', machineId:'HP-500' }
+    { id:'MB-2026-0301-0955', name:'Montagebericht 01.03.2026', date:'01.03.2026 09:55 Uhr', dauer:'2 Std. 05 Min.', techniker:'Lisa Wagner', maschine:'Hydraulikpresse HP-500', machineId:'HP-500', syncStatus:'pending' }
   ]
 };
 
@@ -5119,7 +5217,8 @@ function confirmEndEinsatz() {
       dauer: dauerText,
       techniker: 'Marco K\u00f6hler',
       maschine: mn,
-      machineId: _currentMachineId
+      machineId: _currentMachineId,
+      syncStatus: 'pending'
     };
     if (!_montageberichte[_currentMachineId]) _montageberichte[_currentMachineId] = [];
     _montageberichte[_currentMachineId].unshift(report);
@@ -5135,6 +5234,22 @@ function confirmEndEinsatz() {
   }
 }
 
+function mbSyncBadgeHtml(status) {
+  if (status === 'synced') {
+    return '<span class="mb-sync-badge synced">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' +
+      'Im ERP archiviert</span>';
+  }
+  if (status === 'syncing') {
+    return '<span class="mb-sync-badge syncing">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/><polyline points="21 3 21 10 14 10"/><polyline points="3 21 3 14 10 14"/></svg>' +
+      'Wird &uuml;bertragen&hellip;</span>';
+  }
+  return '<span class="mb-sync-badge pending">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+    'Wartet auf Sync</span>';
+}
+
 function renderMontageberichte(machineId) {
   var section = document.getElementById('montageberichteSection');
   var list = document.getElementById('montageberichteList');
@@ -5143,11 +5258,13 @@ function renderMontageberichte(machineId) {
   if (reports.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   list.innerHTML = reports.map(function(r) {
-    return '<div class="mb-report-item">' +
+    var archived = r.syncStatus === 'synced' ? ' archived' : '';
+    return '<div class="mb-report-item' + archived + '" id="mb-item-' + r.id + '">' +
       '<div class="mb-report-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
       '<div class="mb-report-info">' +
         '<div class="mb-report-name">' + r.id + '</div>' +
         '<div class="mb-report-meta">' + r.date + ' &middot; ' + r.dauer + '</div>' +
+        '<div style="margin-top:5px;">' + mbSyncBadgeHtml(r.syncStatus || 'pending') + '</div>' +
       '</div>' +
       '<button class="mb-report-btn" onclick="openMontageberichtPdf(' + JSON.stringify(r) + ')">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
@@ -5155,6 +5272,141 @@ function renderMontageberichte(machineId) {
       '</button>' +
     '</div>';
   }).join('');
+}
+
+// ===== ERP MB SYNC =====
+function getAllPendingReports() {
+  var pending = [];
+  Object.keys(_montageberichte).forEach(function(mid) {
+    (_montageberichte[mid] || []).forEach(function(r) {
+      if ((r.syncStatus || 'pending') === 'pending') pending.push(r);
+    });
+  });
+  return pending;
+}
+
+function renderErpMbSection() {
+  var pending = getAllPendingReports();
+  var countEl = document.getElementById('erpMbCount');
+  var listEl  = document.getElementById('erpMbList');
+  var btnEl   = document.getElementById('btnErpMbSync');
+  var doneEl  = document.getElementById('erpSyncDone');
+  if (!countEl) return;
+
+  countEl.textContent = pending.length;
+  countEl.style.background = pending.length > 0 ? 'rgba(245,127,23,.15)' : 'rgba(46,125,50,.15)';
+  countEl.style.color = pending.length > 0 ? '#F57F17' : 'var(--green)';
+
+  if (pending.length === 0) {
+    listEl.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">Alle Berichte wurden &uuml;bertragen.</div>';
+    if (btnEl) btnEl.disabled = true;
+    document.getElementById('erpMbSubText').textContent = 'Alle Berichte im ERP archiviert';
+    if (doneEl) doneEl.classList.remove('show');
+  } else {
+    listEl.innerHTML = pending.map(function(r) {
+      return '<div class="erp-mb-row">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="erp-mb-row-id">' + r.id + '</div>' +
+          '<div class="erp-mb-row-meta">' + r.maschine + ' &middot; ' + r.date + '</div>' +
+        '</div>' +
+        mbSyncBadgeHtml('pending') +
+      '</div>';
+    }).join('');
+    if (btnEl) btnEl.disabled = false;
+    document.getElementById('erpMbSubText').textContent = 'Werden an SAP S/4HANA \u00fcbertragen';
+  }
+}
+
+var _erpSyncing = false;
+function startErpMbSync() {
+  if (_erpSyncing) return;
+  var pending = getAllPendingReports();
+  if (pending.length === 0) { showScanLogToast('Keine ausstehenden Berichte'); return; }
+
+  _erpSyncing = true;
+  var btnRow  = document.getElementById('erpMbBtnRow');
+  var progEl  = document.getElementById('erpSyncProgress');
+  var fillEl  = document.getElementById('erpProgressFill');
+  var textEl  = document.getElementById('erpProgressText');
+  var pctEl   = document.getElementById('erpProgressPct');
+  var stepsEl = document.getElementById('erpProgressSteps');
+  var doneEl  = document.getElementById('erpSyncDone');
+  var listEl  = document.getElementById('erpMbList');
+
+  if (btnRow) btnRow.style.display = 'none';
+  if (doneEl) doneEl.classList.remove('show');
+  progEl.classList.add('active');
+
+  var steps = [
+    'Verbindung zu SAP S/4HANA aufgebaut',
+    'Authentifizierung via OAuth 2.0',
+    'Daten-Validierung der Berichte',
+  ].concat(pending.map(function(r){ return r.id + ' wird \u00fcbertragen\u2026'; })).concat(['Archivierung im ERP abgeschlossen']);
+
+  stepsEl.innerHTML = steps.map(function(s, i){
+    return '<div class="erp-step" id="erp-step-' + i + '">' +
+      '<div class="erp-step-dot"></div><span>' + s + '</span></div>';
+  }).join('');
+
+  var total = steps.length;
+  var current = 0;
+
+  function doStep() {
+    if (current >= total) {
+      // Finalize: mark all pending as synced
+      fillEl.style.width = '100%';
+      pctEl.textContent = '100%';
+      textEl.textContent = 'Abgeschlossen';
+
+      pending.forEach(function(r) { r.syncStatus = 'synced'; });
+
+      // update list rows to show synced badge
+      listEl.innerHTML = pending.map(function(r) {
+        return '<div class="erp-mb-row">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div class="erp-mb-row-id" style="opacity:.6;">' + r.id + '</div>' +
+            '<div class="erp-mb-row-meta">' + r.maschine + ' &middot; ' + r.date + '</div>' +
+          '</div>' +
+          mbSyncBadgeHtml('synced') +
+        '</div>';
+      }).join('');
+
+      setTimeout(function() {
+        progEl.classList.remove('active');
+        if (doneEl) doneEl.classList.add('show');
+        _erpSyncing = false;
+        renderErpMbSection();
+
+        // Refresh machine detail if it's open
+        if (_currentMachineId) renderMontageberichte(_currentMachineId);
+
+        var now = new Date();
+        var lastSync = document.getElementById('erpMbLastSync');
+        if (lastSync) lastSync.textContent = 'Zuletzt: ' + now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) + ' Uhr';
+        document.getElementById('erpMbBtnRow').style.display = '';
+        showScanLogToast('ERP-Sync abgeschlossen \u2713 ' + pending.length + ' Bericht(e) archiviert');
+      }, 600);
+      return;
+    }
+
+    var pct = Math.round((current / total) * 100);
+    fillEl.style.width = pct + '%';
+    pctEl.textContent  = pct + '%';
+    textEl.textContent = steps[current];
+
+    var stepEl = document.getElementById('erp-step-' + current);
+    if (stepEl) {
+      stepEl.classList.add('show', 'active');
+      if (current > 0) {
+        var prev = document.getElementById('erp-step-' + (current-1));
+        if (prev) { prev.classList.remove('active'); prev.classList.add('done'); }
+      }
+    }
+    current++;
+    setTimeout(doStep, current <= 3 ? 500 : 700);
+  }
+
+  doStep();
 }
 
 function openMontageberichtPdf(r) {
@@ -6094,7 +6346,7 @@ function setDNav(el, page) {
   else if (page === 'home') showPage('home');
   else if (page === 'scanlogs') showPage('scanlogs');
   else if (page === 'nutzer') { showPage('nutzer'); renderNutzerList(); }
-  else if (page === 'erp') showPage('erp');
+  else if (page === 'erp') { showPage('erp'); renderErpMbSection(); }
   else if (page === 'kunden') { showPage('kunden'); initKundenPage(); }
   else if (page === 'systemeinstellungen') showPage('systemeinstellungen');
 }
