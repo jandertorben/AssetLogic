@@ -892,8 +892,12 @@ header{
   font-size:10px;letter-spacing:3px;text-transform:uppercase;
   color:var(--text-muted);font-weight:700;margin-bottom:16px;
   display:flex;align-items:center;gap:8px;
+  cursor:pointer;user-select:none;
 }
 .config-card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.config-chevron{width:14px;height:14px;flex-shrink:0;color:var(--text-muted);transition:transform .25s ease;}
+.config-card.collapsed .config-chevron{transform:rotate(-90deg);}
+.config-card.collapsed #configCardBody{display:none;}
 .erp-source-badge{
   display:inline-flex;align-items:center;gap:5px;
   background:var(--green-bg);color:var(--green);
@@ -3400,42 +3404,47 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
         </div>
 
         <!-- Config Card -->
-        <div class="config-card">
-          <div class="config-card-title">Asset-Konfiguration</div>
-          <div class="erp-source-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            ERP-Daten geladen
+        <div class="config-card" id="configCard">
+          <div class="config-card-title" onclick="toggleConfigCard()">
+            Asset-Konfiguration
+            <svg class="config-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
-          <div class="config-infobox">
-            <div class="config-row">
-              <span class="config-label">Baujahr</span>
-              <span class="config-value" id="cfg-baujahr">2021</span>
+          <div id="configCardBody">
+            <div class="erp-source-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              ERP-Daten geladen
             </div>
-            <div class="config-row">
-              <span class="config-label">Softwarestand</span>
-              <span class="config-value mono" id="cfg-sw">FW 4.2.1</span>
+            <div class="config-infobox">
+              <div class="config-row">
+                <span class="config-label">Baujahr</span>
+                <span class="config-value" id="cfg-baujahr">2021</span>
+              </div>
+              <div class="config-row">
+                <span class="config-label">Softwarestand</span>
+                <span class="config-value mono" id="cfg-sw">FW 4.2.1</span>
+              </div>
+              <div class="config-row">
+                <span class="config-label">Motortyp / Steuereinheit</span>
+                <span class="config-value" id="cfg-motor">CAT C7.1 ACERT</span>
+              </div>
+              <div class="config-row">
+                <span class="config-label">Betriebsstunden</span>
+                <span class="config-value mono" id="cfg-hours">3.842 h</span>
+              </div>
+              <div class="config-row" id="cfg-maintenance-row">
+                <span class="config-label">Letzte Wartung</span>
+                <span class="config-value" id="cfg-maintenance">vor 120 Betriebsstunden</span>
+              </div>
             </div>
-            <div class="config-row">
-              <span class="config-label">Motortyp / Steuereinheit</span>
-              <span class="config-value" id="cfg-motor">CAT C7.1 ACERT</span>
+            <div class="config-komp-label">Verbaute Komponenten</div>
+            <div class="komponenten-list" id="cfg-komp">
+              <!-- filled by JS -->
             </div>
-            <div class="config-row">
-              <span class="config-label">Betriebsstunden</span>
-              <span class="config-value mono" id="cfg-hours">3.842 h</span>
-            </div>
-            <div class="config-row" id="cfg-maintenance-row">
-              <span class="config-label">Letzte Wartung</span>
-              <span class="config-value" id="cfg-maintenance">vor 120 Betriebsstunden</span>
-            </div>
+            <button class="btn-confirm-config" id="btnConfirmConfig" onclick="confirmConfig()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Konfiguration best&auml;tigen &amp; Diagnose starten
+            </button>
           </div>
-          <div class="config-komp-label">Verbaute Komponenten</div>
-          <div class="komponenten-list" id="cfg-komp">
-            <!-- filled by JS -->
-          </div>
-          <button class="btn-confirm-config" id="btnConfirmConfig" onclick="confirmConfig()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Konfiguration best&auml;tigen &amp; Diagnose starten
-          </button>
         </div>
 
         <!-- Error Code Section -->
@@ -6073,6 +6082,11 @@ function confirmEndEinsatz() {
 // ===== WARTUNGSHISTORIE & BERICHTE =====
 var _whOpen = false;
 
+function toggleConfigCard() {
+  var card = document.getElementById('configCard');
+  if (card) card.classList.toggle('collapsed');
+}
+
 function toggleWartungshistorie() {
   _whOpen = !_whOpen;
   var btn  = document.getElementById('whToggleBtn');
@@ -7866,6 +7880,10 @@ function openMachine(id) {
   renderTechCockpit(id);
   renderWartungshistorie(id);
   renderMontageberichte(id);
+  // Always start with config card expanded
+  var configCard = document.getElementById('configCard');
+  if (configCard) configCard.classList.remove('collapsed');
+
   showPage('machine');
   var lbl = document.getElementById('mdBackLabel');
   if (lbl) lbl.textContent = document.body.classList.contains('role-technician')
