@@ -3334,9 +3334,9 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
     <div id="page-machine" class="page">
 
       <div class="machine-detail-header">
-        <button class="md-back" onclick="showPage('assets');renderAssetsGrid();">
+        <button class="md-back" onclick="machineBackNav()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          Zur&uuml;ck zum Maschinenstamm
+          <span id="mdBackLabel">Zur&uuml;ck zum Maschinenstamm</span>
         </button>
         <div class="md-type-badge" id="md-type-badge">Hydraulikbagger</div>
         <div class="md-name" id="md-machine-name">Bagger CAT 320</div>
@@ -7807,6 +7807,16 @@ function showScanLogToast(label) {
 }
 
 // ===== OPEN MACHINE DETAIL =====
+function machineBackNav() {
+  var isTech = document.body.classList.contains('role-technician');
+  if (isTech) {
+    showPage('home');
+  } else {
+    showPage('assets');
+    renderAssetsGrid();
+  }
+}
+
 function openMachine(id) {
   const m = MACHINES[id];
   if (!m) return;
@@ -7857,6 +7867,10 @@ function openMachine(id) {
   renderWartungshistorie(id);
   renderMontageberichte(id);
   showPage('machine');
+  var lbl = document.getElementById('mdBackLabel');
+  if (lbl) lbl.textContent = document.body.classList.contains('role-technician')
+    ? 'Zur\u00fcck zur Startseite'
+    : 'Zur\u00fcck zum Maschinenstamm';
 
   // If there's an active error, auto-confirm config and show diagnosis
   if (m.activeCode) {
