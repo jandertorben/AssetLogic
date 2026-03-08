@@ -2095,55 +2095,83 @@ nav.bottom-nav{
 .mb-report-btn svg{width:13px;height:13px;}
 /* ===== WARTUNGSHISTORIE & BERICHTE ===== */
 .wh-section{margin-top:20px;}
-.wh-section-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:12px;
+/* Collapsible header */
+.wh-toggle-btn{
+  width:100%;display:flex;align-items:center;gap:10px;
+  background:#fff;border:1.5px solid var(--border);border-radius:12px;
+  padding:13px 15px;cursor:pointer;touch-action:manipulation;
+  transition:border-color .2s,background .2s;
 }
-.wh-section-title{
-  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);
+.wh-toggle-btn:active{background:var(--bg);}
+.wh-toggle-btn.open{border-radius:12px 12px 0 0;border-bottom-color:transparent;}
+.wh-toggle-left{display:flex;align-items:center;gap:9px;flex:1;min-width:0;}
+.wh-toggle-icon{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:var(--accent-lt);display:flex;align-items:center;justify-content:center;
 }
+.wh-toggle-icon svg{width:15px;height:15px;color:var(--accent);}
+.wh-toggle-label{font-size:13px;font-weight:800;color:var(--text);}
+.wh-toggle-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
 .wh-count-badge{
   font-size:10px;font-weight:800;background:var(--accent-lt);color:var(--accent);
-  border-radius:10px;padding:2px 8px;
+  border-radius:10px;padding:2px 8px;flex-shrink:0;
 }
-.wh-list{display:flex;flex-direction:column;gap:0;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
-.wh-item{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 14px;background:#fff;border-bottom:1px solid var(--border);
-  transition:background .15s;cursor:default;
+.wh-chevron{
+  width:20px;height:20px;flex-shrink:0;color:var(--text-muted);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
 }
-.wh-item:last-child{border-bottom:none;}
-.wh-item-icon{
-  width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--bg3);
+.wh-toggle-btn.open .wh-chevron{transform:rotate(180deg);}
+/* Collapsible body */
+.wh-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1);
+  background:#fff;border:1.5px solid var(--border);border-top:none;
+  border-radius:0 0 12px 12px;
 }
-.wh-item-icon svg{width:17px;height:17px;color:var(--text-muted);}
-.wh-item-body{flex:1;min-width:0;}
-.wh-item-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px;}
-.wh-item-art{
-  font-size:12px;font-weight:800;color:var(--text);
+.wh-body.open{max-height:2000px;}
+/* Timeline */
+.wh-timeline{padding:16px 16px 8px 14px;}
+.wh-tl-item{display:flex;gap:0;position:relative;padding-bottom:20px;}
+.wh-tl-item:last-child{padding-bottom:4px;}
+/* Vertical line */
+.wh-tl-left{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;margin-right:12px;}
+.wh-tl-dot{
+  width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:3px;
+  background:var(--accent);border:2px solid #fff;
+  box-shadow:0 0 0 2px var(--accent);z-index:1;
 }
+.wh-tl-line{flex:1;width:2px;background:var(--border);margin-top:4px;}
+.wh-tl-item:last-child .wh-tl-line{display:none;}
+/* Timeline card */
+.wh-tl-card{
+  flex:1;min-width:0;
+  background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+  padding:11px 13px;
+}
+.wh-tl-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.wh-tl-art{font-size:13px;font-weight:800;color:var(--text);line-height:1.3;}
+.wh-tl-date{font-size:10px;font-weight:600;color:var(--text-muted);white-space:nowrap;margin-top:2px;flex-shrink:0;}
+.wh-tl-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
 .wh-erp-badge{
   display:inline-flex;align-items:center;gap:3px;
   font-size:9px;font-weight:700;background:var(--green-bg);color:var(--green);
-  border:1px solid rgba(46,125,50,.2);border-radius:10px;padding:2px 6px;
+  border:1px solid rgba(46,125,50,.2);border-radius:10px;padding:2px 7px;
   white-space:nowrap;
 }
 .wh-erp-badge svg{width:9px;height:9px;}
-.wh-item-meta{font-size:11px;color:var(--text-muted);}
-.wh-item-date{font-size:11px;font-weight:600;color:var(--text-muted);white-space:nowrap;text-align:right;margin-right:4px;}
+.wh-tl-meta{font-size:11px;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .wh-pdf-btn{
-  width:34px;height:34px;border-radius:9px;border:1.5px solid var(--border);
-  background:#fff;color:var(--red);display:flex;align-items:center;justify-content:center;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);
+  background:#fff;color:var(--red);font-size:11px;font-weight:700;
   cursor:pointer;flex-shrink:0;transition:all .15s;touch-action:manipulation;
 }
 .wh-pdf-btn:hover{background:var(--red-bg);border-color:rgba(198,40,40,.3);}
-.wh-pdf-btn:active{transform:scale(.93);}
-.wh-pdf-btn svg{width:15px;height:15px;}
+.wh-pdf-btn:active{transform:scale(.94);}
+.wh-pdf-btn svg{width:12px;height:12px;}
 .wh-empty{
-  padding:18px 16px;font-size:12px;color:var(--text-muted);
-  text-align:center;font-style:italic;background:#fff;border-radius:12px;border:1.5px solid var(--border);
+  padding:20px 16px;font-size:12px;color:var(--text-muted);
+  text-align:center;font-style:italic;
 }
 /* Monteure section */
 .monteur-section{padding:14px 18px 4px;border-top:1px solid var(--border);margin-top:4px;}
@@ -2983,11 +3011,22 @@ nav.bottom-nav{
 
         <!-- Wartungshistorie & Berichte (Admin) -->
         <div class="wh-section" id="wartungshistorieSection">
-          <div class="wh-section-header">
-            <span class="wh-section-title">Wartungshistorie &amp; Berichte</span>
+          <button class="wh-toggle-btn" id="whToggleBtn" onclick="toggleWartungshistorie()" touch-action="manipulation" style="touch-action:manipulation;">
+            <div class="wh-toggle-left">
+              <div class="wh-toggle-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
+              <div>
+                <div class="wh-toggle-label">Wartungshistorie &amp; Berichte</div>
+                <div class="wh-toggle-sub" id="whToggleSub">Wird geladen&hellip;</div>
+              </div>
+            </div>
             <span class="wh-count-badge" id="whCountBadge">0</span>
+            <svg class="wh-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="wh-body" id="whBody">
+            <div class="wh-timeline" id="whList"></div>
           </div>
-          <div id="whList"></div>
         </div>
 
         <!-- Montageberichte -->
@@ -5550,48 +5589,76 @@ function confirmEndEinsatz() {
 }
 
 // ===== WARTUNGSHISTORIE & BERICHTE =====
+var _whOpen = false;
+
+function toggleWartungshistorie() {
+  _whOpen = !_whOpen;
+  var btn  = document.getElementById('whToggleBtn');
+  var body = document.getElementById('whBody');
+  if (!btn || !body) return;
+  if (_whOpen) { btn.classList.add('open'); body.classList.add('open'); }
+  else         { btn.classList.remove('open'); body.classList.remove('open'); }
+}
+
 function renderWartungshistorie(machineId) {
-  var section = document.getElementById('wartungshistorieSection');
   var listEl  = document.getElementById('whList');
   var badge   = document.getElementById('whCountBadge');
-  if (!section || !listEl) return;
+  var sub     = document.getElementById('whToggleSub');
+  var btn     = document.getElementById('whToggleBtn');
+  var body    = document.getElementById('whBody');
+  if (!listEl) return;
 
-  var machine   = MACHINES[machineId] || {};
-  var custId    = machine.customerId || null;
+  // Reset collapsed state on new machine
+  _whOpen = false;
+  if (btn)  { btn.classList.remove('open'); }
+  if (body) { body.classList.remove('open'); }
+
+  var machine    = MACHINES[machineId] || {};
+  var custId     = machine.customerId || null;
   var allReports = _montageberichte[machineId] || [];
 
-  // Only show synced reports that belong to the same customer
   var archived = allReports.filter(function(r) {
     return r.syncStatus === 'synced' && (!custId || !r.customerId || r.customerId === custId);
   });
 
   if (badge) badge.textContent = archived.length;
+  if (sub)   sub.textContent   = archived.length === 0
+    ? 'Noch keine archivierten Berichte'
+    : archived.length + ' Bericht' + (archived.length !== 1 ? 'e' : '') + ' archiviert';
 
   if (archived.length === 0) {
-    listEl.innerHTML = '<div class="wh-empty">Noch keine archivierten Berichte vorhanden.</div>';
+    listEl.innerHTML = '<div class="wh-empty">Noch keine synchronisierten Berichte vorhanden.</div>';
     return;
   }
 
-  listEl.innerHTML = '<div class="wh-list">' + archived.map(function(r) {
-    var erpBadge = r.syncStatus === 'synced'
-      ? '<span class="wh-erp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>ERP-archiviert</span>'
-      : '';
-    var datePart = r.date ? r.date.split(' ').slice(0,2).join(' ') : '—';
-    return '<div class="wh-item">' +
-      '<div class="wh-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>' +
-      '<div class="wh-item-body">' +
-        '<div class="wh-item-top">' +
-          '<span class="wh-item-art">' + (r.einsatzArt || 'Wartungseinsatz') + '</span>' +
-          erpBadge +
-        '</div>' +
-        '<div class="wh-item-meta">' + r.techniker + ' &nbsp;&middot;&nbsp; ' + (r.dauer || '—') + '</div>' +
+  listEl.innerHTML = archived.map(function(r, i) {
+    var isLast   = i === archived.length - 1;
+    var datePart = r.date ? r.date.split(' ').slice(0, 2).join(' ') : '—';
+    var erpBadge = '<span class="wh-erp-badge">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' +
+      'ERP-archiviert</span>';
+
+    return '<div class="wh-tl-item">' +
+      '<div class="wh-tl-left">' +
+        '<div class="wh-tl-dot"></div>' +
+        (isLast ? '' : '<div class="wh-tl-line"></div>') +
       '</div>' +
-      '<div class="wh-item-date">' + datePart + '</div>' +
-      '<button class="wh-pdf-btn" onclick="openMontageberichtPdf(' + JSON.stringify(r) + ')" title="PDF öffnen">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-      '</button>' +
+      '<div class="wh-tl-card">' +
+        '<div class="wh-tl-card-top">' +
+          '<div class="wh-tl-art">' + (r.einsatzArt || 'Wartungseinsatz') + '</div>' +
+          '<div class="wh-tl-date">' + datePart + '</div>' +
+        '</div>' +
+        '<div class="wh-tl-badges">' + erpBadge + '</div>' +
+        '<div class="wh-tl-meta">' +
+          '<span>' + r.techniker + ' &nbsp;&middot;&nbsp; ' + (r.dauer || '—') + '</span>' +
+          '<button class="wh-pdf-btn" onclick="openMontageberichtPdf(' + JSON.stringify(r) + ')">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+            'PDF' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
     '</div>';
-  }).join('') + '</div>';
+  }).join('');
 }
 
 function mbSyncBadgeHtml(status) {
