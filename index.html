@@ -7480,12 +7480,9 @@ function confirmConfig() {
   section.classList.remove('locked');
   overlay.classList.add('hidden');
 
-  // Open the diagnose accordion and scroll to it
+  // Open the diagnose accordion (no auto-scroll — user stays at top)
   var diagAcc = document.getElementById('acc-diagnose');
   if (diagAcc) diagAcc.classList.add('open');
-  setTimeout(function() {
-    if (diagAcc) diagAcc.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 150);
 }
 
 // ===== USER & ROLE SYSTEM =====
@@ -8279,13 +8276,9 @@ function openMachine(id) {
     ? 'Zur\u00fcck zur Startseite'
     : 'Zur\u00fcck zum Maschinenstamm';
 
-  // If there's an active error, auto-confirm config and show diagnosis
-  if (m.activeCode) {
-    setTimeout(() => {
-      confirmConfig();
-      setTimeout(() => searchCode(m.activeCode), 200);
-    }, 400);
-  }
+  // Scroll to top so Techniker-Cockpit is visible first
+  var body = document.querySelector('.app-body');
+  if (body) body.scrollTop = 0;
 }
 
 // ===== SEARCH =====
