@@ -720,6 +720,82 @@ header{
   transition:background .2s,color .2s;
 }
 .btn-show-all-assets:hover{background:var(--accent);color:#fff;}
+
+/* ===== MOBILE PRIORITY DASHBOARD ===== */
+/* Pulsing border animations */
+@keyframes pulse-red{
+  0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,.35),var(--shadow);}
+  50%{box-shadow:0 0 0 7px rgba(198,40,40,0),var(--shadow);}
+}
+@keyframes pulse-orange{
+  0%,100%{box-shadow:0 0 0 0 rgba(230,81,0,.3),var(--shadow);}
+  50%{box-shadow:0 0 0 7px rgba(230,81,0,0),var(--shadow);}
+}
+/* Priority section */
+.prio-section{display:none;padding:12px 18px 0;}
+.prio-section-label{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--red);margin-bottom:9px;display:flex;align-items:center;gap:6px;
+}
+.prio-section-label::before{
+  content:'';width:6px;height:6px;border-radius:50%;background:var(--red);
+  animation:pulse-red 1.6s ease-in-out infinite;flex-shrink:0;
+}
+.prio-tile{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border-radius:12px;
+  background:#fff;border:1.5px solid transparent;
+  margin-bottom:9px;cursor:pointer;
+  transition:transform .15s;
+  position:relative;overflow:hidden;
+}
+.prio-tile::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;
+}
+.prio-tile.prio-err{border-color:rgba(198,40,40,.25);animation:pulse-red 2s ease-in-out infinite;}
+.prio-tile.prio-err::before{background:var(--red);}
+.prio-tile.prio-mnt{border-color:rgba(230,81,0,.25);animation:pulse-orange 2s ease-in-out infinite;}
+.prio-tile.prio-mnt::before{background:var(--warning);}
+.prio-tile:active{transform:scale(.98);}
+.prio-tile-icon{font-size:22px;flex-shrink:0;line-height:1;}
+.prio-tile-body{flex:1;min-width:0;}
+.prio-tile-name{font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prio-tile-code{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;
+  margin-top:3px;letter-spacing:.3px;
+}
+.prio-tile.prio-err .prio-tile-code{background:var(--red-bg);color:var(--red);}
+.prio-tile.prio-mnt .prio-tile-code{background:var(--warn-bg);color:var(--warning);}
+.prio-tile-loc{font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prio-tile-arr{font-size:20px;color:var(--border);flex-shrink:0;}
+/* Compact task list */
+.tasks-compact{display:none;padding:4px 18px 0;}
+.tasks-compact-label{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:8px;
+}
+.task-list{display:flex;flex-direction:column;gap:0;}
+.task-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 2px;border-bottom:1px solid var(--border);cursor:pointer;
+}
+.task-item:last-child{border-bottom:none;}
+.task-item:active{background:var(--bg3);margin:0 -4px;padding-left:6px;padding-right:6px;border-radius:8px;}
+.task-item-icon{font-size:16px;flex-shrink:0;width:28px;text-align:center;}
+.task-item-body{flex:1;min-width:0;}
+.task-item-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.task-item-loc{font-size:11px;color:var(--text-muted);}
+.task-item-status{flex-shrink:0;}
+.tasks-show-all{
+  width:100%;margin-top:10px;padding:11px;border-radius:10px;
+  border:1.5px solid var(--border);background:#fff;
+  font-size:13px;font-weight:700;color:var(--accent);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;touch-action:manipulation;
+}
+.tasks-show-all svg{width:14px;height:14px;}
+
 .machines-list{display:flex;flex-direction:column;gap:10px;}
 .machine-card{
   background:#fff;border:1px solid var(--border);border-radius:var(--r);
@@ -2237,6 +2313,11 @@ nav.bottom-nav{
 /* ===================================================================
    DESKTOP (>= 1024px)
    =================================================================== */
+@media(max-width:1023px){
+  .machines-section{display:none;}
+  .prio-section{display:block;}
+  .tasks-compact{display:block;}
+}
 @media(min-width:1024px){
   .app-body{padding-bottom:0;}
   .d-sidebar{display:flex;}
@@ -2549,9 +2630,14 @@ nav.bottom-nav{
             </div>
           </div>
 
+          <!-- Priority tiles (mobile) -->
+          <div class="prio-section" id="prioDashSection">
+            <!-- filled by JS -->
+          </div>
+
           <!-- Serial number search + scan (mobile) -->
           <div class="serial-search-section">
-            <div style="height:20px;"></div>
+            <div style="height:16px;"></div>
             <div class="sec-label">Asset identifizieren</div>
             <div class="serial-search-card">
               <div class="serial-search-card-title">Seriennummer manuell eingeben</div>
@@ -2599,6 +2685,11 @@ nav.bottom-nav{
               <div class="erp-tile-sub">Tippen zum manuellen Synchronisieren</div>
             </div>
             <span class="erp-tile-arr">&#8250;</span>
+          </div>
+
+          <!-- Compact task list (mobile) -->
+          <div class="tasks-compact" id="tasksCompactSection">
+            <!-- filled by JS -->
           </div>
 
           <!-- Machine list -->
@@ -5175,6 +5266,85 @@ function startWartung() {
   showScanLogToast('Wartung gestartet \u2013 Einsatz l\u00e4uft');
 }
 
+// ===== MOBILE DASHBOARD =====
+var _tasksExpanded = false;
+
+function renderDashboardMobile() {
+  var prioEl = document.getElementById('prioDashSection');
+  var tasksEl = document.getElementById('tasksCompactSection');
+  if (!prioEl || !tasksEl) return;
+
+  var ids = Object.keys(MACHINES);
+  var errMachines  = ids.filter(function(id){ return MACHINES[id].status === 'err'; });
+  var mntMachines  = ids.filter(function(id){ return MACHINES[id].status === 'mnt'; });
+  var okMachines   = ids.filter(function(id){ return MACHINES[id].status === 'ok'; });
+  var prioMachines = errMachines.concat(mntMachines).slice(0, 2);
+  var restMachines = errMachines.concat(mntMachines).slice(2).concat(okMachines);
+
+  // Render priority tiles
+  if (prioMachines.length === 0) {
+    prioEl.innerHTML = '';
+  } else {
+    var label = '<div class="prio-section-label">Sofortiger Handlungsbedarf</div>';
+    var tiles = prioMachines.map(function(id) {
+      var m = MACHINES[id];
+      var isErr = m.status === 'err';
+      var cls = isErr ? 'prio-err' : 'prio-mnt';
+      var icon = MACHINE_ICONS[m.type] || '\uD83D\uDD27';
+      var codeText = m.activeCode || (isErr ? 'Fehler aktiv' : 'Wartung fällig');
+      return '<div class="prio-tile ' + cls + '" onclick="openMachine(\'' + id + '\')">' +
+        '<div class="prio-tile-icon">' + icon + '</div>' +
+        '<div class="prio-tile-body">' +
+          '<div class="prio-tile-name">' + m.name + '</div>' +
+          '<span class="prio-tile-code">' + codeText + '</span>' +
+          '<div class="prio-tile-loc">\uD83D\uDCCD ' + m.location + '</div>' +
+        '</div>' +
+        '<div class="prio-tile-arr">\u203A</div>' +
+      '</div>';
+    }).join('');
+    prioEl.innerHTML = label + tiles;
+  }
+
+  // Render compact task list
+  var COMPACT_LIMIT = 3;
+  var visible = _tasksExpanded ? restMachines : restMachines.slice(0, COMPACT_LIMIT);
+  var statusLabel = { err:'Fehler', mnt:'Wartung', ok:'OK' };
+  var statusCls   = { err:'s-err',  mnt:'s-mnt',  ok:'s-ok' };
+  var rows = visible.map(function(id) {
+    var m = MACHINES[id];
+    var icon = MACHINE_ICONS[m.type] || '\uD83D\uDD27';
+    return '<div class="task-item" onclick="openMachine(\'' + id + '\')">' +
+      '<div class="task-item-icon">' + icon + '</div>' +
+      '<div class="task-item-body">' +
+        '<div class="task-item-name">' + m.name + '</div>' +
+        '<div class="task-item-loc">\uD83D\uDCCD ' + m.location + '</div>' +
+      '</div>' +
+      '<div class="task-item-status"><span class="mc-status ' + statusCls[m.status] + '">' + statusLabel[m.status] + '</span></div>' +
+    '</div>';
+  }).join('');
+
+  var showAllBtn = '';
+  if (!_tasksExpanded && restMachines.length > COMPACT_LIMIT) {
+    var remaining = restMachines.length - COMPACT_LIMIT;
+    showAllBtn = '<button class="tasks-show-all" onclick="_tasksExpanded=true;renderDashboardMobile();">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>' +
+      remaining + ' weitere Maschinen anzeigen' +
+    '</button>';
+  } else if (restMachines.length > 0) {
+    showAllBtn = '<button class="tasks-show-all" onclick="showPage(\'assets\');renderAssetsGrid();">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>' +
+      'Alle ' + Object.keys(MACHINES).length + ' Maschinen im \u00dcberblick' +
+    '</button>';
+  }
+
+  if (restMachines.length === 0) {
+    tasksEl.innerHTML = '';
+  } else {
+    tasksEl.innerHTML = '<div class="tasks-compact-label">Weitere Maschinen</div>' +
+      '<div class="task-list">' + rows + '</div>' + showAllBtn;
+  }
+}
+
 function showEinsatzEnd() {
   if (!_einsatzActive) { showScanLogToast('Kein aktiver Einsatz'); return; }
   var sec = Math.floor((Date.now() - _einsatzStart) / 1000);
@@ -6358,6 +6528,7 @@ function showPage(name) {
   if (navEl) navEl.classList.add('active');
   else document.getElementById('nav-home').classList.add('active');
   document.querySelector('.app-body').scrollTop = 0;
+  if (name === 'home') { _tasksExpanded = false; renderDashboardMobile(); }
   if (name !== 'machine') {
     document.getElementById('solutionArea').style.display = 'none';
     document.getElementById('solutionArea').innerHTML = '';
@@ -6659,6 +6830,7 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
 
 // ===== INIT =====
 renderNutzerList();
+renderDashboardMobile();
 </script>
 
 <!-- ==================== EINSATZ BEENDEN MODAL ==================== -->
