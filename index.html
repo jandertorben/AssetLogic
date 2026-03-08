@@ -2050,6 +2050,58 @@ nav.bottom-nav{
 }
 .mb-report-btn:active{background:var(--accent-lt);}
 .mb-report-btn svg{width:13px;height:13px;}
+/* ===== WARTUNGSHISTORIE & BERICHTE ===== */
+.wh-section{margin-top:20px;}
+.wh-section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.wh-section-title{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);
+}
+.wh-count-badge{
+  font-size:10px;font-weight:800;background:var(--accent-lt);color:var(--accent);
+  border-radius:10px;padding:2px 8px;
+}
+.wh-list{display:flex;flex-direction:column;gap:0;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
+.wh-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:#fff;border-bottom:1px solid var(--border);
+  transition:background .15s;cursor:default;
+}
+.wh-item:last-child{border-bottom:none;}
+.wh-item-icon{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg3);
+}
+.wh-item-icon svg{width:17px;height:17px;color:var(--text-muted);}
+.wh-item-body{flex:1;min-width:0;}
+.wh-item-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px;}
+.wh-item-art{
+  font-size:12px;font-weight:800;color:var(--text);
+}
+.wh-erp-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:9px;font-weight:700;background:var(--green-bg);color:var(--green);
+  border:1px solid rgba(46,125,50,.2);border-radius:10px;padding:2px 6px;
+  white-space:nowrap;
+}
+.wh-erp-badge svg{width:9px;height:9px;}
+.wh-item-meta{font-size:11px;color:var(--text-muted);}
+.wh-item-date{font-size:11px;font-weight:600;color:var(--text-muted);white-space:nowrap;text-align:right;margin-right:4px;}
+.wh-pdf-btn{
+  width:34px;height:34px;border-radius:9px;border:1.5px solid var(--border);
+  background:#fff;color:var(--red);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all .15s;touch-action:manipulation;
+}
+.wh-pdf-btn:hover{background:var(--red-bg);border-color:rgba(198,40,40,.3);}
+.wh-pdf-btn:active{transform:scale(.93);}
+.wh-pdf-btn svg{width:15px;height:15px;}
+.wh-empty{
+  padding:18px 16px;font-size:12px;color:var(--text-muted);
+  text-align:center;font-style:italic;background:#fff;border-radius:12px;border:1.5px solid var(--border);
+}
 /* Monteure section */
 .monteur-section{padding:14px 18px 4px;border-top:1px solid var(--border);margin-top:4px;}
 .monteur-sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
@@ -2906,6 +2958,15 @@ nav.bottom-nav{
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 10 11 15 8 12"/></svg>
             Einsatz beenden
           </button>
+        </div>
+
+        <!-- Wartungshistorie & Berichte (Admin) -->
+        <div class="wh-section" id="wartungshistorieSection">
+          <div class="wh-section-header">
+            <span class="wh-section-title">Wartungshistorie &amp; Berichte</span>
+            <span class="wh-count-badge" id="whCountBadge">0</span>
+          </div>
+          <div id="whList"></div>
         </div>
 
         <!-- Montageberichte -->
@@ -5232,11 +5293,23 @@ var _einsatzStart   = null;
 var _einsatzInterval= null;
 var _montageberichte = {
   'CAT-320': [
-    { id:'MB-2026-0305-0814', name:'Montagebericht 05.03.2026', date:'05.03.2026 08:14 Uhr', dauer:'47 Min. 22 Sek.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320', syncStatus:'pending' },
-    { id:'MB-2026-0218-1330', name:'Montagebericht 18.02.2026', date:'18.02.2026 13:30 Uhr', dauer:'1 Std. 12 Min.', techniker:'Marco K\u00f6hler', maschine:'Bagger CAT 320', machineId:'CAT-320', syncStatus:'synced' }
+    { id:'MB-2026-0305-0814', date:'05.03.2026 08:14 Uhr', dauer:'47 Min. 22 Sek.', techniker:'Marco Köhler', maschine:'Bagger CAT 320', machineId:'CAT-320', einsatzArt:'Störungsbehebung', syncStatus:'pending', customerId:'mayer-bau' },
+    { id:'MB-2026-0218-1330', date:'18.02.2026 13:30 Uhr', dauer:'1 Std. 12 Min.',  techniker:'Marco Köhler', maschine:'Bagger CAT 320', machineId:'CAT-320', einsatzArt:'UVV-Prüfung',       syncStatus:'synced',  customerId:'mayer-bau' },
+    { id:'MB-2025-1120-0900', date:'20.11.2025 09:00 Uhr', dauer:'58 Min. 05 Sek.', techniker:'Lisa Wagner',  maschine:'Bagger CAT 320', machineId:'CAT-320', einsatzArt:'Hydraulikservice',   syncStatus:'synced',  customerId:'mayer-bau' },
+    { id:'MB-2025-0815-1400', date:'15.08.2025 14:00 Uhr', dauer:'2 Std. 30 Min.',  techniker:'Marco Köhler', maschine:'Bagger CAT 320', machineId:'CAT-320', einsatzArt:'Planmäßige Wartung', syncStatus:'synced',  customerId:'mayer-bau' }
   ],
   'HP-500': [
-    { id:'MB-2026-0301-0955', name:'Montagebericht 01.03.2026', date:'01.03.2026 09:55 Uhr', dauer:'2 Std. 05 Min.', techniker:'Lisa Wagner', maschine:'Hydraulikpresse HP-500', machineId:'HP-500', syncStatus:'pending' }
+    { id:'MB-2026-0301-0955', date:'01.03.2026 09:55 Uhr', dauer:'2 Std. 05 Min.',  techniker:'Lisa Wagner',  maschine:'Hydraulikpresse HP-500', machineId:'HP-500', einsatzArt:'Inspektion',         syncStatus:'pending', customerId:'mayer-bau' },
+    { id:'MB-2026-0110-1115', date:'10.01.2026 11:15 Uhr', dauer:'45 Min. 10 Sek.', techniker:'Stefan Brandt',maschine:'Hydraulikpresse HP-500', machineId:'HP-500', einsatzArt:'Ölwechsel',           syncStatus:'synced',  customerId:'mayer-bau' },
+    { id:'MB-2025-1005-0830', date:'05.10.2025 08:30 Uhr', dauer:'1 Std. 20 Min.',  techniker:'Lisa Wagner',  maschine:'Hydraulikpresse HP-500', machineId:'HP-500', einsatzArt:'Planmäßige Wartung', syncStatus:'synced',  customerId:'mayer-bau' }
+  ],
+  'PM-36': [
+    { id:'MB-2026-0220-0745', date:'20.02.2026 07:45 Uhr', dauer:'3 Std. 10 Min.',  techniker:'Marco Köhler', maschine:'Putzmeister M36-5', machineId:'PM-36', einsatzArt:'Störungsbehebung',   syncStatus:'synced', customerId:'mayer-bau' },
+    { id:'MB-2025-1210-1300', date:'10.12.2025 13:00 Uhr', dauer:'1 Std. 45 Min.',  techniker:'Stefan Brandt',maschine:'Putzmeister M36-5', machineId:'PM-36', einsatzArt:'UVV-Prüfung',       syncStatus:'synced', customerId:'mayer-bau' }
+  ],
+  'KOM-PC210': [
+    { id:'MB-2026-0228-0800', date:'28.02.2026 08:00 Uhr', dauer:'55 Min. 40 Sek.', techniker:'Kai Hoffmann', maschine:'Komatsu PC210LC-11', machineId:'KOM-PC210', einsatzArt:'Inspektion',         syncStatus:'synced', customerId:'bauer-soehne' },
+    { id:'MB-2025-0930-1430', date:'30.09.2025 14:30 Uhr', dauer:'2 Std. 00 Min.',  techniker:'Kai Hoffmann', maschine:'Komatsu PC210LC-11', machineId:'KOM-PC210', einsatzArt:'Planmäßige Wartung', syncStatus:'synced', customerId:'bauer-soehne' }
   ]
 };
 
@@ -5411,6 +5484,51 @@ function confirmEndEinsatz() {
   }
 }
 
+// ===== WARTUNGSHISTORIE & BERICHTE =====
+function renderWartungshistorie(machineId) {
+  var section = document.getElementById('wartungshistorieSection');
+  var listEl  = document.getElementById('whList');
+  var badge   = document.getElementById('whCountBadge');
+  if (!section || !listEl) return;
+
+  var machine   = MACHINES[machineId] || {};
+  var custId    = machine.customerId || null;
+  var allReports = _montageberichte[machineId] || [];
+
+  // Only show synced reports that belong to the same customer
+  var archived = allReports.filter(function(r) {
+    return r.syncStatus === 'synced' && (!custId || !r.customerId || r.customerId === custId);
+  });
+
+  if (badge) badge.textContent = archived.length;
+
+  if (archived.length === 0) {
+    listEl.innerHTML = '<div class="wh-empty">Noch keine archivierten Berichte vorhanden.</div>';
+    return;
+  }
+
+  listEl.innerHTML = '<div class="wh-list">' + archived.map(function(r) {
+    var erpBadge = r.syncStatus === 'synced'
+      ? '<span class="wh-erp-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>ERP-archiviert</span>'
+      : '';
+    var datePart = r.date ? r.date.split(' ').slice(0,2).join(' ') : '—';
+    return '<div class="wh-item">' +
+      '<div class="wh-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>' +
+      '<div class="wh-item-body">' +
+        '<div class="wh-item-top">' +
+          '<span class="wh-item-art">' + (r.einsatzArt || 'Wartungseinsatz') + '</span>' +
+          erpBadge +
+        '</div>' +
+        '<div class="wh-item-meta">' + r.techniker + ' &nbsp;&middot;&nbsp; ' + (r.dauer || '—') + '</div>' +
+      '</div>' +
+      '<div class="wh-item-date">' + datePart + '</div>' +
+      '<button class="wh-pdf-btn" onclick="openMontageberichtPdf(' + JSON.stringify(r) + ')" title="PDF öffnen">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+      '</button>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
 function mbSyncBadgeHtml(status) {
   if (status === 'synced') {
     return '<span class="mb-sync-badge synced">' +
@@ -5557,7 +5675,7 @@ function startErpMbSync() {
         renderErpMbSection();
 
         // Refresh machine detail and assets grid
-        if (_currentMachineId) renderMontageberichte(_currentMachineId);
+        if (_currentMachineId) { renderMontageberichte(_currentMachineId); renderWartungshistorie(_currentMachineId); }
         if (document.getElementById('assetsGrid')) renderAssetsGrid();
 
         var now = new Date();
@@ -6040,6 +6158,7 @@ const MACHINES = {
     location: 'Baustelle Nord, Sektion A',
     status: 'err',
     activeCode: 'E-0147',
+    customerId: 'mayer-bau',
     config: {
       baujahr: '2021',
       motor: 'CAT C7.1 ACERT / Bosch Rexroth RC12',
@@ -6057,6 +6176,7 @@ const MACHINES = {
     location: 'Halle 4, Block C',
     status: 'mnt',
     activeCode: 'WARN_KPD_07',
+    customerId: 'mayer-bau',
     config: {
       baujahr: '2019',
       motor: 'Bosch Rexroth HY-8 / Rexroth RC7',
@@ -6074,6 +6194,7 @@ const MACHINES = {
     location: 'Keller, Technikraum',
     status: 'ok',
     activeCode: null,
+    customerId: 'bauer-soehne',
     config: {
       baujahr: '2020',
       motor: 'Kaeser SIGMA 75 / Siemens S7-1200',
@@ -6091,6 +6212,7 @@ const MACHINES = {
     location: 'Halle 2, Station 7',
     status: 'ok',
     activeCode: null,
+    customerId: 'bauer-soehne',
     config: {
       baujahr: '2022',
       motor: 'Fronius TransPuls 500 / Fronius RC-3',
@@ -6108,6 +6230,7 @@ const MACHINES = {
     location: 'Recyclinghof Ost, Tor 3',
     status: 'ok',
     activeCode: null,
+    customerId: 'schmidt-logistik',
     config: {
       baujahr: '2020',
       motor: 'Liebherr D936 A7 / Liebherr LiDAT RC-8',
@@ -6125,6 +6248,7 @@ const MACHINES = {
     location: 'Baustelle S\u00fcd, Abschnitt 2',
     status: 'mnt',
     activeCode: 'WARN_PC210_OIL',
+    customerId: 'bauer-soehne',
     config: {
       baujahr: '2022',
       motor: 'Komatsu SAA6D107E-3 / KDSS RC-5',
@@ -6142,6 +6266,7 @@ const MACHINES = {
     location: 'Baustelle Nord, Block B',
     status: 'err',
     activeCode: 'E-PM36-HYD',
+    customerId: 'mayer-bau',
     config: {
       baujahr: '2021',
       motor: 'MAN D2676 / Rexroth A10VSO RC-6',
@@ -6159,6 +6284,7 @@ const MACHINES = {
     location: 'Fuhrpark, Stellplatz 14',
     status: 'ok',
     activeCode: null,
+    customerId: 'schmidt-logistik',
     config: {
       baujahr: '2023',
       motor: 'John Deere 4045HF285 / Atlas Copco E-Controller',
@@ -6176,6 +6302,7 @@ const MACHINES = {
     location: 'Fuhrpark, Stellplatz 2',
     status: 'ok',
     activeCode: null,
+    customerId: 'mayer-bau',
     config: {
       baujahr: '2022',
       motor: 'MAN D2676 LF26 / MAN TipMatic ECS',
@@ -6610,6 +6737,7 @@ function openMachine(id) {
 
   _currentMachineId = id;
   renderTechCockpit(id);
+  renderWartungshistorie(id);
   renderMontageberichte(id);
   showPage('machine');
 
