@@ -12,6 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLEg=" crossorigin=""></script>
 <style>
 /* ===== RESET & VARS ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -2518,151 +2520,97 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
   body.role-service-leader .d-sidebar{display:flex!important;}
 }
 
-/* ===== SERVICELEITER MAP PAGE ===== */
-.sl-page-wrap{padding:20px 20px 32px;max-width:1400px;}
-.sl-tech-bar{
-  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;
+/* ===== SERVICELEITER KARTE — LEAFLET LAYOUT ===== */
+#page-karte.active{display:flex!important;height:calc(100dvh - var(--hdr-h));overflow:hidden;padding:0;}
+.app-body.map-active{overflow:hidden!important;padding-bottom:0!important;}
+
+/* Filter Sidebar */
+.sl-map-sidebar{
+  width:268px;flex-shrink:0;
+  background:var(--bg);border-right:1.5px solid var(--border);
+  overflow-y:auto;display:flex;flex-direction:column;
 }
-.sl-tech-chip{
-  display:flex;align-items:center;gap:8px;
-  padding:7px 13px 7px 8px;border-radius:40px;
-  background:var(--bg2);border:1.5px solid var(--border);
-  font-size:12.5px;font-weight:600;cursor:pointer;
-  transition:border-color .18s,background .18s;
+.sl-map-sidebar-hdr{
+  padding:16px 14px 12px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--bg);z-index:2;
 }
-.sl-tech-chip:hover{background:var(--accent-lt);border-color:var(--primary);}
-.sl-tech-chip.active-einsatz{border-color:rgba(46,125,50,.4);background:rgba(46,125,50,.07);}
-.sl-tech-chip.active-einsatz:hover{background:rgba(46,125,50,.14);}
-.sl-tech-av{
-  width:26px;height:26px;border-radius:50%;
+.sl-map-sidebar-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:10px;}
+.sl-search-input{
+  width:100%;padding:7px 10px 7px 32px;border-radius:8px;
+  border:1.5px solid var(--border);background:var(--bg2);
+  font-size:12.5px;color:var(--text);outline:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:14px;background-position:9px center;
+}
+.sl-search-input:focus{border-color:var(--primary);}
+.sl-filter-section{padding:8px 14px 14px;flex:1;}
+.sl-filter-label{
+  font-size:10px;font-weight:700;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.6px;margin:10px 0 5px;
+}
+.sl-filter-item{
+  display:flex;align-items:center;gap:9px;padding:7px 8px;
+  border-radius:9px;cursor:pointer;transition:background .15s;
+  margin-bottom:1px;
+}
+.sl-filter-item:hover{background:var(--accent-lt);}
+.sl-filter-item-av{
+  width:28px;height:28px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   font-size:10px;font-weight:800;color:#fff;flex-shrink:0;
 }
-.sl-tech-name{color:var(--text);}
-.sl-tech-status-dot{
-  width:7px;height:7px;border-radius:50%;margin-left:2px;flex-shrink:0;
+.sl-filter-item-icon{
+  width:28px;height:28px;border-radius:8px;background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;
 }
-.sl-tech-status-dot.aktiv{background:#4CAF50;animation:livePulse 2s infinite;}
-.sl-tech-status-dot.busy{background:#FF9800;animation:livePulse 2s infinite;}
-.sl-tech-status-dot.idle{background:#90A4AE;}
+.sl-filter-item-body{flex:1;min-width:0;}
+.sl-filter-item-name{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sl-filter-item-sub{font-size:10.5px;color:var(--text-muted);margin-top:1px;}
+.sl-filter-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sl-filter-dot.ok{background:#4CAF50;}
+.sl-filter-dot.mnt{background:#FB8C00;}
+.sl-filter-dot.err{background:#E53935;animation:livePulse 1.8s infinite;}
+.sl-filter-dot.busy{background:#4CAF50;animation:livePulse 2s infinite;}
+.sl-filter-dot.idle{background:#90A4AE;}
+.sl-filter-divider{height:1px;background:var(--border);margin:10px 0 4px;}
 
-/* Map canvas */
-.sl-map-wrap{
-  position:relative;border-radius:14px;overflow:hidden;
-  border:1.5px solid var(--border);
-  background:#0d1b2a;
-  min-height:420px;
+/* Leaflet container */
+.sl-leaflet-container{flex:1;position:relative;overflow:hidden;}
+#slLeafletMap{width:100%;height:100%;}
+
+/* Leaflet popup overrides */
+.leaflet-popup-content-wrapper{
+  border-radius:14px!important;padding:0!important;overflow:hidden!important;
+  box-shadow:0 12px 48px rgba(0,20,50,.22)!important;
 }
-@media(min-width:1024px){ .sl-map-wrap{min-height:540px;} }
-.sl-map-bg{
-  position:absolute;inset:0;
-  background:
-    linear-gradient(rgba(0,82,204,.06) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,82,204,.06) 1px,transparent 1px),
-    radial-gradient(ellipse 80% 60% at 50% 50%,rgba(0,52,120,.28) 0%,transparent 70%),
-    #0b1829;
-  background-size:40px 40px,40px 40px,100% 100%,100% 100%;
+.leaflet-popup-content{margin:0!important;width:290px!important;}
+.leaflet-popup-tip-container{margin-top:-1px!important;}
+.leaflet-popup-close-button{top:10px!important;right:10px!important;font-size:18px!important;color:#64748b!important;z-index:2!important;}
+/* Popup inner */
+.sl-pop-head{padding:14px 38px 12px 14px;display:flex;align-items:flex-start;gap:11px;background:#f8faff;border-bottom:1px solid #e2e8f0;}
+.sl-pop-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sl-pop-title{font-size:14px;font-weight:800;color:#0f172a;line-height:1.2;}
+.sl-pop-serial{font-size:10.5px;color:#64748b;margin-top:2px;}
+.sl-pop-status{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;}
+.sl-pop-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;}
+.sl-pop-row-lbl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
+.sl-pop-row-val{font-size:12.5px;font-weight:600;color:#0f172a;line-height:1.4;}
+.sl-pop-row-sub{font-size:11.5px;color:#64748b;margin-top:1px;}
+.sl-pop-divider{height:1px;background:#e2e8f0;margin:4px 0;}
+.sl-pop-btn{
+  width:100%;padding:10px;border-radius:8px;border:none;
+  background:#002D5A;color:#fff;font-size:13px;font-weight:700;
+  cursor:pointer;transition:background .18s;margin-top:4px;
+  font-family:inherit;
 }
-.sl-map-region{
-  position:absolute;border-radius:8px;
-  border:1px dashed rgba(255,255,255,.08);
-  background:rgba(255,255,255,.02);
-  font-size:9px;font-weight:700;color:rgba(255,255,255,.2);
-  letter-spacing:.8px;text-transform:uppercase;
-  display:flex;align-items:flex-end;padding:6px 8px;
-}
-/* Pins */
-.sl-pin{
-  position:absolute;transform:translate(-50%,-100%);
-  cursor:pointer;display:flex;flex-direction:column;align-items:center;
-  transition:transform .2s;
-  z-index:2;
-}
-.sl-pin:hover{transform:translate(-50%,-100%) scale(1.12);}
-.sl-pin-marker{
-  width:34px;height:34px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;
-  box-shadow:0 4px 16px rgba(0,0,0,.5);
-  border:2.5px solid rgba(255,255,255,.25);
-  position:relative;
-}
-.sl-pin-marker::after{
-  content:'';position:absolute;bottom:-7px;left:50%;
-  transform:translateX(-50%);
-  width:0;height:0;
-  border-left:6px solid transparent;border-right:6px solid transparent;
-}
-.sl-pin.p-ok .sl-pin-marker{background:linear-gradient(135deg,#2E7D32,#43A047);}
-.sl-pin.p-ok .sl-pin-marker::after{border-top:8px solid #2E7D32;}
-.sl-pin.p-mnt .sl-pin-marker{background:linear-gradient(135deg,#E65100,#FB8C00);}
-.sl-pin.p-mnt .sl-pin-marker::after{border-top:8px solid #E65100;}
-.sl-pin.p-err .sl-pin-marker{background:linear-gradient(135deg,#B71C1C,#E53935);}
-.sl-pin.p-err .sl-pin-marker::after{border-top:8px solid #B71C1C;}
-.sl-pin.p-err .sl-pin-marker{animation:pin-pulse 2s ease-in-out infinite;}
-@keyframes pin-pulse{
-  0%,100%{box-shadow:0 4px 16px rgba(0,0,0,.5),0 0 0 0 rgba(229,57,53,.6);}
-  50%{box-shadow:0 4px 16px rgba(0,0,0,.5),0 0 0 8px rgba(229,57,53,0);}
-}
-.sl-pin-label{
-  margin-top:6px;padding:2px 7px;border-radius:5px;
-  background:rgba(0,0,0,.72);color:#fff;
-  font-size:9.5px;font-weight:700;white-space:nowrap;
-  backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.1);
-}
-/* Pin info popup */
-#slPinModal{
-  display:none;position:fixed;inset:0;z-index:9550;
-  background:rgba(0,15,36,.55);backdrop-filter:blur(4px);
-  align-items:center;justify-content:center;
-}
-#slPinModal.active{display:flex;}
-.sl-info-card{
-  background:#fff;border-radius:16px;
-  max-width:400px;width:92%;
-  box-shadow:0 24px 64px rgba(0,20,50,.3);
-  overflow:hidden;animation:slideUp .22s cubic-bezier(.4,0,.2,1);
-}
-.sl-info-head{
-  padding:16px 18px 14px;
-  display:flex;align-items:center;gap:12px;
-}
-.sl-info-icon{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
-.sl-info-title{font-size:15px;font-weight:800;color:var(--text);}
-.sl-info-serial{font-size:11px;color:var(--text-muted);margin-top:2px;}
-.sl-info-status-row{
-  display:flex;align-items:center;gap:6px;margin-top:4px;
-}
-.sl-info-body{padding:0 18px 18px;}
-.sl-info-row{
-  display:flex;align-items:flex-start;gap:10px;padding:9px 0;
-  border-bottom:1px solid var(--border);
-}
-.sl-info-row:last-child{border-bottom:none;}
-.sl-info-row-icon{
-  width:28px;height:28px;border-radius:8px;background:var(--bg2);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
-}
-.sl-info-row-icon svg{width:14px;height:14px;color:var(--text-sub);}
-.sl-info-row-key{font-size:11px;color:var(--text-muted);font-weight:600;line-height:1;margin-bottom:3px;}
-.sl-info-row-val{font-size:13px;color:var(--text);font-weight:600;line-height:1.4;}
-.sl-info-row-val a{color:var(--primary);text-decoration:none;}
-.sl-info-footer{
-  padding:12px 18px;border-top:1px solid var(--border);
-  display:flex;gap:8px;background:var(--bg2);
-}
-.sl-info-btn{
-  flex:1;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;
-  font-size:12.5px;font-weight:700;transition:all .18s;
-}
-.sl-info-btn.primary{background:var(--primary);color:#fff;}
-.sl-info-btn.primary:hover{background:#004aaf;}
-.sl-info-btn.secondary{background:var(--bg3);color:var(--text);border:1.5px solid var(--border);}
-.sl-info-btn.secondary:hover{background:var(--accent-lt);}
+.sl-pop-btn:hover{background:#004aaf;}
+
+/* Mobile: hide sidebar, show only map */
+@media(max-width:1023px){.sl-map-sidebar{display:none;}}
+/* Legend chips in sidebar footer */
+.sl-legend-bar{display:flex;gap:12px;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.sl-legend-chip{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text-muted);}
+.sl-legend-chip-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 
 /* ===== TECHNIKER ÜBERSICHT PAGE ===== */
 .tov-section-title{font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin:0 0 12px;}
@@ -4626,32 +4574,26 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
   </div>
 </div>
 
-<!-- ==================== SERVICELEITER KARTE ==================== -->
+<!-- ==================== SERVICELEITER KARTE (LEAFLET) ==================== -->
 <div id="page-karte" class="page">
-  <div class="d-admin-topbar">
-    <div class="d-page-title">Serviceleiter-Zentrale</div>
-    <div class="d-page-sub">Live-Übersicht aller Maschinen &amp; Techniker</div>
+  <!-- Left filter sidebar -->
+  <div class="sl-map-sidebar">
+    <div class="sl-map-sidebar-hdr">
+      <div class="sl-map-sidebar-title">Serviceleiter-Zentrale</div>
+      <input type="search" class="sl-search-input" id="slSearchInput"
+        placeholder="Maschine oder Techniker…"
+        oninput="filterSlItems(this.value)">
+    </div>
+    <div class="sl-filter-section" id="slFilterContent"></div>
+    <div class="sl-legend-bar">
+      <span class="sl-legend-chip"><span class="sl-legend-chip-dot" style="background:#4CAF50;"></span>Betrieb OK</span>
+      <span class="sl-legend-chip"><span class="sl-legend-chip-dot" style="background:#FB8C00;"></span>Wartung</span>
+      <span class="sl-legend-chip"><span class="sl-legend-chip-dot" style="background:#E53935;"></span>Fehler</span>
+    </div>
   </div>
-  <div class="sl-page-wrap">
-    <!-- Techniker Status-Chips -->
-    <div class="sl-tech-bar" id="slTechBar"></div>
-    <!-- Map legend -->
-    <div class="sl-legend">
-      <span class="sl-legend-item"><span class="sl-legend-dot ok"></span>Alles okay</span>
-      <span class="sl-legend-item"><span class="sl-legend-dot mnt"></span>Wartung fällig</span>
-      <span class="sl-legend-item"><span class="sl-legend-dot err"></span>Kritischer Fehler</span>
-    </div>
-    <!-- Interactive pin map -->
-    <div class="sl-map-wrap">
-      <div class="sl-map-bg"></div>
-      <!-- Region labels -->
-      <div class="sl-map-region" style="left:8%;top:8%;width:26%;height:42%;">Ruhrgebiet West</div>
-      <div class="sl-map-region" style="left:56%;top:6%;width:32%;height:44%;">NRW Mitte</div>
-      <div class="sl-map-region" style="left:10%;top:60%;width:32%;height:30%;">Essen Süd</div>
-      <div class="sl-map-region" style="left:46%;top:56%;width:38%;height:34%;">Bochum / Duisburg</div>
-      <!-- Pins rendered by JS -->
-      <div id="slMapPins"></div>
-    </div>
+  <!-- Leaflet map -->
+  <div class="sl-leaflet-container">
+    <div id="slLeafletMap"></div>
   </div>
 </div>
 
@@ -6641,6 +6583,7 @@ const MACHINES = {
     customerId: 'mayer-bau',
     technicianId: 'mo-001',
     coords: { x: 24, y: 28 },
+    latlng: [51.4796, 7.0192],
     config: {
       baujahr: '2021',
       motor: 'CAT C7.1 ACERT / Bosch Rexroth RC12',
@@ -6662,6 +6605,7 @@ const MACHINES = {
     customerId: 'mayer-bau',
     technicianId: 'mo-002',
     coords: { x: 34, y: 56 },
+    latlng: [51.4438, 7.0278],
     config: {
       baujahr: '2019',
       motor: 'Bosch Rexroth HY-8 / Rexroth RC7',
@@ -6683,6 +6627,7 @@ const MACHINES = {
     customerId: 'bauer-soehne',
     technicianId: 'mo-004',
     coords: { x: 64, y: 24 },
+    latlng: [51.2222, 6.9108],
     config: {
       baujahr: '2020',
       motor: 'Kaeser SIGMA 75 / Siemens S7-1200',
@@ -6704,6 +6649,7 @@ const MACHINES = {
     customerId: 'bauer-soehne',
     technicianId: 'mo-004',
     coords: { x: 70, y: 36 },
+    latlng: [51.2264, 6.9185],
     config: {
       baujahr: '2022',
       motor: 'Fronius TransPuls 500 / Fronius RC-3',
@@ -6725,6 +6671,7 @@ const MACHINES = {
     customerId: 'schmidt-logistik',
     technicianId: 'mo-003',
     coords: { x: 54, y: 66 },
+    latlng: [51.4353, 6.7628],
     config: {
       baujahr: '2020',
       motor: 'Liebherr D936 A7 / Liebherr LiDAT RC-8',
@@ -6746,6 +6693,7 @@ const MACHINES = {
     customerId: 'bauer-soehne',
     technicianId: 'mo-004',
     coords: { x: 74, y: 60 },
+    latlng: [51.4828, 7.2155],
     config: {
       baujahr: '2022',
       motor: 'Komatsu SAA6D107E-3 / KDSS RC-5',
@@ -6767,6 +6715,7 @@ const MACHINES = {
     customerId: 'mayer-bau',
     technicianId: 'mo-001',
     coords: { x: 30, y: 72 },
+    latlng: [51.4106, 7.0148],
     config: {
       baujahr: '2021',
       motor: 'MAN D2676 / Rexroth A10VSO RC-6',
@@ -6788,6 +6737,7 @@ const MACHINES = {
     customerId: 'schmidt-logistik',
     technicianId: 'mo-003',
     coords: { x: 47, y: 82 },
+    latlng: [51.4514, 6.7292],
     config: {
       baujahr: '2023',
       motor: 'John Deere 4045HF285 / Atlas Copco E-Controller',
@@ -6809,6 +6759,7 @@ const MACHINES = {
     customerId: 'mayer-bau',
     technicianId: 'mo-002',
     coords: { x: 19, y: 50 },
+    latlng: [51.4558, 6.9762],
     config: {
       baujahr: '2022',
       motor: 'MAN D2676 LF26 / MAN TipMatic ECS',
@@ -7105,103 +7056,134 @@ function applyRole(user) {
   }
 }
 
-// ===== SERVICELEITER MAP =====
+// ===== SERVICELEITER MAP (LEAFLET) =====
+var _leafletMap = null;
+var _leafletMarkers = {};
+
 function renderKarte() {
-  renderSlTechBar();
-  var pinsEl = document.getElementById('slMapPins');
-  if (!pinsEl) return;
-  var html = '';
-  Object.keys(MACHINES).forEach(function(id) {
-    var m = MACHINES[id];
-    var c = m.coords || { x: 50, y: 50 };
-    var cls = m.status === 'err' ? 'p-err' : m.status === 'mnt' ? 'p-mnt' : 'p-ok';
-    var icon = MACHINE_ICONS[m.type] || '🔧';
-    html += '<div class="sl-pin ' + cls + '" style="left:' + c.x + '%;top:' + c.y + '%;" onclick="showPinInfo(\'' + id + '\')">' +
-      '<div class="sl-pin-marker">' + icon + '</div>' +
-      '<div class="sl-pin-label">' + m.name.split(' ').slice(-2).join(' ') + '</div>' +
-    '</div>';
-  });
-  pinsEl.innerHTML = html;
+  renderSlFilter('');
+  requestAnimationFrame(function() { setTimeout(_initLeafletMap, 80); });
 }
 
-function renderSlTechBar() {
-  var el = document.getElementById('slTechBar');
-  if (!el) return;
-  el.innerHTML = Object.keys(MONTEURE_DB).map(function(id) {
-    var t = MONTEURE_DB[id];
-    var isBusy = t.status === 'im-einsatz';
-    // find active machine
-    var activeMachine = null;
-    Object.keys(MACHINES).forEach(function(mid) {
-      if (MACHINES[mid].technicianId === id) activeMachine = MACHINES[mid].name;
-    });
-    var dotCls = isBusy ? 'busy' : 'idle';
-    var chipCls = isBusy ? 'active-einsatz' : '';
-    var label = isBusy && activeMachine ? activeMachine.split(' ').slice(0,3).join(' ') : 'Verfügbar';
-    return '<div class="sl-tech-chip ' + chipCls + '" onclick="setDNav(document.getElementById(\'dnav-technikerliste\'),\'technikerliste\')">' +
-      '<div class="sl-tech-av" style="background:' + t.grad + '">' + t.initials + '</div>' +
-      '<span class="sl-tech-name">' + t.name.split(' ')[0] + '</span>' +
-      '<span style="font-size:11px;color:var(--text-muted);">&nbsp;· ' + label + '</span>' +
-      '<span class="sl-tech-status-dot ' + dotCls + '"></span>' +
-    '</div>';
-  }).join('');
+function _initLeafletMap() {
+  var mapEl = document.getElementById('slLeafletMap');
+  if (!mapEl) return;
+  if (_leafletMap) { _leafletMap.invalidateSize(); return; }
+  _leafletMap = L.map('slLeafletMap', { center: [51.43, 7.00], zoom: 10, zoomControl: true });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(_leafletMap);
+  Object.keys(MACHINES).forEach(function(id) { _addLeafletMarker(id); });
+  var lls = Object.keys(MACHINES).filter(function(id){ return MACHINES[id].latlng; }).map(function(id){ return MACHINES[id].latlng; });
+  if (lls.length) _leafletMap.fitBounds(L.latLngBounds(lls), { padding: [50, 60] });
 }
 
-function showPinInfo(machineId) {
-  var m = MACHINES[machineId];
-  if (!m) return;
+function _addLeafletMarker(id) {
+  var m = MACHINES[id];
+  if (!m.latlng || !_leafletMap) return;
+  var color  = m.status === 'err' ? '#E53935' : m.status === 'mnt' ? '#FB8C00' : '#43A047';
+  var shadow = m.status === 'err' ? '0 0 0 5px rgba(229,57,53,.22),0 4px 16px rgba(0,0,0,.35)' : '0 4px 16px rgba(0,0,0,.28)';
+  var pulse  = m.status === 'err'
+    ? '<div style="position:absolute;inset:-5px;border-radius:50%;background:rgba(229,57,53,.18);animation:pin-pulse 1.8s ease-in-out infinite;"></div>' : '';
+  var icon   = MACHINE_ICONS[m.type] || '🔧';
+  var markerHtml =
+    '<div style="position:relative;width:36px;height:44px;">' + pulse +
+      '<div style="width:36px;height:36px;background:' + color + ';border-radius:50%;border:3px solid #fff;box-shadow:' + shadow + ';display:flex;align-items:center;justify-content:center;font-size:17px;position:relative;z-index:1;">' + icon + '</div>' +
+      '<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid ' + color + ';z-index:1;"></div>' +
+    '</div>';
+  var divIcon = L.divIcon({ html: markerHtml, iconSize: [36, 44], iconAnchor: [18, 44], popupAnchor: [0, -48], className: '' });
+  var marker  = L.marker(m.latlng, { icon: divIcon }).addTo(_leafletMap);
+  marker.bindPopup(_buildLeafletPopup(id), { maxWidth: 300, className: '' });
+  _leafletMarkers[id] = marker;
+}
+
+function _buildLeafletPopup(id) {
+  var m    = MACHINES[id];
   var cust = CUSTOMERS_DB[m.customerId] || {};
   var tech = m.technicianId ? MONTEURE_DB[m.technicianId] : null;
   var icon = MACHINE_ICONS[m.type] || '🔧';
   var statusLabel = m.status === 'err' ? 'Kritischer Fehler' : m.status === 'mnt' ? 'Wartung fällig' : 'Betrieb OK';
-  var statusColor = m.status === 'err' ? 'var(--red)' : m.status === 'mnt' ? '#E65100' : 'var(--green)';
-  var bgColor = m.status === 'err' ? 'rgba(198,40,40,.1)' : m.status === 'mnt' ? 'rgba(230,81,0,.1)' : 'rgba(46,125,50,.1)';
-
-  document.getElementById('slInfoHead').innerHTML =
-    '<div class="sl-info-icon" style="background:' + bgColor + '">' + icon + '</div>' +
+  var sColor = m.status === 'err' ? '#C62828' : m.status === 'mnt' ? '#E65100' : '#2E7D32';
+  var sBg    = m.status === 'err' ? '#FFEBEE' : m.status === 'mnt' ? '#FFF3E0' : '#E8F5E9';
+  var iBg    = m.status === 'err' ? '#FFEBEE' : m.status === 'mnt' ? '#FFF8F0' : '#F1F8F2';
+  return '<div class="sl-pop-head">' +
+    '<div class="sl-pop-icon" style="background:' + iBg + '">' + icon + '</div>' +
     '<div>' +
-      '<div class="sl-info-title">' + m.name + '</div>' +
-      '<div class="sl-info-serial">' + m.serial + '</div>' +
-      '<div class="sl-info-status-row">' +
-        '<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:' + statusColor + ';">' +
-          '<span style="width:8px;height:8px;border-radius:50%;background:' + statusColor + ';display:inline-block;"></span>' +
-          statusLabel +
-        '</span>' +
-        (m.activeCode ? '<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">Code: ' + m.activeCode + '</span>' : '') +
-      '</div>' +
-    '</div>';
-
-  document.getElementById('slInfoBody').innerHTML =
-    '<div class="sl-info-row">' +
-      '<div class="sl-info-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>' +
-      '<div><div class="sl-info-row-key">Standort</div>' +
-        '<div class="sl-info-row-val">' + m.location + '<br><span style="font-weight:500;font-size:12px;color:var(--text-muted);">' + (m.address || '—') + '</span></div></div>' +
+      '<div class="sl-pop-title">' + m.name + '</div>' +
+      '<div class="sl-pop-serial">' + m.serial + '</div>' +
+      '<span class="sl-pop-status" style="background:' + sBg + ';color:' + sColor + '">' +
+        '<span style="width:6px;height:6px;border-radius:50%;background:' + sColor + ';display:inline-block;flex-shrink:0;"></span>&nbsp;' +
+        statusLabel + (m.activeCode ? ' &middot; ' + m.activeCode : '') +
+      '</span>' +
     '</div>' +
-    '<div class="sl-info-row">' +
-      '<div class="sl-info-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>' +
-      '<div><div class="sl-info-row-key">Ansprechpartner Kunde</div>' +
-        '<div class="sl-info-row-val">' + (cust.contact || '—') + ' · ' + (cust.name || '—') + '<br>' +
-          '<a href="tel:' + (cust.phone || '') + '" style="font-size:12px;font-weight:500;">' + (cust.phone || '—') + '</a></div></div>' +
+  '</div>' +
+  '<div class="sl-pop-body">' +
+    '<div><div class="sl-pop-row-lbl">&#128205; Standort</div><div class="sl-pop-row-val">' + m.location + '</div><div class="sl-pop-row-sub">' + (m.address || '—') + '</div></div>' +
+    '<div class="sl-pop-divider"></div>' +
+    '<div><div class="sl-pop-row-lbl">&#127970; Kunde &amp; Ansprechpartner</div><div class="sl-pop-row-val">' + (cust.name || '—') + '</div>' +
+      '<div class="sl-pop-row-sub">' + (cust.contact || '—') + ' &nbsp;&middot;&nbsp; <a href="tel:' + (cust.phone || '') + '" style="color:#0052CC;text-decoration:none;font-weight:600;">' + (cust.phone || '—') + '</a></div></div>' +
+    '<div class="sl-pop-divider"></div>' +
+    '<div><div class="sl-pop-row-lbl">&#128373; Zuständiger Techniker</div><div class="sl-pop-row-val">' +
+      (tech ? tech.name : 'Nicht zugewiesen') +
+      (tech && tech.status === 'im-einsatz' ? '&nbsp;<span style="color:#2E7D32;font-size:10px;font-weight:700;background:#E8F5E9;padding:1px 6px;border-radius:8px;">&#9679; Im Einsatz</span>' : '') +
     '</div>' +
-    '<div class="sl-info-row">' +
-      '<div class="sl-info-row-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>' +
-      '<div><div class="sl-info-row-key">Zuständiger Techniker</div>' +
-        '<div class="sl-info-row-val">' +
-          (tech ? tech.name + ' · <span style="font-weight:500;font-size:12px;color:var(--text-muted);">' + tech.rolle + '</span>' : 'Nicht zugewiesen') +
-          (tech && tech.status === 'im-einsatz' ? ' <span style="color:#2E7D32;font-size:11px;font-weight:700;margin-left:4px;">● Im Einsatz</span>' : '') +
-        '</div></div>' +
-    '</div>';
-
-  var openBtn = document.getElementById('slInfoOpenMachine');
-  if (openBtn) openBtn.setAttribute('onclick', 'closePinInfo();openMachine(\'' + machineId + '\')');
-  document.getElementById('slPinModal').classList.add('active');
-  document.body.style.overflow = 'hidden';
+    (tech ? '<div class="sl-pop-row-sub">' + tech.rolle + '</div>' : '') + '</div>' +
+    '<button class="sl-pop-btn" onclick="openMachineFromMap(\'' + id + '\')">Details &amp; Maschinenakte &#8594;</button>' +
+  '</div>';
 }
 
-function closePinInfo() {
-  document.getElementById('slPinModal').classList.remove('active');
-  document.body.style.overflow = '';
+function openMachineFromMap(id) {
+  if (_leafletMap) _leafletMap.closePopup();
+  openMachine(id);
 }
+
+function flyToMachine(id) {
+  var m = MACHINES[id];
+  if (!m || !m.latlng || !_leafletMap) return;
+  _leafletMap.flyTo(m.latlng, 14, { duration: 1.1 });
+  setTimeout(function() { if (_leafletMarkers[id]) _leafletMarkers[id].openPopup(); }, 1250);
+}
+
+function flyToTech(techId) {
+  var ids = Object.keys(MACHINES).filter(function(mid){ return MACHINES[mid].technicianId === techId; });
+  if (ids.length) flyToMachine(ids[0]);
+}
+
+function renderSlFilter(query) {
+  var el = document.getElementById('slFilterContent');
+  if (!el) return;
+  var q = (query || '').toLowerCase();
+  var html = '<div class="sl-filter-label">Techniker</div>';
+  Object.keys(MONTEURE_DB).forEach(function(tid) {
+    var t = MONTEURE_DB[tid];
+    if (q && !t.name.toLowerCase().includes(q)) return;
+    var isBusy = t.status === 'im-einsatz';
+    var activeMachine = '';
+    Object.keys(MACHINES).forEach(function(mid){ if (MACHINES[mid].technicianId === tid && isBusy) activeMachine = MACHINES[mid].name.split(' ').slice(0,3).join(' '); });
+    html += '<div class="sl-filter-item" onclick="flyToTech(\'' + tid + '\')">' +
+      '<div class="sl-filter-item-av" style="background:' + t.grad + '">' + t.initials + '</div>' +
+      '<div class="sl-filter-item-body"><div class="sl-filter-item-name">' + t.name + '</div>' +
+        '<div class="sl-filter-item-sub">' + (isBusy && activeMachine ? activeMachine : 'Verfügbar') + '</div></div>' +
+      '<div class="sl-filter-dot ' + (isBusy ? 'busy' : 'idle') + '"></div>' +
+    '</div>';
+  });
+  html += '<div class="sl-filter-divider"></div><div class="sl-filter-label">Maschinen</div>';
+  Object.keys(MACHINES).forEach(function(mid) {
+    var m = MACHINES[mid];
+    if (q && !m.name.toLowerCase().includes(q) && !m.location.toLowerCase().includes(q)) return;
+    var icon = MACHINE_ICONS[m.type] || '🔧';
+    html += '<div class="sl-filter-item" onclick="flyToMachine(\'' + mid + '\')">' +
+      '<div class="sl-filter-item-icon">' + icon + '</div>' +
+      '<div class="sl-filter-item-body"><div class="sl-filter-item-name">' + m.name + '</div>' +
+        '<div class="sl-filter-item-sub">' + m.location + '</div></div>' +
+      '<div class="sl-filter-dot ' + m.status + '"></div>' +
+    '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function filterSlItems(q) { renderSlFilter(q); }
 
 // ===== TECHNIKER ÜBERSICHT =====
 function renderTechnikerUebersicht() {
@@ -7354,7 +7336,13 @@ function showPage(name) {
   const navEl = document.getElementById('nav-' + name);
   if (navEl) navEl.classList.add('active');
   else document.getElementById('nav-home').classList.add('active');
-  document.querySelector('.app-body').scrollTop = 0;
+  const appBody = document.querySelector('.app-body');
+  if (name === 'karte') {
+    appBody.classList.add('map-active');
+  } else {
+    appBody.classList.remove('map-active');
+    appBody.scrollTop = 0;
+  }
   if (name === 'home') { _tasksExpanded = false; renderDashboardMobile(); }
   if (name === 'aufgaben') renderAufgaben();
   if (name !== 'machine') {
@@ -7663,22 +7651,6 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
 renderNutzerList();
 renderDashboardMobile();
 </script>
-
-<!-- ==================== SERVICELEITER PIN-INFO MODAL ==================== -->
-<div id="slPinModal">
-  <div class="sl-info-card">
-    <div class="sl-info-head" id="slInfoHead">
-      <!-- rendered by JS -->
-    </div>
-    <div class="sl-info-body" id="slInfoBody">
-      <!-- rendered by JS -->
-    </div>
-    <div class="sl-info-footer">
-      <button class="sl-info-btn secondary" onclick="closePinInfo()">Schließen</button>
-      <button class="sl-info-btn primary" id="slInfoOpenMachine" onclick="">Maschine öffnen</button>
-    </div>
-  </div>
-</div>
 
 <!-- ==================== WARTUNG STARTEN BESTÄTIGUNG (DESKTOP) ==================== -->
 <div id="startWartungConfirm">
