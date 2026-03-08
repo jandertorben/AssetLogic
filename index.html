@@ -1943,6 +1943,45 @@ nav.bottom-nav{
 .tech-action-btn.end{background:var(--red-bg);color:var(--red);border:1.5px solid rgba(198,40,40,.2);}
 .tech-action-btn.end:active{background:rgba(198,40,40,.12);}
 .tech-action-btn.running{background:#1B5E20;color:#fff;box-shadow:0 4px 14px rgba(27,94,32,.3);}
+@media(min-width:1024px){
+  .tech-action-bar{gap:10px;padding:10px 0 4px;}
+  .tech-action-btn{
+    flex:0 0 auto;flex-direction:row;gap:8px;
+    padding:9px 18px;border-radius:8px;
+    font-size:13px;font-weight:600;letter-spacing:.15px;
+  }
+  .tech-action-btn svg{width:17px;height:17px;}
+  .tech-action-btn.start:hover{background:#004a9f;transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,45,90,.35);}
+  .tech-action-btn.running:hover{background:#1a6b21;}
+  .tech-action-btn.scan-btn-tech:hover{background:var(--accent-lt);}
+  .tech-action-btn.end:hover{background:rgba(198,40,40,.14);}
+}
+/* Start-Wartung Bestätigungs-Dialog */
+#startWartungConfirm{
+  display:none;position:fixed;inset:0;z-index:9600;
+  background:rgba(0,29,58,.45);backdrop-filter:blur(5px);
+  align-items:center;justify-content:center;
+}
+#startWartungConfirm.active{display:flex;}
+.swc-card{
+  background:#fff;border-radius:16px;padding:28px 24px 22px;
+  max-width:400px;width:90%;
+  box-shadow:0 24px 60px rgba(0,29,58,.22);
+  animation:slideUp .22s cubic-bezier(.4,0,.2,1);
+}
+.swc-icon{width:44px;height:44px;border-radius:12px;background:var(--accent-lt);
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.swc-icon svg{width:22px;height:22px;color:var(--primary);}
+.swc-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.swc-sub{font-size:13.5px;color:var(--text-sub);line-height:1.55;margin-bottom:20px;}
+.swc-tech{font-weight:700;color:var(--primary);}
+.swc-btns{display:flex;gap:10px;}
+/* Timeline slide-in animation */
+@keyframes slideInEntry{
+  from{opacity:0;transform:translateX(20px);}
+  to{opacity:1;transform:translateX(0);}
+}
+.wh-tl-item.new-entry{animation:slideInEntry .45s cubic-bezier(.4,0,.2,1) both;}
 /* Offline Banner */
 .offline-banner{
   display:none;position:fixed;top:0;left:0;right:0;z-index:9900;
@@ -5356,6 +5395,28 @@ var _montageberichte = {
 
 function startWartung() {
   if (_einsatzActive) { showScanLogToast('Einsatz l\u00e4uft bereits'); return; }
+  if (window.innerWidth >= 1024) {
+    var mn = _currentMachineId && MACHINES[_currentMachineId] ? MACHINES[_currentMachineId].name : '\u2014';
+    var el = document.getElementById('swcMachineName');
+    if (el) el.textContent = mn;
+    document.getElementById('startWartungConfirm').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+  _doStartWartung();
+}
+
+function closeStartWartungConfirm() {
+  document.getElementById('startWartungConfirm').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function confirmStartWartung() {
+  closeStartWartungConfirm();
+  _doStartWartung();
+}
+
+function _doStartWartung() {
   _einsatzActive = true;
   _einsatzStart  = Date.now();
 
@@ -5564,6 +5625,7 @@ function confirmEndEinsatz() {
     var dateStr = now.toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
     var timeStr = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
     var mn = MACHINES[_currentMachineId] ? MACHINES[_currentMachineId].name : _currentMachineId;
+    var isDesktop = window.innerWidth >= 1024;
     var report = {
       id: 'MB-' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0'),
       name: 'Montagebericht ' + dateStr,
@@ -5572,11 +5634,34 @@ function confirmEndEinsatz() {
       techniker: 'Marco K\u00f6hler',
       maschine: mn,
       machineId: _currentMachineId,
-      syncStatus: 'pending'
+      einsatzArt: 'Wartungseinsatz',
+      customerId: MACHINES[_currentMachineId] ? MACHINES[_currentMachineId].customerId : null,
+      syncStatus: isDesktop ? 'synced' : 'pending'
     };
     if (!_montageberichte[_currentMachineId]) _montageberichte[_currentMachineId] = [];
     _montageberichte[_currentMachineId].unshift(report);
-    renderMontageberichte(_currentMachineId);
+
+    if (isDesktop) {
+      // Open Wartungshistorie and animate new entry into timeline
+      renderWartungshistorie(_currentMachineId);
+      var whBtn  = document.getElementById('whToggleBtn');
+      var whBody = document.getElementById('whBody');
+      if (!_whOpen && whBtn && whBody) {
+        _whOpen = true;
+        whBtn.classList.add('open');
+        whBody.classList.add('open');
+      }
+      // After DOM update, mark the first timeline item as new-entry for animation
+      setTimeout(function() {
+        var first = document.querySelector('#whList .wh-tl-item');
+        if (first) {
+          first.classList.add('new-entry');
+          first.addEventListener('animationend', function() { first.classList.remove('new-entry'); }, { once: true });
+        }
+      }, 40);
+    } else {
+      renderMontageberichte(_currentMachineId);
+    }
   }
 
   closeEinsatzEndModal();
@@ -5584,7 +5669,7 @@ function confirmEndEinsatz() {
     queueOfflineAction({ type: 'end_wartung', machineId: _currentMachineId });
     showScanLogToast('Lokal gespeichert \u2013 Sync bei n\u00e4chster Verbindung');
   } else {
-    showScanLogToast('Montagebericht erstellt \u2713');
+    showScanLogToast(window.innerWidth >= 1024 ? 'Bericht archiviert \u2713' : 'Montagebericht erstellt \u2713');
   }
 }
 
@@ -7093,6 +7178,25 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
 renderNutzerList();
 renderDashboardMobile();
 </script>
+
+<!-- ==================== WARTUNG STARTEN BESTÄTIGUNG (DESKTOP) ==================== -->
+<div id="startWartungConfirm">
+  <div class="swc-card">
+    <div class="swc-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+    </div>
+    <div class="swc-title">Wartungseinsatz starten</div>
+    <div class="swc-sub">
+      M&ouml;chten Sie diesen Einsatz wirklich im Namen von
+      <span class="swc-tech">Marco K&ouml;hler</span> starten?<br>
+      Maschine: <strong id="swcMachineName">&mdash;</strong>
+    </div>
+    <div class="swc-btns">
+      <button class="admin-btn admin-btn-secondary" style="flex:1;justify-content:center;" onclick="closeStartWartungConfirm()">Abbrechen</button>
+      <button class="nm-btn-save" style="flex:1;" onclick="confirmStartWartung()">Ja, starten</button>
+    </div>
+  </div>
+</div>
 
 <!-- ==================== EINSATZ BEENDEN MODAL ==================== -->
 <div id="einsatzEndModal">
