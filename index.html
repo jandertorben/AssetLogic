@@ -1280,7 +1280,12 @@ header{
 .aufg-tech-name{font-size:13px;font-weight:800;color:var(--text);}
 .aufg-tech-role{font-size:11px;color:var(--text-muted);}
 .aufg-stats{display:flex;gap:8px;margin-bottom:14px;}
-.aufg-stat{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center;}
+.aufg-stat{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s;user-select:none;}
+.aufg-stat:hover{background:var(--accent-lt);border-color:#cbd5e1;}
+.aufg-stat:active{transform:scale(.97);}
+.aufg-stat.active-err{background:#FFF0F0;border-color:#E53935;box-shadow:0 0 0 3px rgba(229,57,53,.12);}
+.aufg-stat.active-mnt{background:#FFF8F0;border-color:#FB8C00;box-shadow:0 0 0 3px rgba(251,140,0,.12);}
+.aufg-stat.active-all{background:#EBF0FF;border-color:#0052CC;box-shadow:0 0 0 3px rgba(0,82,204,.12);}
 .aufg-stat-val{font-size:20px;font-weight:900;color:var(--text);}
 .aufg-stat-lbl{font-size:10px;color:var(--text-muted);margin-top:2px;}
 .pri-low{background:var(--green-bg);color:var(--green);border:1px solid rgba(46,125,50,.2);}
@@ -2153,6 +2158,36 @@ nav.bottom-nav{
 }
 .mb-report-btn:active{background:var(--accent-lt);}
 .mb-report-btn svg{width:13px;height:13px;}
+/* ── ERP-Sync in Maschinenkarte ── */
+.mb-erp-sync-btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;margin-top:10px;padding:12px 16px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#0052CC 0%,#0070f3 100%);
+  color:#fff;font-size:13px;font-weight:700;cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,82,204,.25);
+  transition:opacity .15s,transform .15s;touch-action:manipulation;
+}
+.mb-erp-sync-btn:hover{opacity:.9;}
+.mb-erp-sync-btn:active{transform:scale(.98);}
+.mb-erp-sync-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.mb-erp-sync-btn svg{width:15px;height:15px;flex-shrink:0;}
+.mb-erp-progress{display:none;padding:12px 2px 4px;}
+.mb-erp-progress.active{display:block;}
+.mb-erp-prog-bar{height:4px;background:#e2e8f0;border-radius:3px;margin-bottom:11px;overflow:hidden;}
+.mb-erp-prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#0052CC,#0070f3);border-radius:3px;transition:width .45s ease;}
+.mb-erp-step{display:flex;align-items:center;gap:8px;font-size:11px;color:#94a3b8;padding:2.5px 0;transition:color .25s,opacity .25s;opacity:.4;}
+.mb-erp-step.active{color:#0052CC;opacity:1;}
+.mb-erp-step.done{color:#2E7D32;opacity:1;}
+.mb-erp-step-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.mb-erp-step.active .mb-erp-step-dot{animation:livePulse 1s ease-in-out infinite;}
+.mb-erp-done-strip{
+  display:none;align-items:center;gap:9px;margin-top:10px;
+  padding:10px 14px;border-radius:10px;
+  background:#E8F5E9;border:1.5px solid rgba(46,125,50,.2);
+  font-size:12px;font-weight:700;color:#2E7D32;
+}
+.mb-erp-done-strip.show{display:flex;}
+.mb-erp-done-strip svg{width:15px;height:15px;flex-shrink:0;}
 /* ===== WARTUNGSHISTORIE & BERICHTE ===== */
 .wh-section{margin-top:20px;}
 /* Collapsible header */
@@ -5849,23 +5884,36 @@ function renderDashboardMobile() {
 // Logged-in technician
 var CURRENT_TECH = { id:'mo-001', name:'Marco K\u00f6hler', initials:'MK', rolle:'Senior Techniker', customerId:'mayer-bau' };
 
+var _aufgabenFilter = 'all';
+
+function filterAufgaben(f) {
+  // Toggle off if already active (except 'all')
+  _aufgabenFilter = (_aufgabenFilter === f && f !== 'all') ? 'all' : f;
+  renderAufgaben();
+}
+
 function renderAufgaben() {
   var listEl = document.getElementById('aufgabenList');
   if (!listEl) return;
 
   // All machines assigned to this technician's customer
-  var myMachines = Object.keys(MACHINES).filter(function(id) {
+  var allMachines = Object.keys(MACHINES).filter(function(id) {
     return MACHINES[id].customerId === CURRENT_TECH.customerId;
   });
 
   // Sort: err first, then mnt, then ok
-  myMachines.sort(function(a, b) {
+  allMachines.sort(function(a, b) {
     var order = { err: 0, mnt: 1, ok: 2 };
     return (order[MACHINES[a].status] || 2) - (order[MACHINES[b].status] || 2);
   });
 
-  var errCount = myMachines.filter(function(id){ return MACHINES[id].status === 'err'; }).length;
-  var mntCount = myMachines.filter(function(id){ return MACHINES[id].status === 'mnt'; }).length;
+  var errCount = allMachines.filter(function(id){ return MACHINES[id].status === 'err'; }).length;
+  var mntCount = allMachines.filter(function(id){ return MACHINES[id].status === 'mnt'; }).length;
+
+  // Active-class per tile
+  var errCls = _aufgabenFilter === 'err' ? ' active-err' : '';
+  var mntCls = _aufgabenFilter === 'mnt' ? ' active-mnt' : '';
+  var allCls = _aufgabenFilter === 'all' ? ' active-all' : '';
 
   // Header: tech info + stats
   var header = '<div class="aufg-tech-header">' +
@@ -5874,36 +5922,60 @@ function renderAufgaben() {
     '<div class="aufg-tech-role">' + CURRENT_TECH.rolle + '</div></div>' +
   '</div>' +
   '<div class="aufg-stats">' +
-    '<div class="aufg-stat"><div class="aufg-stat-val" style="color:var(--red);">' + errCount + '</div><div class="aufg-stat-lbl">Kritisch</div></div>' +
-    '<div class="aufg-stat"><div class="aufg-stat-val" style="color:var(--warning);">' + mntCount + '</div><div class="aufg-stat-lbl">Wartung f\u00e4llig</div></div>' +
-    '<div class="aufg-stat"><div class="aufg-stat-val">' + myMachines.length + '</div><div class="aufg-stat-lbl">Maschinen gesamt</div></div>' +
+    '<div class="aufg-stat' + errCls + '" onclick="filterAufgaben(\'err\')" role="button" aria-label="Kritische Maschinen filtern">' +
+      '<div class="aufg-stat-val" style="color:var(--red);">' + errCount + '</div>' +
+      '<div class="aufg-stat-lbl">Kritisch</div>' +
+    '</div>' +
+    '<div class="aufg-stat' + mntCls + '" onclick="filterAufgaben(\'mnt\')" role="button" aria-label="Wartung fällig filtern">' +
+      '<div class="aufg-stat-val" style="color:var(--warning);">' + mntCount + '</div>' +
+      '<div class="aufg-stat-lbl">Wartung f\u00e4llig</div>' +
+    '</div>' +
+    '<div class="aufg-stat' + allCls + '" onclick="filterAufgaben(\'all\')" role="button" aria-label="Alle Maschinen anzeigen">' +
+      '<div class="aufg-stat-val">' + allMachines.length + '</div>' +
+      '<div class="aufg-stat-lbl">Maschinen gesamt</div>' +
+    '</div>' +
   '</div>';
 
-  if (myMachines.length === 0) {
+  // Apply filter to card list
+  var myMachines = _aufgabenFilter === 'all'
+    ? allMachines
+    : allMachines.filter(function(id){ return MACHINES[id].status === _aufgabenFilter; });
+
+  // Update section label
+  var labelEl = document.getElementById('aufgabenLabel');
+  if (labelEl) {
+    labelEl.textContent = _aufgabenFilter === 'err' ? 'Kritische Maschinen'
+      : _aufgabenFilter === 'mnt' ? 'Wartung f\u00e4llig'
+      : 'Meine Maschinen';
+  }
+
+  if (allMachines.length === 0) {
     listEl.innerHTML = header + '<div class="aufg-empty">Keine Maschinen zugewiesen.</div>';
     return;
   }
 
-  var cards = myMachines.map(function(id) {
-    var m = MACHINES[id];
-    var icon = (typeof MACHINE_ICONS !== 'undefined' && MACHINE_ICONS[m.type]) || '\uD83D\uDD27';
-    var statusLabel = m.status === 'err' ? 'Fehler aktiv' : m.status === 'mnt' ? 'Wartung f\u00e4llig' : 'Betrieb OK';
-    var codeBadge = m.activeCode
-      ? '<span class="aufg-badge code">' + m.activeCode + '</span>'
-      : '';
-    return '<div class="aufg-card ' + m.status + '" onclick="openMachine(\'' + id + '\')">' +
-      '<div class="aufg-card-icon">' + icon + '</div>' +
-      '<div class="aufg-card-body">' +
-        '<div class="aufg-card-name">' + m.name + '</div>' +
-        '<div class="aufg-card-sub">\uD83D\uDCCD ' + m.location + '</div>' +
-        '<div class="aufg-card-badges">' +
-          '<span class="aufg-badge ' + m.status + '">' + statusLabel + '</span>' +
-          codeBadge +
-        '</div>' +
-      '</div>' +
-      '<div class="aufg-card-arr">\u203A</div>' +
-    '</div>';
-  }).join('');
+  var cards = myMachines.length === 0
+    ? '<div class="aufg-empty">Keine Maschinen in dieser Kategorie.</div>'
+    : myMachines.map(function(id) {
+        var m = MACHINES[id];
+        var icon = (typeof MACHINE_ICONS !== 'undefined' && MACHINE_ICONS[m.type]) || '\uD83D\uDD27';
+        var statusLabel = m.status === 'err' ? 'Fehler aktiv' : m.status === 'mnt' ? 'Wartung f\u00e4llig' : 'Betrieb OK';
+        var codeBadge = m.activeCode
+          ? '<span class="aufg-badge code">' + m.activeCode + '</span>'
+          : '';
+        return '<div class="aufg-card ' + m.status + '" onclick="openMachine(\'' + id + '\')">' +
+          '<div class="aufg-card-icon">' + icon + '</div>' +
+          '<div class="aufg-card-body">' +
+            '<div class="aufg-card-name">' + m.name + '</div>' +
+            '<div class="aufg-card-sub">\uD83D\uDCCD ' + m.location + '</div>' +
+            '<div class="aufg-card-badges">' +
+              '<span class="aufg-badge ' + m.status + '">' + statusLabel + '</span>' +
+              codeBadge +
+            '</div>' +
+          '</div>' +
+          '<div class="aufg-card-arr">\u203A</div>' +
+        '</div>';
+      }).join('');
 
   listEl.innerHTML = header + cards;
 }
@@ -6071,6 +6143,75 @@ function renderWartungshistorie(machineId) {
   }).join('');
 }
 
+var _mbErpSyncing = {};
+
+function syncErpForMachine(machineId) {
+  if (_mbErpSyncing[machineId]) return;
+  var pending = (_montageberichte[machineId] || []).filter(function(r) {
+    return (r.syncStatus || 'pending') !== 'synced';
+  });
+  if (pending.length === 0) { showScanLogToast('Keine ausstehenden Berichte'); return; }
+
+  _mbErpSyncing[machineId] = true;
+
+  var btnEl   = document.getElementById('mb-erp-sync-btn-' + machineId);
+  var progEl  = document.getElementById('mb-erp-progress-' + machineId);
+  var fillEl  = document.getElementById('mb-erp-fill-' + machineId);
+  var stepsEl = document.getElementById('mb-erp-steps-' + machineId);
+  var doneEl  = document.getElementById('mb-erp-done-' + machineId);
+
+  if (btnEl)  btnEl.disabled = true;
+  if (progEl) progEl.classList.add('active');
+
+  var steps = [
+    'Verbindung zu SAP\u00a0S/4HANA hergestellt',
+    'Authentifizierung via OAuth\u00a02.0',
+    'Daten-Validierung'
+  ].concat(pending.map(function(r) {
+    return '\u201e' + r.id + '\u201c wird \u00fcbertragen\u2026';
+  })).concat(['ERP-Archivierung abgeschlossen']);
+
+  if (stepsEl) stepsEl.innerHTML = steps.map(function(s, i) {
+    return '<div class="mb-erp-step" id="mb-step-' + machineId + '-' + i + '">' +
+      '<div class="mb-erp-step-dot"></div><span>' + s + '</span></div>';
+  }).join('');
+
+  var total = steps.length;
+  var current = 0;
+
+  function doStep() {
+    if (current >= total) {
+      if (fillEl) fillEl.style.width = '100%';
+      pending.forEach(function(r) { r.syncStatus = 'synced'; });
+      setTimeout(function() {
+        if (progEl) progEl.classList.remove('active');
+        if (doneEl) doneEl.classList.add('show');
+        _mbErpSyncing[machineId] = false;
+        // After a brief moment, collapse the section (reports are now synced)
+        setTimeout(function() {
+          renderMontageberichte(machineId);
+          renderWartungshistorie(machineId);
+          // Also refresh global ERP panel if visible
+          if (typeof renderErpMbSection === 'function') renderErpMbSection();
+          if (document.getElementById('assetsGrid')) renderAssetsGrid();
+        }, 1200);
+      }, 500);
+      return;
+    }
+    var stepEl = document.getElementById('mb-step-' + machineId + '-' + current);
+    if (stepEl) stepEl.classList.add('active');
+    if (fillEl) fillEl.style.width = Math.round((current + 1) / total * 95) + '%';
+
+    setTimeout(function() {
+      if (stepEl) { stepEl.classList.remove('active'); stepEl.classList.add('done'); }
+      current++;
+      setTimeout(doStep, 300);
+    }, 480);
+  }
+
+  doStep();
+}
+
 function mbSyncBadgeHtml(status) {
   if (status === 'synced') {
     return '<span class="mb-sync-badge synced">' +
@@ -6097,7 +6238,7 @@ function renderMontageberichte(machineId) {
   });
   if (reports.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  list.innerHTML = reports.map(function(r) {
+  var reportRows = reports.map(function(r) {
     return '<div class="mb-report-item" id="mb-item-' + r.id + '">' +
       '<div class="mb-report-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
       '<div class="mb-report-info">' +
@@ -6111,6 +6252,26 @@ function renderMontageberichte(machineId) {
       '</button>' +
     '</div>';
   }).join('');
+
+  var syncUi =
+    '<button class="mb-erp-sync-btn" id="mb-erp-sync-btn-' + machineId + '"' +
+        ' onclick="syncErpForMachine(\'' + machineId + '\')">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' +
+        '<path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/>' +
+        '<polyline points="21 3 21 10 14 10"/><polyline points="3 21 3 14 10 14"/>' +
+      '</svg>' +
+      'ERP-Sync starten' +
+    '</button>' +
+    '<div class="mb-erp-progress" id="mb-erp-progress-' + machineId + '">' +
+      '<div class="mb-erp-prog-bar"><div class="mb-erp-prog-fill" id="mb-erp-fill-' + machineId + '"></div></div>' +
+      '<div id="mb-erp-steps-' + machineId + '"></div>' +
+    '</div>' +
+    '<div class="mb-erp-done-strip" id="mb-erp-done-' + machineId + '">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' +
+      'Berichte erfolgreich ins ERP &uuml;bertragen' +
+    '</div>';
+
+  list.innerHTML = reportRows + syncUi;
 }
 
 // ===== ERP MB SYNC =====
@@ -7609,7 +7770,7 @@ function showPage(name) {
     appBody.scrollTop = 0;
   }
   if (name === 'home') { _tasksExpanded = false; renderDashboardMobile(); }
-  if (name === 'aufgaben') renderAufgaben();
+  if (name === 'aufgaben') { _aufgabenFilter = 'all'; renderAufgaben(); }
   if (name !== 'machine') {
     document.getElementById('solutionArea').style.display = 'none';
     document.getElementById('solutionArea').innerHTML = '';
