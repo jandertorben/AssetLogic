@@ -646,6 +646,47 @@ header{
 .d-admin-topbar .d-page-title{font-size:20px;font-weight:800;color:var(--text);}
 .d-admin-topbar .d-page-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 
+/* ===== ADMIN REAL-TIME DASHBOARD ===== */
+.admin-dashboard-wrapper{display:none;}
+.adm-header{padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;}
+.adm-title{font-size:20px;font-weight:800;color:var(--text);}
+.adm-sub{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;align-items:center;gap:6px;}
+.adm-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0;}
+.adm-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px 0;}
+.adm-kpi{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.adm-kpi:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.adm-kpi-val{font-size:30px;font-weight:900;line-height:1;color:var(--text);}
+.adm-kpi-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-top:5px;text-transform:uppercase;letter-spacing:.4px;}
+.adm-kpi-icon{position:absolute;right:14px;top:12px;font-size:22px;opacity:.4;}
+.adm-kpi.crit{border-left:3px solid var(--red);}.adm-kpi.crit .adm-kpi-val{color:var(--red);}
+.adm-kpi.warn{border-left:3px solid var(--warning);}.adm-kpi.warn .adm-kpi-val{color:var(--warning);}
+.adm-kpi.ok{border-left:3px solid var(--green);}
+.adm-kpi.info{border-left:3px solid var(--accent);}
+.adm-body{display:grid;grid-template-columns:1fr 300px;gap:14px;padding:14px 24px 24px;}
+.adm-section{background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.adm-section-header{padding:13px 16px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.adm-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);}
+.adm-section-badge{font-size:11px;font-weight:700;background:var(--accent-lt);color:var(--accent);padding:2px 8px;border-radius:10px;}
+.adm-wo-row{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .12s;}
+.adm-wo-row:last-child{border-bottom:none;}
+.adm-wo-row:hover{background:var(--bg);}
+.adm-wo-icon{width:34px;height:34px;border-radius:9px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.adm-wo-body{flex:1;min-width:0;}
+.adm-wo-title{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm-wo-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.adm-tech-row{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.adm-tech-row:last-child{border-bottom:none;}
+.adm-tech-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.adm-tech-body{flex:1;min-width:0;}
+.adm-tech-name{font-size:13px;font-weight:700;color:var(--text);}
+.adm-tech-rolle{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.adm-tech-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+.adm-tech-badge.im-einsatz{background:var(--green-bg);color:var(--green);}
+.adm-tech-badge.verfuegbar{background:var(--accent-lt);color:var(--accent);}
+.adm-tech-badge.off{background:var(--bg3);color:var(--text-muted);}
+.adm-update-bar{padding:7px 24px 16px;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text-muted);}
+.adm-asset-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;flex-shrink:0;}
+
 /* ===== GREETING BAR ===== */
 .greeting-bar{padding:20px 18px 0;}
 .greeting-name{font-size:22px;font-weight:800;color:var(--text);line-height:1.2;}
@@ -2605,6 +2646,7 @@ nav.bottom-nav{
   .scan-section{display:none;}
   .d-stats-bar{display:block;padding:24px 24px 0;}
   .d-admin-topbar{display:block;padding:20px 24px 0;}
+  body.role-service-leader .admin-dashboard-wrapper{display:block;}
   .d-feed{display:block;}
   .serial-search-section{display:block;padding:20px 24px 0;}
   .machines-section{padding:20px 24px 0;}
@@ -3290,32 +3332,8 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
     <!-- ==================== HOME / DASHBOARD ==================== -->
     <div id="page-home" class="page active">
 
-      <!-- Desktop admin topbar -->
-      <div class="d-admin-topbar">
-        <div class="d-page-title">Maschinenstamm</div>
-        <div class="d-page-sub">Asset-&Uuml;bersicht &middot; Donnerstag, 05. M&auml;rz 2026 &middot; Schicht: Fr&uuml;h</div>
-      </div>
-
-      <!-- Desktop stats -->
-      <div class="d-stats-bar">
-        <div class="d-stats-grid">
-          <div class="stat-card crit" onclick="filterDashboard('err')">
-            <div class="stat-value">2</div>
-            <div class="stat-label">Aktive Fehler</div>
-            <div class="stat-icon">&#128308;</div>
-          </div>
-          <div class="stat-card warn" onclick="filterDashboard('mnt')">
-            <div class="stat-value">2</div>
-            <div class="stat-label">Wartung f&auml;llig</div>
-            <div class="stat-icon">&#9888;&#65039;</div>
-          </div>
-          <div class="stat-card scan" onclick="filterDashboard(null)">
-            <div class="stat-value">9</div>
-            <div class="stat-label">Assets erfasst</div>
-            <div class="stat-icon">&#128230;</div>
-          </div>
-        </div>
-      </div>
+      <!-- ===== ADMIN REAL-TIME DASHBOARD (Service Leader, Desktop only) ===== -->
+      <div id="adminDashboard" class="admin-dashboard-wrapper"></div>
 
       <div class="d-workspace">
         <div class="d-main-col">
@@ -7748,12 +7766,12 @@ function applyRole(user) {
     showPage('home');
   } else {
     body.classList.add('role-service-leader');
-    // activate karte nav item
+    // Start on Dashboard
     document.querySelectorAll('.d-nav-item').forEach(function(n){ n.classList.remove('active'); });
-    var kn = document.getElementById('dnav-karte');
-    if (kn) kn.classList.add('active');
-    showPage('karte');
-    renderKarte();
+    var dn = document.getElementById('dnav-home');
+    if (dn) dn.classList.add('active');
+    showPage('home');
+    renderAdminDashboard();
   }
 }
 
@@ -8411,7 +8429,7 @@ function setDNav(el, page) {
   if (page === 'karte') { showPage('karte'); renderKarte(); }
   else if (page === 'technikerliste') { showPage('technikerliste'); renderTechnikerUebersicht(); }
   else if (page === 'assets') { showPage('assets'); renderAssetsGrid(); document.getElementById('assetSearchInput').value = ''; }
-  else if (page === 'home') showPage('home');
+  else if (page === 'home') { showPage('home'); renderAdminDashboard(); }
   else if (page === 'scanlogs') showPage('scanlogs');
   else if (page === 'nutzer') { showPage('nutzer'); renderNutzerList(); }
   else if (page === 'erp') { showPage('erp'); renderErpMbSection(); }
@@ -9036,6 +9054,146 @@ function filterWoList(filter) {
     if (el) el.classList.toggle('wo-active', key === filter);
   });
   _renderWoList();
+}
+
+// ===== ADMIN REAL-TIME DASHBOARD =====
+var _dashInterval = null;
+
+function renderAdminDashboard() {
+  var el = document.getElementById('adminDashboard');
+  if (!el) return;
+
+  var now = new Date();
+  var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
+  var timeStr = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+
+  var machines = Object.entries(MACHINES);
+  var errMachines = machines.filter(function(e){ return e[1].status === 'err'; });
+  var mntMachines = machines.filter(function(e){ return e[1].status === 'mnt'; });
+  var wos = Object.values(WORK_ORDERS_DB);
+  var activeWos = wos.filter(function(wo){ return wo.status !== 'COMPLETED'; });
+  var techs = Object.entries(MONTEURE_DB);
+  var techsOnDuty = techs.filter(function(e){ return e[1].status === 'im-einsatz'; });
+  var sortedWos = wos.slice().sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }).slice(0,7);
+
+  var woPriColors = { CRITICAL:'var(--red)', HIGH:'var(--warning)', MEDIUM:'var(--accent)', LOW:'var(--text-muted)' };
+  var woStatusColors = { OPEN:'var(--accent)', IN_PROGRESS:'var(--warning)', COMPLETED:'var(--green)' };
+
+  var html = '';
+
+  // Header
+  html += '<div class="adm-header">' +
+    '<div><div class="adm-title">Dashboard</div>' +
+    '<div class="adm-sub"><div class="adm-live-dot"></div>Echtzeit-Übersicht &middot; Stand: ' + timeStr + '</div></div>' +
+    '</div>';
+
+  // KPI row
+  var kpiErr = errMachines.length > 0 ? 'crit' : 'ok';
+  var kpiWo  = activeWos.length > 0 ? 'warn' : 'ok';
+  html += '<div class="adm-kpi-row">' +
+    _admKpi(machines.length, 'Assets gesamt', '📦', 'info', "setDNav(document.getElementById('dnav-assets'),'assets')") +
+    _admKpi(activeWos.length, 'Aktive Aufträge', '📋', kpiWo, "setDNav(document.getElementById('dnav-auftraege'),'auftraege')") +
+    _admKpi(errMachines.length, 'Aktive Fehler', '🔴', kpiErr, '') +
+    _admKpi(techsOnDuty.length + ' / ' + techs.length, 'Techniker im Einsatz', '👷', 'info', "setDNav(document.getElementById('dnav-technikerliste'),'technikerliste')") +
+    '</div>';
+
+  // Body
+  html += '<div class="adm-body">';
+
+  // Left: Work Orders
+  html += '<div class="adm-section"><div class="adm-section-header">' +
+    '<div class="adm-section-title">Aktuelle Aufträge</div>' +
+    '<span class="adm-section-badge">' + wos.length + ' gesamt</span>' +
+    '</div>';
+  if (sortedWos.length === 0) {
+    html += '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">Keine Aufträge vorhanden</div>';
+  } else {
+    sortedWos.forEach(function(wo) {
+      var m = MACHINES[wo.assetId];
+      var t = MONTEURE_DB[wo.technicianId];
+      var icon = (m && MACHINE_ICONS[m.type]) ? MACHINE_ICONS[m.type] : '🔧';
+      html += '<div class="adm-wo-row" onclick="setDNav(document.getElementById(\'dnav-auftraege\'),\'auftraege\')">' +
+        '<div class="adm-wo-icon">' + icon + '</div>' +
+        '<div class="adm-wo-body">' +
+          '<div class="adm-wo-title">' + _esc(wo.title) + '</div>' +
+          '<div class="adm-wo-meta">' + _esc(m ? m.name : wo.assetId) + ' &middot; ' + _esc(t ? t.name : wo.technicianId) + '</div>' +
+        '</div>' +
+        '<div style="text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:10px;font-weight:700;color:' + (woStatusColors[wo.status]||'var(--text-muted)') + ';">' + (WO_STATUS_LABEL[wo.status]||wo.status) + '</div>' +
+          '<div style="font-size:10px;color:' + (woPriColors[wo.priority]||'var(--text-muted)') + ';margin-top:2px;">' + (WO_PRIORITY_LABEL[wo.priority]||wo.priority) + '</div>' +
+        '</div>' +
+        '</div>';
+    });
+  }
+  html += '</div>';
+
+  // Right column
+  html += '<div style="display:flex;flex-direction:column;gap:14px;">';
+
+  // Technician status
+  html += '<div class="adm-section"><div class="adm-section-header">' +
+    '<div class="adm-section-title">Techniker</div>' +
+    '<span class="adm-section-badge">' + techsOnDuty.length + ' im Einsatz</span>' +
+    '</div>';
+  techs.forEach(function(entry) {
+    var t = entry[1];
+    var badgeCls = t.status === 'im-einsatz' ? 'im-einsatz' : (t.status === 'verfuegbar' ? 'verfuegbar' : 'off');
+    var badgeLbl = t.status === 'im-einsatz' ? 'Im Einsatz' : (t.status === 'verfuegbar' ? 'Verfügbar' : 'Offline');
+    html += '<div class="adm-tech-row">' +
+      '<div class="adm-tech-avatar" style="background:' + t.grad + '">' + _esc(t.initials) + '</div>' +
+      '<div class="adm-tech-body"><div class="adm-tech-name">' + _esc(t.name) + '</div>' +
+      '<div class="adm-tech-rolle">' + _esc(t.rolle) + '</div></div>' +
+      '<span class="adm-tech-badge ' + badgeCls + '">' + badgeLbl + '</span>' +
+      '</div>';
+  });
+  html += '</div>';
+
+  // Asset health
+  html += '<div class="adm-section"><div class="adm-section-header">' +
+    '<div class="adm-section-title">Asset-Status</div>' +
+    '<span class="adm-section-badge">' + machines.length + ' Assets</span>' +
+    '</div>';
+  machines.forEach(function(entry) {
+    var id = entry[0], m = entry[1];
+    var icon = MACHINE_ICONS[m.type] || '🔧';
+    var statusDot = m.status === 'err' ? '🔴' : (m.status === 'mnt' ? '🟡' : '🟢');
+    var statusTxt = m.status === 'err' ? (m.activeCode || 'Fehler') : (m.status === 'mnt' ? 'Wartung fällig' : 'OK');
+    html += '<div class="adm-wo-row" onclick="openMachine(\'' + _esc(id) + '\')">' +
+      '<div class="adm-wo-icon">' + icon + '</div>' +
+      '<div class="adm-wo-body">' +
+        '<div class="adm-wo-title">' + _esc(m.name) + '</div>' +
+        '<div class="adm-wo-meta">' + _esc(m.location) + '</div>' +
+      '</div>' +
+      '<div class="adm-asset-status">' + statusDot + ' <span>' + _esc(statusTxt) + '</span></div>' +
+      '</div>';
+  });
+  html += '</div>';
+
+  html += '</div>'; // end right col
+  html += '</div>'; // end adm-body
+
+  // Update bar
+  html += '<div class="adm-update-bar"><div class="adm-live-dot"></div>Auto-Refresh alle 30 s &middot; Zuletzt: ' + timeStr + '</div>';
+
+  el.innerHTML = html;
+
+  // Start auto-refresh
+  if (!_dashInterval) {
+    _dashInterval = setInterval(function() {
+      var ap = document.querySelector('.page.active');
+      if (ap && ap.id === 'page-home' && document.body.classList.contains('role-service-leader')) {
+        renderAdminDashboard();
+      }
+    }, 30000);
+  }
+}
+
+function _admKpi(val, label, icon, cls, onclick) {
+  return '<div class="adm-kpi ' + cls + '"' + (onclick ? ' onclick="' + onclick + '"' : '') + '>' +
+    '<div class="adm-kpi-icon">' + icon + '</div>' +
+    '<div class="adm-kpi-val">' + val + '</div>' +
+    '<div class="adm-kpi-label">' + label + '</div>' +
+    '</div>';
 }
 
 // ----- Admin: renderAdminAuftraege -----
