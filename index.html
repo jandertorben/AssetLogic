@@ -60,6 +60,7 @@ select option{background:#1a1a1a;color:#fff;}
 .tile-glass{background:rgba(15,15,15,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.06);}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .slide-up{animation:slideUp 0.3s ease-out forwards;}
+@keyframes fabPulse{0%{transform:scale(1);opacity:0.7;}70%{transform:scale(1.6);opacity:0;}100%{transform:scale(1.6);opacity:0;}}
 </style>
 </head>
 <body>
@@ -900,6 +901,127 @@ function MobileProfil({user,onLogout,onNavigate}){
   );
 }
 
+// ── SCAN FAB (draggable, snap-to-side, position memory) ───────────────────────
+function ScanFAB({onPress}){
+  const STORAGE_KEY='fieldfix_fab_side';
+  const [side,setSide]=React.useState(()=>localStorage.getItem(STORAGE_KEY)||'right');
+  const [dragging,setDragging]=React.useState(false);
+  const [pulse,setPulse]=React.useState(true);
+  const fabRef=React.useRef(null);
+  const dragState=React.useRef({active:false,startX:0,startY:0,moved:false});
+
+  // stop pulse after 4s (draw attention on first open, then calm down)
+  React.useEffect(()=>{const t=setTimeout(()=>setPulse(false),4000);return()=>clearTimeout(t);},[]);
+
+  function startDrag(e){
+    const cx=e.touches?e.touches[0].clientX:e.clientX;
+    const cy=e.touches?e.touches[0].clientY:e.clientY;
+    dragState.current={active:true,startX:cx,startY:cy,moved:false};
+    setDragging(true);
+  }
+  function onDrag(e){
+    if(!dragState.current.active)return;
+    const cx=e.touches?e.touches[0].clientX:e.clientX;
+    const dx=Math.abs(cx-dragState.current.startX);
+    const dy=Math.abs((e.touches?e.touches[0].clientY:e.clientY)-dragState.current.startY);
+    if(dx>8||dy>8) dragState.current.moved=true;
+    if(dragState.current.moved){
+      const newSide=cx<window.innerWidth/2?'left':'right';
+      setSide(newSide);
+    }
+  }
+  function endDrag(e){
+    if(!dragState.current.active)return;
+    dragState.current.active=false;
+    setDragging(false);
+    if(!dragState.current.moved){
+      // it was a tap, not a drag → open scan
+      onPress();
+    } else {
+      // save side preference
+      localStorage.setItem(STORAGE_KEY,side);
+    }
+  }
+
+  const baseStyle={
+    position:'fixed',
+    bottom:'90px',
+    [side==='right'?'right':'left']:'16px',
+    zIndex:60,
+    width:'72px',
+    height:'72px',
+    borderRadius:'50%',
+    background:'linear-gradient(135deg,#2979FF 0%,#1565c0 100%)',
+    border:'none',
+    cursor:dragging?'grabbing':'grab',
+    display:'flex',alignItems:'center',justifyContent:'center',
+    boxShadow:'0 4px 24px rgba(41,121,255,0.55), 0 1px 4px rgba(0,0,0,0.4)',
+    transition:dragging?'none':'right 0.3s cubic-bezier(.34,1.56,.64,1), left 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s',
+    userSelect:'none',
+    WebkitUserSelect:'none',
+    touchAction:'none',
+  };
+
+  return(
+    <div style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:60}}>
+      {/* pulse ring */}
+      {pulse&&(
+        <div style={{
+          position:'fixed',
+          bottom:'90px',
+          [side==='right'?'right':'left']:'16px',
+          width:'72px',height:'72px',borderRadius:'50%',
+          border:'2px solid rgba(41,121,255,0.6)',
+          animation:'fabPulse 1.2s ease-out infinite',
+          pointerEvents:'none',
+          zIndex:59,
+        }}/>
+      )}
+      <button
+        ref={fabRef}
+        style={{...baseStyle,pointerEvents:'all'}}
+        onMouseDown={startDrag}
+        onMouseMove={onDrag}
+        onMouseUp={endDrag}
+        onTouchStart={startDrag}
+        onTouchMove={onDrag}
+        onTouchEnd={endDrag}
+        aria-label="Maschine scannen"
+      >
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/>
+          <line x1="11" y1="3" x2="11" y2="8"/><line x1="3" y1="11" x2="21" y2="11"/><line x1="13" y1="3" x2="21" y2="3"/>
+          <line x1="21" y1="8" x2="21" y2="16"/><line x1="13" y1="21" x2="21" y2="21"/><line x1="16" y1="13" x2="16" y2="16"/>
+          <rect x="13" y="16" width="4" height="5" rx="1"/>
+        </svg>
+        {/* drag hint indicator */}
+        <div style={{
+          position:'absolute',top:'-6px',left:'50%',transform:'translateX(-50%)',
+          width:'20px',height:'3px',borderRadius:'2px',background:'rgba(255,255,255,0.3)'
+        }}/>
+      </button>
+      {/* drag hint tooltip (first 4s) */}
+      {pulse&&(
+        <div style={{
+          position:'fixed',
+          bottom:'170px',
+          [side==='right'?'right':'left']:'8px',
+          background:'rgba(30,30,40,0.95)',
+          border:'1px solid rgba(41,121,255,0.3)',
+          borderRadius:'10px',
+          padding:'6px 12px',
+          fontSize:'11px',
+          color:'#aaa',
+          whiteSpace:'nowrap',
+          pointerEvents:'none',
+          zIndex:61,
+          animation:'fadeIn 0.3s ease',
+        }}>↔ Ziehen zum Wechseln der Seite</div>
+      )}
+    </div>
+  );
+}
+
 // ── MOBILE APP ────────────────────────────────────────────────────────────────
 function MobileApp({user,onLogout}){
   const [screen,setScreen]=React.useState('home');
@@ -914,30 +1036,24 @@ function MobileApp({user,onLogout}){
         {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders} onSelectAsset={setSelectedAsset}/>}
         {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout} onNavigate={setScreen}/>}
       </div>
-      {/* ── BOTTOM NAV ── */}
-      <div className="fixed bottom-0 bg-[#111] border-t border-mob-border flex items-end justify-around pb-safe z-40"
-        style={{left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:'448px',height:'72px'}}>
-        {/* Home */}
-        <button onClick={()=>setScreen('home')} className={`flex flex-col items-center justify-center gap-1 pt-2 w-16 transition-colors ${screen==='home'?'text-[#2979FF]':'text-gray-600'}`}>
+      {/* ── BOTTOM NAV (3 items, clean) ── */}
+      <div className="fixed bottom-0 bg-[#111] border-t border-mob-border flex items-center justify-around z-40"
+        style={{left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:'448px',height:'72px',paddingBottom:'env(safe-area-inset-bottom)'}}>
+        <button onClick={()=>setScreen('home')} className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${screen==='home'?'text-[#2979FF]':'text-gray-600'}`}>
           <IconHome size={22}/>
           <span className="text-xs">Home</span>
         </button>
-        {/* Aufträge */}
-        <button onClick={()=>setScreen('auftraege')} className={`flex flex-col items-center justify-center gap-1 pt-2 w-16 transition-colors ${screen==='auftraege'?'text-[#2979FF]':'text-gray-600'}`}>
+        <button onClick={()=>setScreen('auftraege')} className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${screen==='auftraege'?'text-[#2979FF]':'text-gray-600'}`}>
           <IconClipboard size={22}/>
           <span className="text-xs">Aufträge</span>
         </button>
-        {/* FAB Scan */}
-        <button onClick={()=>setShowScan(true)} className="btn-press relative w-16 h-16 rounded-full bg-[#2979FF] flex items-center justify-center border-4 border-[#0d0d0d]"
-          style={{marginTop:'-24px',boxShadow:'0 0 24px rgba(41,121,255,0.5)'}}>
-          <IconQR size={26} cls="text-white"/>
-        </button>
-        {/* Profil */}
-        <button onClick={()=>setScreen('profil')} className={`flex flex-col items-center justify-center gap-1 pt-2 w-16 transition-colors ${screen==='profil'?'text-[#2979FF]':'text-gray-600'}`}>
+        <button onClick={()=>setScreen('profil')} className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${screen==='profil'?'text-[#2979FF]':'text-gray-600'}`}>
           <IconUser size={22}/>
           <span className="text-xs">Profil</span>
         </button>
       </div>
+      {/* ── SMART SCAN FAB (draggable, snap-to-side) ── */}
+      <ScanFAB onPress={()=>setShowScan(true)}/>
       {showScan&&<ScanModal onClose={()=>setShowScan(false)} onFound={name=>{setShowScan(false);const a=ASSETS_DB.find(x=>x.name===name);if(a)setSelectedAsset(a);}}/>}
     </div>
   );
