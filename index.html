@@ -1473,7 +1473,12 @@ nav.bottom-nav{
 .admin-stat-card{
   background:#fff;border:1px solid var(--border);border-radius:var(--r);
   padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  cursor:pointer;transition:box-shadow .15s,border-color .15s;
 }
+.admin-stat-card:hover{box-shadow:var(--shadow-md);border-color:var(--accent);}
+.admin-stat-card.wo-active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(21,101,192,.18),var(--shadow-md);}
+.admin-stat-card.wo-active.orange{border-color:var(--warning);box-shadow:0 0 0 2px rgba(230,81,0,.18),var(--shadow-md);}
+.admin-stat-card.wo-active.green{border-color:var(--green);box-shadow:0 0 0 2px rgba(46,125,50,.18),var(--shadow-md);}
 .admin-stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;}
 .admin-stat-card.blue::before{background:var(--accent);}
 .admin-stat-card.green::before{background:var(--green);}
@@ -4557,19 +4562,19 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 
         <!-- KPI Stats (werden per JS bef&uuml;llt) -->
         <div class="admin-stats" style="grid-template-columns:repeat(4,1fr);" id="wo-stats-row">
-          <div class="admin-stat-card blue">
+          <div class="admin-stat-card blue wo-active" id="wo-kpi-all" onclick="filterWoList('all')">
             <div class="admin-stat-val" id="wo-stat-total">0</div>
             <div class="admin-stat-lbl">Gesamt</div>
           </div>
-          <div class="admin-stat-card orange">
+          <div class="admin-stat-card orange" id="wo-kpi-open" onclick="filterWoList('OPEN')">
             <div class="admin-stat-val" id="wo-stat-open">0</div>
             <div class="admin-stat-lbl">Offen</div>
           </div>
-          <div class="admin-stat-card blue">
+          <div class="admin-stat-card blue" id="wo-kpi-inprogress" onclick="filterWoList('IN_PROGRESS')">
             <div class="admin-stat-val" id="wo-stat-inprogress">0</div>
             <div class="admin-stat-lbl">In Bearbeitung</div>
           </div>
-          <div class="admin-stat-card green">
+          <div class="admin-stat-card green" id="wo-kpi-done" onclick="filterWoList('COMPLETED')">
             <div class="admin-stat-val" id="wo-stat-done">0</div>
             <div class="admin-stat-lbl">Abgeschlossen</div>
           </div>
@@ -8759,6 +8764,21 @@ var WO_STATUS_LABEL = { OPEN: 'Offen', IN_PROGRESS: 'In Bearbeitung', COMPLETED:
 /** @type {Object.<WorkOrderPriority, string>} */
 var WO_PRIORITY_LABEL = { LOW: 'Niedrig', MEDIUM: 'Mittel', HIGH: 'Hoch', CRITICAL: 'Kritisch' };
 
+// ----- Admin: KPI-Filter -----
+/** @type {'all'|WorkOrderStatus} */
+var _woFilter = 'all';
+
+function filterWoList(filter) {
+  _woFilter = filter;
+  // Update active state on KPI cards
+  var kpiMap = { all:'wo-kpi-all', OPEN:'wo-kpi-open', IN_PROGRESS:'wo-kpi-inprogress', COMPLETED:'wo-kpi-done' };
+  Object.keys(kpiMap).forEach(function(key) {
+    var el = document.getElementById(kpiMap[key]);
+    if (el) el.classList.toggle('wo-active', key === filter);
+  });
+  _renderWoList();
+}
+
 // ----- Admin: renderAdminAuftraege -----
 function renderAdminAuftraege() {
   // Populate asset dropdown
@@ -8793,33 +8813,44 @@ function renderAdminAuftraege() {
   if (el('wo-stat-inprogress')) el('wo-stat-inprogress').textContent = inPrCount;
   if (el('wo-stat-done'))       el('wo-stat-done').textContent       = doneCount;
 
-  // Render order list
+  _renderWoList();
+}
+
+function _renderWoList() {
   var container = document.getElementById('wo-list-container');
   if (!container) return;
-  if (orders.length === 0) {
+  var allOrders = Object.values(WORK_ORDERS_DB);
+  if (allOrders.length === 0) {
     container.innerHTML = '<div class="wo-empty">Noch keine Auftr\u00e4ge angelegt.</div>';
     return;
   }
-  var sorted = orders.slice().sort(function(a, b) {
+  var filtered = _woFilter === 'all'
+    ? allOrders
+    : allOrders.filter(function(o) { return o.status === _woFilter; });
+  var sorted = filtered.slice().sort(function(a, b) {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
+  var filterLabel = _woFilter === 'all' ? '' :
+    ' <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(' + WO_STATUS_LABEL[_woFilter] + ')</span>';
   var header = '<div class="wo-list-header">' +
-    '<span>Auftrag</span><span>Asset</span><span>Techniker</span>' +
+    '<span>Auftrag' + filterLabel + '</span><span>Asset</span><span>Techniker</span>' +
     '<span>Status</span><span>Priorit\u00e4t</span>' +
   '</div>';
-  var rows = sorted.map(function(wo) {
-    var machine = MACHINES[wo.assetId];
-    var tech = MONTEURE_DB[wo.technicianId];
-    var date = new Date(wo.createdAt).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
-    return '<div class="wo-list-row">' +
-      '<div><div class="wo-list-title">' + _esc(wo.title) + '</div>' +
-        '<div class="wo-list-sub">' + date + '</div></div>' +
-      '<div class="wo-list-sub">' + (machine ? _esc(machine.name) : wo.assetId) + '</div>' +
-      '<div class="wo-list-sub">' + (tech ? _esc(tech.name) : wo.technicianId) + '</div>' +
-      '<div><span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span></div>' +
-      '<div><span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span></div>' +
-    '</div>';
-  }).join('');
+  var rows = sorted.length === 0
+    ? '<div class="wo-empty">Keine Auftr\u00e4ge in dieser Kategorie.</div>'
+    : sorted.map(function(wo) {
+        var machine = MACHINES[wo.assetId];
+        var tech = MONTEURE_DB[wo.technicianId];
+        var date = new Date(wo.createdAt).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+        return '<div class="wo-list-row">' +
+          '<div><div class="wo-list-title">' + _esc(wo.title) + '</div>' +
+            '<div class="wo-list-sub">' + date + '</div></div>' +
+          '<div class="wo-list-sub">' + (machine ? _esc(machine.name) : wo.assetId) + '</div>' +
+          '<div class="wo-list-sub">' + (tech ? _esc(tech.name) : wo.technicianId) + '</div>' +
+          '<div><span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span></div>' +
+          '<div><span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span></div>' +
+        '</div>';
+      }).join('');
   container.innerHTML = header + rows;
 }
 
