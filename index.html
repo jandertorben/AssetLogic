@@ -2960,6 +2960,30 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 .einsatz-card-asset{font-size:12px;color:var(--text-muted);margin-bottom:7px;}
 .einsatz-card-badges{display:flex;gap:6px;flex-wrap:wrap;}
 .einsatz-card-arr{font-size:22px;color:var(--text-muted);align-self:center;line-height:1;}
+
+/* ===== KI-ANALYSE ===== */
+.ai-analysis{background:var(--bg);border:1px solid rgba(21,101,192,.15);border-radius:var(--r);padding:13px 14px;margin-top:12px;}
+.ai-analysis-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ai-analysis-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:linear-gradient(90deg,var(--accent),#1976D2);color:#fff;letter-spacing:.3px;}
+.ai-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin:10px 0 5px;}
+.ai-section-label:first-of-type{margin-top:0;}
+.ai-reparatur{font-size:12px;color:var(--text);line-height:1.65;white-space:pre-wrap;}
+.ai-baugruppe-badge{display:inline-flex;align-items:center;padding:4px 11px;border-radius:6px;font-size:12px;font-weight:700;background:var(--accent-lt);color:var(--accent);border:1px solid rgba(21,101,192,.18);}
+.ai-ersatzteil-list{display:flex;flex-direction:column;gap:5px;}
+.ai-ersatzteil-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;}
+.ai-art-nr{font-size:10px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent);min-width:90px;flex-shrink:0;}
+.ai-part-name{font-size:12px;color:var(--text);flex:1;}
+.ai-part-group{font-size:10px;color:var(--text-muted);white-space:nowrap;}
+.ai-part-qty{font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap;}
+.ai-dokumente{display:flex;flex-wrap:wrap;gap:6px;}
+.ai-dok-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;background:var(--bg2);color:var(--text);border:1px solid var(--border);}
+.ai-dok-chip svg{width:12px;height:12px;color:var(--text-muted);flex-shrink:0;}
+.ai-loading{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:12px;color:var(--text-muted);}
+.ai-spinner{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:ai-spin .7s linear infinite;flex-shrink:0;}
+@keyframes ai-spin{to{transform:rotate(360deg)}}
+.ai-error{font-size:12px;color:var(--red);padding:4px 0;display:flex;align-items:center;gap:6px;}
+/* admin wo-list ai column */
+.wo-ai-cell{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -4538,6 +4562,33 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
             <button class="admin-btn admin-btn-secondary" style="touch-action:manipulation;" onclick="showScanLogToast('Support-Ticket wird ge\u00f6ffnet\u2026')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               Support kontaktieren
+            </button>
+          </div>
+        </div>
+
+        <!-- KI-Integration -->
+        <div class="sys-card">
+          <div class="sys-card-header">
+            <div class="sys-card-icon" style="background:var(--accent-lt);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+            </div>
+            <div>
+              <div class="sys-card-title">KI-Integration &mdash; Anthropic Claude</div>
+              <div class="sys-card-sub">API-Key f&uuml;r automatische Auftragsanalyse, Reparaturvorschl&auml;ge &amp; Ersatzteillisten</div>
+            </div>
+          </div>
+          <div class="sys-row">
+            <div><div class="sys-row-label">Anthropic API-Key</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Wird nur lokal im Browser gespeichert</div></div>
+            <input class="sys-row-select" type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." style="font-family:'IBM Plex Mono',monospace;font-size:12px;" oninput="ANTHROPIC_API_KEY=this.value">
+          </div>
+          <div class="sys-row">
+            <div><div class="sys-row-label">Status</div></div>
+            <span class="sys-badge" id="apiKeyStatus" style="background:var(--bg3);color:var(--text-muted);">Kein Key gesetzt</span>
+          </div>
+          <div style="padding:14px 18px;">
+            <button class="admin-btn admin-btn-primary" onclick="testApiKey()" style="touch-action:manipulation;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Key speichern &amp; testen
             </button>
           </div>
         </div>
@@ -8655,6 +8706,207 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
 });
 
 // =============================================================================
+// ===== KI-INTEGRATION (Anthropic Claude) =====
+// =============================================================================
+
+/** @type {string} API-Key wird in Systemeinstellungen gesetzt */
+var ANTHROPIC_API_KEY = '';
+
+/**
+ * Ruft die Claude API direkt aus dem Browser auf.
+ * @param {string} prompt
+ * @returns {Promise<string>}
+ */
+async function _callClaude(prompt) {
+  if (!ANTHROPIC_API_KEY || !ANTHROPIC_API_KEY.startsWith('sk-')) {
+    throw new Error('Kein gültiger API-Key gesetzt (Systemeinstellungen → KI-Integration)');
+  }
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-request-header': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4-6',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!resp.ok) {
+    var err = await resp.json().catch(function() { return {}; });
+    throw new Error((err.error && err.error.message) || 'API-Fehler ' + resp.status);
+  }
+  var data = await resp.json();
+  return data.content[0].text;
+}
+
+/**
+ * Testet den API-Key aus den Systemeinstellungen.
+ */
+async function testApiKey() {
+  var statusEl = document.getElementById('apiKeyStatus');
+  if (statusEl) { statusEl.textContent = 'Wird getestet…'; statusEl.style.background = 'var(--warn-bg)'; statusEl.style.color = 'var(--warning)'; }
+  try {
+    await _callClaude('Antworte nur mit "OK".');
+    if (statusEl) { statusEl.textContent = 'Verbunden ✓'; statusEl.style.background = 'var(--green-bg)'; statusEl.style.color = 'var(--green)'; }
+    showScanLogToast('KI-Integration aktiv');
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = 'Fehler: ' + e.message; statusEl.style.background = 'var(--red-bg)'; statusEl.style.color = 'var(--red)'; }
+  }
+}
+
+/**
+ * @typedef {{
+ *   reparaturVorschlag: string,
+ *   hauptBaugruppe: string,
+ *   dokumente: Array<{titel: string, typ: string, beschreibung: string}>,
+ *   ersatzteile: Array<{artikelNr: string, bezeichnung: string, baugruppe: string, menge: number}>
+ * }} AIAnalysis
+ */
+
+/**
+ * Generiert eine KI-Analyse für einen Arbeitsauftrag und speichert
+ * das Ergebnis direkt im WORK_ORDERS_DB Eintrag.
+ * @param {string} workOrderId
+ */
+async function generateAIAnalysis(workOrderId) {
+  var wo = WORK_ORDERS_DB[workOrderId];
+  if (!wo) return;
+
+  // Status: lädt
+  wo.aiAnalysis = { status: 'pending' };
+  _refreshAIDisplay(workOrderId);
+
+  var machine = MACHINES[wo.assetId] || {};
+  var errorCode = machine.activeCode ? (machine.activeCode + ' — ' + ((ERROR_CODES && ERROR_CODES[machine.activeCode] && ERROR_CODES[machine.activeCode].title) || '')) : 'kein aktiver Code';
+  var komponents = (machine.config && machine.config.komp) ? machine.config.komp.join(', ') : 'unbekannt';
+
+  var prompt = 'Du bist ein erfahrener Servicetechniker für industrielle Maschinen.\n\n' +
+    'Arbeitsauftrag:\n' +
+    '- Maschine: ' + (machine.name || wo.assetId) + ' (' + (machine.type || '') + ')\n' +
+    '- Seriennummer: ' + (machine.serial || 'unbekannt') + '\n' +
+    '- Standort: ' + (machine.location || 'unbekannt') + '\n' +
+    '- Aktiver Fehlercode: ' + errorCode + '\n' +
+    '- Betriebsstunden: ' + ((machine.config && machine.config.hours) || 'unbekannt') + '\n' +
+    '- Komponenten: ' + komponents + '\n' +
+    '- Auftragstitel: ' + wo.title + '\n' +
+    '- Beschreibung: ' + (wo.description || 'keine') + '\n' +
+    '- Priorität: ' + wo.priority + '\n\n' +
+    'Erstelle eine technische Analyse. Antworte NUR mit validem JSON, kein Markdown, kein Text davor/danach:\n' +
+    '{\n' +
+    '  "reparaturVorschlag": "Schritt-für-Schritt Reparaturanleitung (max. 5 Schritte, deutsch)",\n' +
+    '  "hauptBaugruppe": "Name der betroffenen Hauptbaugruppe",\n' +
+    '  "dokumente": [\n' +
+    '    {"titel": "Dokumentname", "typ": "Schaltplan|Explosionszeichnung|Wartungsanleitung|Fehlercode-Tabelle", "beschreibung": "Kurzbeschreibung"}\n' +
+    '  ],\n' +
+    '  "ersatzteile": [\n' +
+    '    {"artikelNr": "ART-XXXXX", "bezeichnung": "Teilebezeichnung", "baugruppe": "Baugruppe", "menge": 1}\n' +
+    '  ]\n' +
+    '}';
+
+  try {
+    var raw = await _callClaude(prompt);
+    // JSON aus der Antwort extrahieren (robuste Methode)
+    var jsonStr = raw.trim();
+    var start = jsonStr.indexOf('{');
+    var end = jsonStr.lastIndexOf('}');
+    if (start !== -1 && end !== -1) jsonStr = jsonStr.slice(start, end + 1);
+    /** @type {AIAnalysis} */
+    var analysis = JSON.parse(jsonStr);
+    wo.aiAnalysis = { status: 'ready', data: analysis };
+  } catch(e) {
+    wo.aiAnalysis = { status: 'error', message: e.message };
+  }
+  _refreshAIDisplay(workOrderId);
+}
+
+/**
+ * Aktualisiert alle sichtbaren UI-Elemente, die eine KI-Analyse anzeigen.
+ * @param {string} workOrderId
+ */
+function _refreshAIDisplay(workOrderId) {
+  // Einsätze-Seite neu rendern wenn sichtbar
+  var einsaetzePage = document.getElementById('page-einsaetze');
+  if (einsaetzePage && einsaetzePage.classList.contains('active')) {
+    renderEinsaetze();
+  }
+  // Admin-Liste neu rendern wenn sichtbar
+  var auftraegePage = document.getElementById('page-auftraege');
+  if (auftraegePage && auftraegePage.classList.contains('active')) {
+    _renderWoList();
+  }
+}
+
+/**
+ * Rendert eine KI-Analyse-Box als HTML-String.
+ * @param {object} aiAnalysis
+ * @returns {string}
+ */
+function _renderAIAnalysisHTML(aiAnalysis) {
+  if (!aiAnalysis) return '';
+
+  if (aiAnalysis.status === 'pending') {
+    return '<div class="ai-analysis">' +
+      '<div class="ai-loading"><div class="ai-spinner"></div>KI analysiert Auftrag…</div>' +
+    '</div>';
+  }
+  if (aiAnalysis.status === 'error') {
+    return '<div class="ai-analysis">' +
+      '<div class="ai-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      'KI-Analyse fehlgeschlagen: ' + _esc(aiAnalysis.message || 'Unbekannter Fehler') + '</div>' +
+    '</div>';
+  }
+  if (aiAnalysis.status !== 'ready' || !aiAnalysis.data) return '';
+
+  var d = aiAnalysis.data;
+
+  // Reparaturvorschlag
+  var repHtml = '<div class="ai-section-label">Reparaturvorschlag</div>' +
+    '<div class="ai-reparatur">' + _esc(d.reparaturVorschlag || '') + '</div>';
+
+  // Hauptbaugruppe
+  var bgHtml = d.hauptBaugruppe
+    ? '<div class="ai-section-label">Hauptbaugruppe</div><span class="ai-baugruppe-badge">' + _esc(d.hauptBaugruppe) + '</span>'
+    : '';
+
+  // Ersatzteile
+  var etHtml = '';
+  if (d.ersatzteile && d.ersatzteile.length > 0) {
+    var rows = d.ersatzteile.map(function(et) {
+      return '<div class="ai-ersatzteil-row">' +
+        '<span class="ai-art-nr">' + _esc(et.artikelNr || '—') + '</span>' +
+        '<span class="ai-part-name">' + _esc(et.bezeichnung || '') + '</span>' +
+        '<span class="ai-part-group">' + _esc(et.baugruppe || '') + '</span>' +
+        '<span class="ai-part-qty">' + (et.menge || 1) + '&thinsp;St.</span>' +
+      '</div>';
+    }).join('');
+    etHtml = '<div class="ai-section-label">Ersatzteile &amp; Artikelnummern</div>' +
+      '<div class="ai-ersatzteil-list">' + rows + '</div>';
+  }
+
+  // Dokumente & Zeichnungen
+  var docHtml = '';
+  if (d.dokumente && d.dokumente.length > 0) {
+    var chips = d.dokumente.map(function(doc) {
+      return '<span class="ai-dok-chip">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+        _esc(doc.titel || doc.typ || 'Dokument') +
+      '</span>';
+    }).join('');
+    docHtml = '<div class="ai-section-label">Dokumente &amp; Zeichnungen</div>' +
+      '<div class="ai-dokumente">' + chips + '</div>';
+  }
+
+  return '<div class="ai-analysis">' +
+    '<div class="ai-analysis-header"><span class="ai-analysis-badge">&#10024; KI-Analyse</span></div>' +
+    repHtml + bgHtml + etHtml + docHtml +
+  '</div>';
+}
+
+// =============================================================================
 // ===== WORK ORDER MANAGEMENT =====
 // =============================================================================
 
@@ -8670,7 +8922,8 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
  *   description: string,
  *   priority: WorkOrderPriority,
  *   status: WorkOrderStatus,
- *   createdAt: string
+ *   createdAt: string,
+ *   aiAnalysis: ({status:'pending'}|{status:'ready',data:AIAnalysis}|{status:'error',message:string}|null)
  * }} WorkOrder
  */
 
@@ -8684,7 +8937,8 @@ var WORK_ORDERS_DB = {
     description: 'Planmäßiger Ölwechsel am Hydraulikaggregat V3. Filterwechsel inklusive. Benötigtes Material: 20 L HLP 46.',
     priority: 'HIGH',
     status: 'OPEN',
-    createdAt: '2026-03-08T09:00:00.000Z'
+    createdAt: '2026-03-08T09:00:00.000Z',
+    aiAnalysis: null
   },
   'wo-002': {
     id: 'wo-002',
@@ -8694,7 +8948,8 @@ var WORK_ORDERS_DB = {
     description: 'Steuerventil SV-4 auf Dichtheit prüfen. Fehlermeldung WARN_KPD_07 analysieren und Ursache beheben.',
     priority: 'CRITICAL',
     status: 'IN_PROGRESS',
-    createdAt: '2026-03-09T08:30:00.000Z'
+    createdAt: '2026-03-09T08:30:00.000Z',
+    aiAnalysis: null
   },
   'wo-003': {
     id: 'wo-003',
@@ -8704,7 +8959,8 @@ var WORK_ORDERS_DB = {
     description: 'GPS-Signal-Drift beheben. Firmware-Update auf FW 4.2.2 einspielen und Kalibrierung durchführen.',
     priority: 'MEDIUM',
     status: 'COMPLETED',
-    createdAt: '2026-03-07T14:00:00.000Z'
+    createdAt: '2026-03-07T14:00:00.000Z',
+    aiAnalysis: null
   }
 };
 
@@ -8729,7 +8985,8 @@ function createWorkOrder(assetId, technicianId, title, description, priority) {
     description: description,
     priority: /** @type {WorkOrderPriority} */ (priority || 'MEDIUM'),
     status: 'OPEN',
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    aiAnalysis: null
   };
   WORK_ORDERS_DB[id] = order;
   return order;
@@ -8807,6 +9064,33 @@ function renderAdminAuftraege() {
   _renderWoList();
 }
 
+/**
+ * Rendert den KI-Status-Badge in der Admin-Auftragsliste.
+ * @param {object|null} ai
+ * @param {string} woId
+ * @returns {string}
+ */
+function _renderAdminAICell(ai, woId) {
+  if (!ai) {
+    return '<button class="wo-list-del" onclick="generateAIAnalysis(\'' + _esc(woId) + '\')" title="KI-Analyse starten">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>' +
+      ' Analysieren</button>';
+  }
+  if (ai.status === 'pending') {
+    return '<span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);">' +
+      '<div class="ai-spinner" style="width:11px;height:11px;"></div>Lädt…</span>';
+  }
+  if (ai.status === 'error') {
+    return '<span style="font-size:11px;color:var(--red);">Fehler</span>' +
+      '<button class="wo-list-del" onclick="generateAIAnalysis(\'' + _esc(woId) + '\')" style="margin-left:4px;">Retry</button>';
+  }
+  if (ai.status === 'ready') {
+    var parts = ai.data.ersatzteile ? ai.data.ersatzteile.length + ' Teile' : '';
+    return '<span class="ai-analysis-badge" style="font-size:10px;">&#10024; Fertig' + (parts ? ' · ' + parts : '') + '</span>';
+  }
+  return '';
+}
+
 function _renderWoList() {
   var container = document.getElementById('wo-list-container');
   if (!container) return;
@@ -8825,7 +9109,7 @@ function _renderWoList() {
     ' <span style="font-size:11px;font-weight:400;color:var(--text-muted);">(' + WO_STATUS_LABEL[_woFilter] + ')</span>';
   var header = '<div class="wo-list-header">' +
     '<span>Auftrag' + filterLabel + '</span><span>Asset</span><span>Techniker</span>' +
-    '<span>Status</span><span>Priorit\u00e4t</span>' +
+    '<span>Status</span><span>KI-Analyse</span>' +
   '</div>';
   var rows = sorted.length === 0
     ? '<div class="wo-empty">Keine Auftr\u00e4ge in dieser Kategorie.</div>'
@@ -8839,7 +9123,7 @@ function _renderWoList() {
           '<div class="wo-list-sub">' + (machine ? _esc(machine.name) : wo.assetId) + '</div>' +
           '<div class="wo-list-sub">' + (tech ? _esc(tech.name) : wo.technicianId) + '</div>' +
           '<div><span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span></div>' +
-          '<div><span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span></div>' +
+          '<div class="wo-ai-cell">' + _renderAdminAICell(wo.aiAnalysis, wo.id) + '</div>' +
         '</div>';
       }).join('');
   container.innerHTML = header + rows;
@@ -8856,10 +9140,12 @@ function submitWorkOrder() {
   if (!techId)   { showScanLogToast('Bitte einen Techniker w\u00e4hlen'); return; }
   if (!title)    { showScanLogToast('Bitte einen Titel eingeben'); return; }
 
-  createWorkOrder(assetId, techId, title, desc, priority);
+  var newOrder = createWorkOrder(assetId, techId, title, desc, priority);
   _resetWoForm();
   renderAdminAuftraege();
-  showScanLogToast('Auftrag erfolgreich erstellt');
+  showScanLogToast('Auftrag erstellt — KI analysiert\u2026');
+  // KI-Analyse asynchron starten (fire & forget)
+  generateAIAnalysis(newOrder.id);
 }
 
 function _resetWoForm() {
@@ -8904,17 +9190,21 @@ function renderEinsaetze() {
       ? MACHINE_ICONS[machine.type]
       : '\uD83D\uDD27';
     var machineName = machine ? machine.name : wo.assetId;
-    return '<div class="einsatz-card ' + wo.priority + '" onclick="openMachine(\'' + _esc(wo.assetId) + '\')">' +
-      '<div class="einsatz-card-icon">' + icon + '</div>' +
-      '<div class="einsatz-card-body">' +
-        '<div class="einsatz-card-title">' + _esc(wo.title) + '</div>' +
-        '<div class="einsatz-card-asset">\uD83D\uDD27 ' + _esc(machineName) + '</div>' +
-        '<div class="einsatz-card-badges">' +
-          '<span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span>' +
-          '<span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span>' +
+    var aiHtml = _renderAIAnalysisHTML(wo.aiAnalysis);
+    return '<div class="einsatz-card ' + wo.priority + '">' +
+      '<div style="display:flex;align-items:flex-start;gap:13px;cursor:pointer;" onclick="openMachine(\'' + _esc(wo.assetId) + '\')">' +
+        '<div class="einsatz-card-icon">' + icon + '</div>' +
+        '<div class="einsatz-card-body">' +
+          '<div class="einsatz-card-title">' + _esc(wo.title) + '</div>' +
+          '<div class="einsatz-card-asset">\uD83D\uDD27 ' + _esc(machineName) + '</div>' +
+          '<div class="einsatz-card-badges">' +
+            '<span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span>' +
+            '<span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span>' +
+          '</div>' +
         '</div>' +
+        '<div class="einsatz-card-arr">\u203A</div>' +
       '</div>' +
-      '<div class="einsatz-card-arr">\u203A</div>' +
+      aiHtml +
     '</div>';
   }
 
