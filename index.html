@@ -2910,6 +2910,51 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 .sl-legend-dot.ok{background:#43A047;}
 .sl-legend-dot.mnt{background:#FB8C00;}
 .sl-legend-dot.err{background:#E53935;}
+
+/* ===== WORK ORDERS — STATUS & PRIORITY BADGES ===== */
+.wo-status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;}
+.wo-status.OPEN{background:var(--warn-bg);color:var(--warning);}
+.wo-status.IN_PROGRESS{background:var(--accent-lt);color:var(--accent);}
+.wo-status.COMPLETED{background:var(--green-bg);color:var(--green);}
+.wo-priority{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;}
+.wo-priority.LOW{background:#F3F4F6;color:#6B7A99;}
+.wo-priority.MEDIUM{background:var(--warn-bg);color:var(--warning);}
+.wo-priority.HIGH{background:var(--red-bg);color:var(--red);}
+.wo-priority.CRITICAL{background:#F3E5F5;color:#7B1FA2;}
+/* ===== WORK ORDERS — ADMIN CREATE FORM ===== */
+.wo-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:16px 0 4px;}
+.wo-form-group{display:flex;flex-direction:column;gap:6px;}
+.wo-form-group.full{grid-column:1/-1;}
+.wo-form-label{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase;}
+.wo-form-input,.wo-form-select,.wo-form-textarea{width:100%;border:1.5px solid var(--border);border-radius:var(--r);padding:10px 13px;font-size:14px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+.wo-form-input:focus,.wo-form-select:focus,.wo-form-textarea:focus{border-color:var(--accent);}
+.wo-form-textarea{resize:vertical;min-height:80px;}
+.wo-form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;padding-top:4px;}
+/* ===== WORK ORDERS — ORDER LIST ===== */
+.wo-list-header{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:12px;padding:10px 14px;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.wo-list-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 80px;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);transition:background .12s;}
+.wo-list-row:last-child{border-bottom:none;}
+.wo-list-row:hover{background:var(--bg);}
+.wo-list-title{font-size:13px;font-weight:600;color:var(--text);}
+.wo-list-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.wo-list-del{background:none;border:1.5px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--red);cursor:pointer;transition:background .12s,border-color .12s;}
+.wo-list-del:hover{background:var(--red-bg);border-color:var(--red);}
+.wo-empty{padding:36px 14px;text-align:center;color:var(--text-muted);font-size:14px;}
+/* ===== EINSÄTZE — TECHNIKER-APP ===== */
+.einsatz-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;gap:14px;text-align:center;}
+.einsatz-empty-icon{font-size:46px;opacity:.3;}
+.einsatz-empty-text{font-size:15px;font-weight:600;color:var(--text-muted);}
+.einsatz-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin:16px 0 8px;}
+.einsatz-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:13px;cursor:pointer;transition:border-color .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;}
+.einsatz-card:active,.einsatz-card:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(21,101,192,.12);}
+.einsatz-card-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--accent-lt);}
+.einsatz-card.CRITICAL .einsatz-card-icon{background:#F3E5F5;}
+.einsatz-card.HIGH .einsatz-card-icon{background:var(--red-bg);}
+.einsatz-card-body{flex:1;min-width:0;}
+.einsatz-card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.einsatz-card-asset{font-size:12px;color:var(--text-muted);margin-bottom:7px;}
+.einsatz-card-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.einsatz-card-arr{font-size:22px;color:var(--text-muted);align-self:center;line-height:1;}
 </style>
 </head>
 <body>
@@ -3181,6 +3226,10 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
       <button class="d-nav-item" onclick="setDNav(this,'systemeinstellungen')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Systemeinstellungen
+      </button>
+      <button class="d-nav-item" id="dnav-auftraege" onclick="setDNav(this,'auftraege')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/><polyline points="9 9 10 9"/></svg>
+        Auftragsmanagement
       </button>
       <button class="d-nav-item" onclick="startScan()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
@@ -4495,6 +4544,109 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
       </div>
     </div><!-- end page-systemeinstellungen -->
 
+    <!-- ==================== AUFTRAGSMANAGEMENT (Admin) ==================== -->
+    <div id="page-auftraege" class="page">
+      <div class="admin-section">
+
+        <div class="admin-topbar-row">
+          <div>
+            <div class="admin-page-title">Auftragsmanagement</div>
+            <div class="admin-page-sub">Auftr&auml;ge erstellen &middot; Techniker zuweisen &middot; Status verfolgen</div>
+          </div>
+        </div>
+
+        <!-- KPI Stats (werden per JS bef&uuml;llt) -->
+        <div class="admin-stats" style="grid-template-columns:repeat(4,1fr);" id="wo-stats-row">
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val" id="wo-stat-total">0</div>
+            <div class="admin-stat-lbl">Gesamt</div>
+          </div>
+          <div class="admin-stat-card orange">
+            <div class="admin-stat-val" id="wo-stat-open">0</div>
+            <div class="admin-stat-lbl">Offen</div>
+          </div>
+          <div class="admin-stat-card blue">
+            <div class="admin-stat-val" id="wo-stat-inprogress">0</div>
+            <div class="admin-stat-lbl">In Bearbeitung</div>
+          </div>
+          <div class="admin-stat-card green">
+            <div class="admin-stat-val" id="wo-stat-done">0</div>
+            <div class="admin-stat-lbl">Abgeschlossen</div>
+          </div>
+        </div>
+
+        <!-- Neuen Auftrag anlegen -->
+        <div class="sys-card">
+          <div class="sys-card-header">
+            <div class="sys-card-icon" style="background:var(--accent-lt);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div>
+              <div class="sys-card-title">Neuen Auftrag anlegen</div>
+              <div class="sys-card-sub">Asset w&auml;hlen, Techniker zuweisen und Auftragsdetails hinterlegen</div>
+            </div>
+          </div>
+          <div class="wo-form" id="wo-create-form">
+            <div class="wo-form-group">
+              <label class="wo-form-label" for="wo-asset-select">Asset / Maschine</label>
+              <select class="wo-form-select" id="wo-asset-select">
+                <option value="">-- Asset w&auml;hlen --</option>
+              </select>
+            </div>
+            <div class="wo-form-group">
+              <label class="wo-form-label" for="wo-tech-select">Techniker</label>
+              <select class="wo-form-select" id="wo-tech-select">
+                <option value="">-- Techniker w&auml;hlen --</option>
+              </select>
+            </div>
+            <div class="wo-form-group">
+              <label class="wo-form-label" for="wo-title-input">Titel</label>
+              <input class="wo-form-input" id="wo-title-input" type="text" placeholder="z.B. Hydraulik&ouml;l wechseln" maxlength="80">
+            </div>
+            <div class="wo-form-group">
+              <label class="wo-form-label" for="wo-priority-select">Priorit&auml;t</label>
+              <select class="wo-form-select" id="wo-priority-select">
+                <option value="LOW">Niedrig</option>
+                <option value="MEDIUM" selected>Mittel</option>
+                <option value="HIGH">Hoch</option>
+                <option value="CRITICAL">Kritisch</option>
+              </select>
+            </div>
+            <div class="wo-form-group full">
+              <label class="wo-form-label" for="wo-desc-input">Beschreibung</label>
+              <textarea class="wo-form-textarea" id="wo-desc-input" placeholder="Details zum Auftrag, notwendige Materialien, Sicherheitshinweise&#8230;" maxlength="500"></textarea>
+            </div>
+            <div class="wo-form-actions">
+              <button class="admin-btn admin-btn-secondary" type="button" onclick="_resetWoForm()">Zur&uuml;cksetzen</button>
+              <button class="admin-btn admin-btn-primary" type="button" onclick="submitWorkOrder()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Auftrag erstellen
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auftragsliste -->
+        <div class="sys-card">
+          <div class="sys-card-header">
+            <div class="sys-card-icon" style="background:var(--bg3);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+              <div class="sys-card-title">Alle Auftr&auml;ge</div>
+              <div class="sys-card-sub">Vollst&auml;ndige &Uuml;bersicht aller angelegten Arbeitsauftr&auml;ge</div>
+            </div>
+          </div>
+          <div id="wo-list-container"><!-- rendered by JS --></div>
+        </div>
+
+        <div class="page-footer">
+          <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+          <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+        </div>
+      </div>
+    </div><!-- end page-auftraege -->
+
 <!-- ==================== OFFLINE BANNER ==================== -->
 <div id="offlineBanner" class="offline-banner">
   <div class="offline-banner-dot"></div>
@@ -5091,6 +5243,19 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
       </div>
     </div>
 
+    <!-- ==================== EINSÄTZE (Techniker) ==================== -->
+    <div id="page-einsaetze" class="page">
+      <div class="tasks-section">
+        <div style="height:4px;"></div>
+        <div class="sec-label">Meine Einst&auml;tze</div>
+        <div id="einsaetzeList"><!-- filled by JS --></div>
+      </div>
+      <div class="page-footer">
+        <p><strong>AssetLogic v1.0</strong> &mdash; <span class="footer-name">Developed by Torben Jander</span></p>
+        <p>Field Service Edition &middot; 2026 &nbsp;|&nbsp; ERP-Integration aktiv</p>
+      </div>
+    </div>
+
     <!-- ==================== PROFIL ==================== -->
     <div id="page-profil" class="page">
       <div class="profil-section">
@@ -5150,6 +5315,10 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
   <button class="nav-item" id="nav-aufgaben" onclick="showPage('aufgaben')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     <span>Aufgaben</span>
+  </button>
+  <button class="nav-item" id="nav-einsaetze" onclick="showPage('einsaetze')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    <span>Einst&auml;tze</span>
   </button>
   <button class="nav-item" id="nav-profil" onclick="showPage('profil')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -8169,6 +8338,7 @@ function showPage(name) {
   }
   if (name === 'home') { _tasksExpanded = false; renderDashboardMobile(); }
   if (name === 'aufgaben') { _aufgabenFilter = 'all'; renderAufgaben(); }
+  if (name === 'einsaetze') { renderEinsaetze(); }
   if (name !== 'machine') {
     document.getElementById('solutionArea').style.display = 'none';
     document.getElementById('solutionArea').innerHTML = '';
@@ -8189,6 +8359,7 @@ function setDNav(el, page) {
   else if (page === 'erp') { showPage('erp'); renderErpMbSection(); }
   else if (page === 'kunden') { showPage('kunden'); initKundenPage(); }
   else if (page === 'systemeinstellungen') showPage('systemeinstellungen');
+  else if (page === 'auftraege') { showPage('auftraege'); renderAdminAuftraege(); }
 }
 
 function showScanLogToast(label) {
@@ -8487,6 +8658,257 @@ document.getElementById('scanOverlay').addEventListener('click', function(e) {
   if (e.target === this) cancelScan();
 });
 
+// =============================================================================
+// ===== WORK ORDER MANAGEMENT =====
+// =============================================================================
+
+/**
+ * @typedef {'OPEN' | 'IN_PROGRESS' | 'COMPLETED'} WorkOrderStatus
+ * @typedef {'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'} WorkOrderPriority
+ *
+ * @typedef {{
+ *   id: string,
+ *   assetId: string,
+ *   technicianId: string,
+ *   title: string,
+ *   description: string,
+ *   priority: WorkOrderPriority,
+ *   status: WorkOrderStatus,
+ *   createdAt: string
+ * }} WorkOrder
+ */
+
+/** @type {Object.<string, WorkOrder>} */
+var WORK_ORDERS_DB = {
+  'wo-001': {
+    id: 'wo-001',
+    assetId: 'CAT-320',
+    technicianId: 'mo-001',
+    title: 'Hydrauliköl wechseln',
+    description: 'Planmäßiger Ölwechsel am Hydraulikaggregat V3. Filterwechsel inklusive. Benötigtes Material: 20 L HLP 46.',
+    priority: 'HIGH',
+    status: 'OPEN',
+    createdAt: '2026-03-08T09:00:00.000Z'
+  },
+  'wo-002': {
+    id: 'wo-002',
+    assetId: 'HP-500',
+    technicianId: 'mo-002',
+    title: 'Druckventil prüfen — WARN_KPD_07',
+    description: 'Steuerventil SV-4 auf Dichtheit prüfen. Fehlermeldung WARN_KPD_07 analysieren und Ursache beheben.',
+    priority: 'CRITICAL',
+    status: 'IN_PROGRESS',
+    createdAt: '2026-03-09T08:30:00.000Z'
+  },
+  'wo-003': {
+    id: 'wo-003',
+    assetId: 'CAT-320',
+    technicianId: 'mo-001',
+    title: 'GPS-Modul TG-200 kalibrieren',
+    description: 'GPS-Signal-Drift beheben. Firmware-Update auf FW 4.2.2 einspielen und Kalibrierung durchführen.',
+    priority: 'MEDIUM',
+    status: 'COMPLETED',
+    createdAt: '2026-03-07T14:00:00.000Z'
+  }
+};
+
+// ----- API: createWorkOrder -----
+/**
+ * Legt einen neuen Arbeitsauftrag an (nur Admin / Service-Leiter).
+ * @param {string} assetId
+ * @param {string} technicianId
+ * @param {string} title
+ * @param {string} description
+ * @param {WorkOrderPriority} priority
+ * @returns {WorkOrder}
+ */
+function createWorkOrder(assetId, technicianId, title, description, priority) {
+  var id = 'wo-' + Date.now();
+  /** @type {WorkOrder} */
+  var order = {
+    id: id,
+    assetId: assetId,
+    technicianId: technicianId,
+    title: title,
+    description: description,
+    priority: /** @type {WorkOrderPriority} */ (priority || 'MEDIUM'),
+    status: 'OPEN',
+    createdAt: new Date().toISOString()
+  };
+  WORK_ORDERS_DB[id] = order;
+  return order;
+}
+
+// ----- API: getMyWorkOrders -----
+/**
+ * Gibt alle Aufträge für den aktuell eingeloggten Techniker zurück.
+ * Lädt ausschließlich Daten, die dem zugewiesenen Techniker gehören.
+ * @returns {WorkOrder[]}
+ */
+function getMyWorkOrders() {
+  if (!CURRENT_USER || !CURRENT_USER.technicianId) return [];
+  var tid = CURRENT_USER.technicianId;
+  return Object.values(WORK_ORDERS_DB)
+    .filter(function(wo) { return wo.technicianId === tid; })
+    .sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+}
+
+// ----- UI Helpers -----
+/** @type {Object.<WorkOrderStatus, string>} */
+var WO_STATUS_LABEL = { OPEN: 'Offen', IN_PROGRESS: 'In Bearbeitung', COMPLETED: 'Abgeschlossen' };
+/** @type {Object.<WorkOrderPriority, string>} */
+var WO_PRIORITY_LABEL = { LOW: 'Niedrig', MEDIUM: 'Mittel', HIGH: 'Hoch', CRITICAL: 'Kritisch' };
+
+// ----- Admin: renderAdminAuftraege -----
+function renderAdminAuftraege() {
+  // Populate asset dropdown
+  var assetSel = document.getElementById('wo-asset-select');
+  if (assetSel && assetSel.options.length <= 1) {
+    Object.keys(MACHINES).forEach(function(id) {
+      var opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = MACHINES[id].name + ' (' + id + ')';
+      assetSel.appendChild(opt);
+    });
+  }
+  // Populate technician dropdown
+  var techSel = document.getElementById('wo-tech-select');
+  if (techSel && techSel.options.length <= 1) {
+    Object.keys(MONTEURE_DB).forEach(function(id) {
+      var opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = MONTEURE_DB[id].name + ' — ' + MONTEURE_DB[id].rolle;
+      techSel.appendChild(opt);
+    });
+  }
+
+  // Update stats
+  var orders = Object.values(WORK_ORDERS_DB);
+  var openCount = orders.filter(function(o) { return o.status === 'OPEN'; }).length;
+  var inPrCount = orders.filter(function(o) { return o.status === 'IN_PROGRESS'; }).length;
+  var doneCount = orders.filter(function(o) { return o.status === 'COMPLETED'; }).length;
+  var el = function(id) { return document.getElementById(id); };
+  if (el('wo-stat-total'))      el('wo-stat-total').textContent      = orders.length;
+  if (el('wo-stat-open'))       el('wo-stat-open').textContent       = openCount;
+  if (el('wo-stat-inprogress')) el('wo-stat-inprogress').textContent = inPrCount;
+  if (el('wo-stat-done'))       el('wo-stat-done').textContent       = doneCount;
+
+  // Render order list
+  var container = document.getElementById('wo-list-container');
+  if (!container) return;
+  if (orders.length === 0) {
+    container.innerHTML = '<div class="wo-empty">Noch keine Auftr\u00e4ge angelegt.</div>';
+    return;
+  }
+  var sorted = orders.slice().sort(function(a, b) {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+  var header = '<div class="wo-list-header">' +
+    '<span>Auftrag</span><span>Asset</span><span>Techniker</span>' +
+    '<span>Status</span><span>Priorit\u00e4t</span>' +
+  '</div>';
+  var rows = sorted.map(function(wo) {
+    var machine = MACHINES[wo.assetId];
+    var tech = MONTEURE_DB[wo.technicianId];
+    var date = new Date(wo.createdAt).toLocaleDateString('de-DE', { day:'2-digit', month:'2-digit', year:'numeric' });
+    return '<div class="wo-list-row">' +
+      '<div><div class="wo-list-title">' + _esc(wo.title) + '</div>' +
+        '<div class="wo-list-sub">' + date + '</div></div>' +
+      '<div class="wo-list-sub">' + (machine ? _esc(machine.name) : wo.assetId) + '</div>' +
+      '<div class="wo-list-sub">' + (tech ? _esc(tech.name) : wo.technicianId) + '</div>' +
+      '<div><span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span></div>' +
+      '<div><span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span></div>' +
+    '</div>';
+  }).join('');
+  container.innerHTML = header + rows;
+}
+
+function submitWorkOrder() {
+  var assetId   = document.getElementById('wo-asset-select').value;
+  var techId    = document.getElementById('wo-tech-select').value;
+  var title     = document.getElementById('wo-title-input').value.trim();
+  var desc      = document.getElementById('wo-desc-input').value.trim();
+  var priority  = /** @type {WorkOrderPriority} */ (document.getElementById('wo-priority-select').value);
+
+  if (!assetId)  { showScanLogToast('Bitte ein Asset w\u00e4hlen'); return; }
+  if (!techId)   { showScanLogToast('Bitte einen Techniker w\u00e4hlen'); return; }
+  if (!title)    { showScanLogToast('Bitte einen Titel eingeben'); return; }
+
+  createWorkOrder(assetId, techId, title, desc, priority);
+  _resetWoForm();
+  renderAdminAuftraege();
+  showScanLogToast('Auftrag erfolgreich erstellt');
+}
+
+function _resetWoForm() {
+  document.getElementById('wo-asset-select').value   = '';
+  document.getElementById('wo-tech-select').value    = '';
+  document.getElementById('wo-title-input').value    = '';
+  document.getElementById('wo-desc-input').value     = '';
+  document.getElementById('wo-priority-select').value = 'MEDIUM';
+}
+
+/** Escaped HTML string helper */
+function _esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ----- Techniker: renderEinsaetze -----
+function renderEinsaetze() {
+  var listEl = document.getElementById('einsaetzeList');
+  if (!listEl) return;
+
+  var orders = getMyWorkOrders();
+
+  if (orders.length === 0) {
+    listEl.innerHTML =
+      '<div class="einsatz-empty">' +
+        '<div class="einsatz-empty-icon">\uD83D\uDCCB</div>' +
+        '<div class="einsatz-empty-text">Keine aktiven Auftr\u00e4ge</div>' +
+      '</div>';
+    return;
+  }
+
+  var active  = orders.filter(function(o) { return o.status !== 'COMPLETED'; });
+  var done    = orders.filter(function(o) { return o.status === 'COMPLETED'; });
+
+  function buildCard(wo) {
+    var machine = MACHINES[wo.assetId];
+    var icon = (machine && typeof MACHINE_ICONS !== 'undefined' && MACHINE_ICONS[machine.type])
+      ? MACHINE_ICONS[machine.type]
+      : '\uD83D\uDD27';
+    var machineName = machine ? machine.name : wo.assetId;
+    return '<div class="einsatz-card ' + wo.priority + '" onclick="openMachine(\'' + _esc(wo.assetId) + '\')">' +
+      '<div class="einsatz-card-icon">' + icon + '</div>' +
+      '<div class="einsatz-card-body">' +
+        '<div class="einsatz-card-title">' + _esc(wo.title) + '</div>' +
+        '<div class="einsatz-card-asset">\uD83D\uDD27 ' + _esc(machineName) + '</div>' +
+        '<div class="einsatz-card-badges">' +
+          '<span class="wo-status ' + wo.status + '">' + WO_STATUS_LABEL[wo.status] + '</span>' +
+          '<span class="wo-priority ' + wo.priority + '">' + WO_PRIORITY_LABEL[wo.priority] + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="einsatz-card-arr">\u203A</div>' +
+    '</div>';
+  }
+
+  var html = '';
+  if (active.length > 0) {
+    html += '<div class="einsatz-section-label">Aktive Auftr\u00e4ge (' + active.length + ')</div>';
+    html += active.map(buildCard).join('');
+  }
+  if (done.length > 0) {
+    html += '<div class="einsatz-section-label">Abgeschlossen (' + done.length + ')</div>';
+    html += done.map(buildCard).join('');
+  }
+  listEl.innerHTML = html;
+}
+
+// =============================================================================
 // ===== INIT =====
 renderNutzerList();
 renderDashboardMobile();
