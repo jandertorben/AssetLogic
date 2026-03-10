@@ -3173,7 +3173,7 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 10a6 6 0 0 0-11.6-2M6 14a6 6 0 0 0 11.6 2"/><polyline points="21 3 21 10 14 10"/><polyline points="3 21 3 14 10 14"/></svg>
       <span id="hdrOfflineBadgeText">0 ausstehend</span>
     </div>
-    <div class="hdr-notif" onclick="showPage('aufgaben')">
+    <div class="hdr-notif" onclick="showPage('einsaetze')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -5307,23 +5307,15 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="nav-item active" id="nav-home" onclick="showPage('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>Assets</span>
+  <button class="nav-item active" id="nav-einsaetze" onclick="showPage('einsaetze')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    <span>Einst&auml;tze</span>
   </button>
   <button class="nav-item scan-btn" onclick="startScan()">
     <div class="scan-fab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
       <span>SCAN</span>
     </div>
-  </button>
-  <button class="nav-item" id="nav-aufgaben" onclick="showPage('aufgaben')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    <span>Aufgaben</span>
-  </button>
-  <button class="nav-item" id="nav-einsaetze" onclick="showPage('einsaetze')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-    <span>Einst&auml;tze</span>
   </button>
   <button class="nav-item" id="nav-profil" onclick="showPage('profil')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -7691,7 +7683,7 @@ function applyRole(user) {
       rolle: MONTEURE_DB[user.technicianId] ? MONTEURE_DB[user.technicianId].rolle : 'Techniker',
       customerId: user.customerId
     };
-    showPage('home');
+    showPage('einsaetze');
   } else {
     body.classList.add('role-service-leader');
     // activate karte nav item
@@ -8329,7 +8321,6 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   const navEl = document.getElementById('nav-' + name);
   if (navEl) navEl.classList.add('active');
-  else document.getElementById('nav-home').classList.add('active');
   const appBody = document.querySelector('.app-body');
   if (name === 'karte') {
     appBody.classList.add('map-active');
@@ -8384,7 +8375,7 @@ function showScanLogToast(label) {
 function machineBackNav() {
   var isTech = document.body.classList.contains('role-technician');
   if (isTech) {
-    showPage('home');
+    showPage('einsaetze');
   } else {
     showPage('assets');
     renderAssetsGrid();
