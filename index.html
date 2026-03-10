@@ -437,7 +437,256 @@ function daysUntil(dateStr){
 }
 
 // ── ASSET DETAIL VIEW ─────────────────────────────────────────────────────────
+// ── SCHALTPLAN MODAL ──────────────────────────────────────────────────────────
+// Maps asset status + type to the relevant circuit section
+function getSchaltplanSection(asset){
+  if(asset.status==='FEHLER'){
+    if(asset.type==='Bagger'||asset.type==='Radlader'||asset.hydraulikDruck<asset.hydraulikMax*0.7)
+      return 'hydraulik';
+    return 'elektrik';
+  }
+  if(asset.status==='WARTUNG') return 'wartung';
+  return 'gesamt';
+}
+
+function SchaltplanModal({asset,onClose}){
+  const section=getSchaltplanSection(asset);
+  const [zoom,setZoom]=React.useState(1);
+  const [tab,setTab]=React.useState(section);
+
+  const tabs=[
+    {id:'hydraulik', label:'Hydraulik'},
+    {id:'elektrik',  label:'Elektrik'},
+    {id:'wartung',   label:'Service'},
+  ];
+
+  // SVG diagrams per section
+  function HydraulikDiagram({highlight}){
+    return(
+      <svg viewBox="0 0 360 280" style={{width:'100%',height:'auto',fontFamily:'JetBrains Mono,monospace'}}>
+        <rect width="360" height="280" fill="#0a0a0f"/>
+        {/* grid */}
+        {[0,40,80,120,160,200,240,280,320,360].map(x=><line key={x} x1={x} y1="0" x2={x} y2="280" stroke="#ffffff08" strokeWidth="1"/>)}
+        {[0,40,80,120,160,200,240,280].map(y=><line key={y} x1="0" y1={y} x2="360" y2={y} stroke="#ffffff08" strokeWidth="1"/>)}
+
+        {/* Tank */}
+        <rect x="20" y="200" width="50" height="60" rx="3" fill="#1a1a2e" stroke="#334155" strokeWidth="1.5"/>
+        <text x="45" y="235" textAnchor="middle" fill="#64748b" fontSize="9">TANK</text>
+        <text x="45" y="248" textAnchor="middle" fill="#64748b" fontSize="8">HLP46</text>
+
+        {/* Pumpe */}
+        <circle cx="130" cy="230" r="22" fill={highlight==='pumpe'?'#1e3a5f':'#111827'} stroke={highlight==='pumpe'?'#2979FF':'#334155'} strokeWidth={highlight==='pumpe'?2:1.5}/>
+        <text x="130" y="226" textAnchor="middle" fill={highlight==='pumpe'?'#60a5fa':'#64748b'} fontSize="8">PUMPE</text>
+        <text x="130" y="238" textAnchor="middle" fill={highlight==='pumpe'?'#93c5fd':'#475569'} fontSize="7">HP-440</text>
+        {/* pump arrow */}
+        <polygon points="122,230 138,222 138,238" fill={highlight==='pumpe'?'#2979FF':'#334155'}/>
+
+        {/* Drucksensor */}
+        <rect x="190" y="185" width="38" height="28" rx="4" fill={highlight==='sensor'?'#3b1f1f':'#111827'} stroke={highlight==='sensor'?'#ef4444':'#334155'} strokeWidth={highlight==='sensor'?2:1.5}/>
+        <text x="209" y="198" textAnchor="middle" fill={highlight==='sensor'?'#f87171':'#64748b'} fontSize="7.5">SENSOR</text>
+        <text x="209" y="208" textAnchor="middle" fill={highlight==='sensor'?'#fca5a5':'#475569'} fontSize="7">DS-200</text>
+        {highlight==='sensor'&&<>
+          <circle cx="234" cy="185" r="5" fill="none" stroke="#ef4444" strokeWidth="1.5" opacity="0.8"><animate attributeName="r" values="5;9;5" dur="1.2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.8;0;0.8" dur="1.2s" repeatCount="indefinite"/></circle>
+        </>}
+
+        {/* Ventil */}
+        <rect x="260" y="100" width="44" height="30" rx="4" fill={highlight==='ventil'?'#1f2f1a':'#111827'} stroke={highlight==='ventil'?'#22c55e':'#334155'} strokeWidth="1.5"/>
+        <text x="282" y="113" textAnchor="middle" fill={highlight==='ventil'?'#86efac':'#64748b'} fontSize="7.5">VENTIL</text>
+        <text x="282" y="123" textAnchor="middle" fill={highlight==='ventil'?'#bbf7d0':'#475569'} fontSize="7">PV-220</text>
+
+        {/* Zylinder */}
+        <rect x="290" y="30" width="50" height="55" rx="3" fill="#111827" stroke="#334155" strokeWidth="1.5"/>
+        <rect x="305" y="20" width="20" height="15" rx="2" fill="#1e293b" stroke="#334155" strokeWidth="1"/>
+        <text x="315" y="58" textAnchor="middle" fill="#64748b" fontSize="7.5">ZYLINDER</text>
+        <text x="315" y="69" textAnchor="middle" fill="#475569" fontSize="7">A1/B1</text>
+
+        {/* Leitungen */}
+        {/* Tank → Pumpe */}
+        <path d="M70 230 L108 230" stroke="#334155" strokeWidth="2" fill="none"/>
+        {/* Pumpe → Sensor */}
+        <path d="M152 220 L180 200 L190 199" stroke={highlight?'#2979FF':'#334155'} strokeWidth={highlight?2.5:2} fill="none"/>
+        {highlight&&<path d="M152 220 L180 200 L190 199" stroke="#2979FF" strokeWidth="1" fill="none" strokeDasharray="4 4"><animate attributeName="strokeDashoffset" values="0;-8" dur="0.5s" repeatCount="indefinite"/></path>}
+        {/* Sensor → Ventil */}
+        <path d="M228 199 L240 199 L240 115 L260 115" stroke="#334155" strokeWidth="2" fill="none"/>
+        {/* Ventil → Zylinder */}
+        <path d="M304 100 L315 85" stroke="#334155" strokeWidth="2" fill="none"/>
+        {/* Return line */}
+        <path d="M290 57 L45 57 L45 200" stroke="#1e3a5f" strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
+
+        {/* Druckmanometer */}
+        <circle cx="175" cy="140" r="18" fill="#111827" stroke="#334155" strokeWidth="1.5"/>
+        <text x="175" y="136" textAnchor="middle" fill="#64748b" fontSize="7">BAR</text>
+        <text x="175" y="148" textAnchor="middle" fill={asset.hydraulikDruck<asset.hydraulikMax*0.7?'#ef4444':'#22c55e'} fontSize="9" fontWeight="bold">{asset.hydraulikDruck}</text>
+        <path d="M175 140 L175 140" stroke="#94a3b8" strokeWidth="1"/>
+        {/* needle */}
+        {(()=>{const angle=(asset.hydraulikDruck/asset.hydraulikMax)*180-90;const rad=angle*Math.PI/180;return<line x1="175" y1="140" x2={175+Math.cos(rad)*12} y2={140+Math.sin(rad)*12} stroke={asset.hydraulikDruck<asset.hydraulikMax*0.7?'#ef4444':'#22c55e'} strokeWidth="1.5" strokeLinecap="round"/>})()}
+
+        {/* Labels */}
+        <text x="10" y="15" fill="#475569" fontSize="8">HYDRAULIKKREIS — AUSSCHNITT</text>
+        <text x="10" y="275" fill="#1d4ed8" fontSize="7">{asset.name} · {asset.seriennummer}</text>
+
+        {/* Fehler-Markierung */}
+        {highlight&&<>
+          <rect x="168" y="180" width="90" height="16" rx="3" fill="#ef444420"/>
+          <text x="213" y="191" textAnchor="middle" fill="#f87171" fontSize="7">⚠ FEHLER BEREICH</text>
+        </>}
+      </svg>
+    );
+  }
+
+  function ElektrikDiagram(){
+    return(
+      <svg viewBox="0 0 360 280" style={{width:'100%',height:'auto',fontFamily:'JetBrains Mono,monospace'}}>
+        <rect width="360" height="280" fill="#0a0a0f"/>
+        {[0,40,80,120,160,200,240,280,320,360].map(x=><line key={x} x1={x} y1="0" x2={x} y2="280" stroke="#ffffff08" strokeWidth="1"/>)}
+        {[0,40,80,120,160,200,240,280].map(y=><line key={y} x1="0" y1={y} x2="360" y2={y} stroke="#ffffff08" strokeWidth="1"/>)}
+
+        {/* Batterie/Steuergerät */}
+        <rect x="20" y="20" width="60" height="40" rx="4" fill="#111827" stroke="#334155" strokeWidth="1.5"/>
+        <text x="50" y="36" textAnchor="middle" fill="#64748b" fontSize="8">ECU</text>
+        <text x="50" y="48" textAnchor="middle" fill="#475569" fontSize="7">STEUERGERÄT</text>
+
+        {/* CAN-Bus Linie */}
+        <line x1="80" y1="40" x2="340" y2="40" stroke="#2979FF" strokeWidth="2.5"/>
+        <line x1="80" y1="44" x2="340" y2="44" stroke="#1565c0" strokeWidth="1.5"/>
+        <text x="190" y="36" textAnchor="middle" fill="#3b82f6" fontSize="7.5">CAN-BUS H/L</text>
+        {/* CAN error pulse */}
+        {asset.status==='FEHLER'&&<rect x="80" y="38" width="260" height="8" fill="#ef4444" opacity="0.15"><animate attributeName="opacity" values="0.15;0.4;0.15" dur="1s" repeatCount="indefinite"/></rect>}
+
+        {/* Lenksensor */}
+        <rect x="110" y="80" width="50" height="35" rx="4" fill={asset.status==='FEHLER'?'#3b1f1f':'#111827'} stroke={asset.status==='FEHLER'?'#ef4444':'#334155'} strokeWidth={asset.status==='FEHLER'?2:1.5}/>
+        <text x="135" y="95" textAnchor="middle" fill={asset.status==='FEHLER'?'#f87171':'#64748b'} fontSize="7.5">LENK-</text>
+        <text x="135" y="106" textAnchor="middle" fill={asset.status==='FEHLER'?'#f87171':'#64748b'} fontSize="7.5">SENSOR</text>
+        <line x1="135" y1="80" x2="135" y2="44" stroke={asset.status==='FEHLER'?'#ef4444':'#475569'} strokeWidth="1.5" strokeDasharray={asset.status==='FEHLER'?'4 3':'none'}/>
+        {asset.status==='FEHLER'&&<>
+          <circle cx="135" cy="62" r="4" fill="#ef4444" opacity="0.9"><animate attributeName="r" values="4;8;4" dur="1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.9;0;0.9" dur="1s" repeatCount="indefinite"/></circle>
+          <text x="165" y="98" fill="#f87171" fontSize="7">← Pin 4,7</text>
+        </>}
+
+        {/* Temp Sensor */}
+        <rect x="200" y="80" width="50" height="35" rx="4" fill={asset.temperatur>85?'#3b1f1f':'#111827'} stroke={asset.temperatur>85?'#f97316':'#334155'} strokeWidth="1.5"/>
+        <text x="225" y="95" textAnchor="middle" fill={asset.temperatur>85?'#fb923c':'#64748b'} fontSize="7.5">TEMP</text>
+        <text x="225" y="106" textAnchor="middle" fill={asset.temperatur>85?'#fdba74':'#475569'} fontSize="7">{asset.temperatur}°C</text>
+        <line x1="225" y1="80" x2="225" y2="44" stroke="#475569" strokeWidth="1.5"/>
+
+        {/* Terminierung */}
+        <rect x="318" y="30" width="22" height="20" rx="3" fill="#111827" stroke="#334155" strokeWidth="1.5"/>
+        <text x="329" y="40" textAnchor="middle" fill="#64748b" fontSize="7">120Ω</text>
+        <text x="329" y="48" textAnchor="middle" fill="#475569" fontSize="6">TERM.</text>
+
+        {/* Sicherungskasten */}
+        <rect x="20" y="150" width="80" height="100" rx="4" fill="#0f0f1a" stroke="#334155" strokeWidth="1.5"/>
+        <text x="60" y="165" textAnchor="middle" fill="#64748b" fontSize="8">SICHERUNGEN</text>
+        {[['F1','15A','#22c55e'],['F2','20A','#22c55e'],['F3','10A','#ef4444'],['F4','25A','#22c55e'],['F5','15A','#22c55e']].map(([f,a,c],i)=>(
+          <g key={f} transform={`translate(25,${175+i*14})`}>
+            <rect width="30" height="10" rx="2" fill="#1e293b" stroke={c} strokeWidth="1"/>
+            <text x="15" y="8" textAnchor="middle" fill={c} fontSize="7">{f} {a}</text>
+          </g>
+        ))}
+
+        <text x="10" y="15" fill="#475569" fontSize="8">ELEKTROSCHEMA — AUSSCHNITT</text>
+        <text x="10" y="275" fill="#1d4ed8" fontSize="7">{asset.name} · {asset.seriennummer}</text>
+      </svg>
+    );
+  }
+
+  function WartungDiagram(){
+    const items=[
+      {label:'Motoröl',      val:asset.oelstand,    max:100, unit:'%', warn:40,  color:'#f97316'},
+      {label:'Hydrauliköl',  val:hydraulikPct,      max:100, unit:'%', warn:60,  color:'#2979FF'},
+      {label:'Kühlmittel',   val:78,                max:100, unit:'%', warn:30,  color:'#06b6d4'},
+      {label:'Kraftstoff',   val:55,                max:100, unit:'%', warn:20,  color:'#a855f7'},
+    ];
+    const hydraulikPct2=Math.round((asset.hydraulikDruck/asset.hydraulikMax)*100);
+    return(
+      <svg viewBox="0 0 360 280" style={{width:'100%',height:'auto',fontFamily:'JetBrains Mono,monospace'}}>
+        <rect width="360" height="280" fill="#0a0a0f"/>
+        <text x="10" y="20" fill="#475569" fontSize="8">SERVICE-ÜBERSICHT — {asset.name}</text>
+
+        {/* Füllstand-Balken */}
+        {items.map(({label,val,max,unit,warn,color},i)=>{
+          const y=40+i*50;
+          const w=260;
+          const filled=(val/max)*w;
+          const isWarn=val<warn;
+          return(
+            <g key={label}>
+              <text x="10" y={y+10} fill="#64748b" fontSize="8">{label}</text>
+              <rect x="10" y={y+15} width={w} height="16" rx="3" fill="#1e293b"/>
+              <rect x="10" y={y+15} width={filled} height="16" rx="3" fill={isWarn?'#ef4444':color} opacity={isWarn?'1':'0.8'}/>
+              {isWarn&&<rect x="10" y={y+15} width={filled} height="16" rx="3" fill="#ef4444" opacity="0.4"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="1s" repeatCount="indefinite"/></rect>}
+              <text x={18+filled} y={y+27} fill="white" fontSize="8" fontWeight="bold">{val}{unit}</text>
+              <text x={w+18} y={y+27} fill={isWarn?'#f87171':'#475569'} fontSize="7">{isWarn?'⚠ NIEDRIG':'OK'}</text>
+            </g>
+          );
+        })}
+
+        {/* Wartungsintervall */}
+        <rect x="10" y="250" width="340" height="22" rx="4" fill="#111827" stroke="#334155" strokeWidth="1"/>
+        <text x="20" y="264" fill="#64748b" fontSize="8">Nächste UVV: {new Date(asset.naechsteUVV).toLocaleDateString('de-DE')} · Letzte Wartung: {new Date(asset.letzteWartung).toLocaleDateString('de-DE')}</text>
+
+        <text x="10" y="278" fill="#1d4ed8" fontSize="7">{asset.seriennummer}</text>
+      </svg>
+    );
+  }
+
+  const hydraulikPct=Math.round((asset.hydraulikDruck/asset.hydraulikMax)*100);
+  const isHydraulikFehler=asset.status==='FEHLER'&&(asset.type==='Bagger'||asset.hydraulikDruck<asset.hydraulikMax*0.7);
+
+  return(
+    <div className="fixed inset-0 z-[70] flex flex-col" style={{background:'rgba(0,0,0,0.96)'}}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800" style={{background:'#0a0a0f'}}>
+        <div>
+          <div className="text-white font-bold text-base">Schaltplan</div>
+          <div className="text-gray-500 text-xs">{asset.name} · {asset.seriennummer}</div>
+        </div>
+        <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800 text-gray-400 hover:bg-slate-700 transition-colors text-lg font-bold">×</button>
+      </div>
+
+      {/* Fehler-Banner wenn aktiv */}
+      {asset.status==='FEHLER'&&(
+        <div className="mx-4 mt-3 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center gap-2">
+          <span className="text-red-400 text-sm">⚠</span>
+          <span className="text-red-300 text-xs">Fehlerrelevanter Bereich ist markiert</span>
+          <span className="ml-auto text-red-400/60 text-xs">{isHydraulikFehler?'E-001':'F-201'}</span>
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div className="flex gap-1 px-4 mt-3">
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${tab===t.id?'bg-[#2979FF] text-white':'bg-slate-800 text-gray-400 hover:bg-slate-700'}`}>
+            {t.label}
+          </button>
+        ))}
+        <div className="ml-auto flex gap-1">
+          <button onClick={()=>setZoom(z=>Math.min(z+0.25,2.5))} className="w-8 h-8 rounded-lg bg-slate-800 text-gray-300 text-base hover:bg-slate-700 flex items-center justify-center">+</button>
+          <button onClick={()=>setZoom(z=>Math.max(z-0.25,0.75))} className="w-8 h-8 rounded-lg bg-slate-800 text-gray-300 text-base hover:bg-slate-700 flex items-center justify-center">−</button>
+        </div>
+      </div>
+
+      {/* Diagram area */}
+      <div className="flex-1 overflow-auto p-4" style={{touchAction:'pan-x pan-y'}}>
+        <div style={{transform:`scale(${zoom})`,transformOrigin:'top left',transition:'transform 0.2s'}}>
+          {tab==='hydraulik'&&<HydraulikDiagram highlight={isHydraulikFehler?'sensor':null}/>}
+          {tab==='elektrik'&&<ElektrikDiagram/>}
+          {tab==='wartung'&&<WartungDiagram/>}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-3 border-t border-slate-800 flex items-center gap-3" style={{background:'#0a0a0f'}}>
+        <span className="text-gray-600 text-xs">Rev. 03/2026 · Stand: {new Date().toLocaleDateString('de-DE')}</span>
+        <span className="ml-auto text-gray-600 text-xs">Zum Zoomen + / −</span>
+      </div>
+    </div>
+  );
+}
+
 function AssetDetailView({asset,onBack}){
+  const [showSchaltplan,setShowSchaltplan]=React.useState(false);
   const hydraulikPct=Math.round((asset.hydraulikDruck/asset.hydraulikMax)*100);
   const uvvDays=daysUntil(asset.naechsteUVV);
   const uvvUrgent=uvvDays<30;
@@ -600,8 +849,17 @@ function AssetDetailView({asset,onBack}){
         <div>
           <div className="text-gray-500 text-xs uppercase tracking-widest mb-3 font-semibold">Aktionen</div>
           <div className="space-y-2">
+            {/* Schaltplan — mit Fehler-Badge wenn Status FEHLER */}
+            <button onClick={()=>setShowSchaltplan(true)} className="btn-press w-full flex items-center gap-4 px-4 border rounded-2xl transition-all text-left bg-[#2979FF]/8 hover:bg-[#2979FF]/15 border-[#2979FF]/20" style={{minHeight:'64px',background:'rgba(255,255,255,0.02)'}}>
+              <div className="flex-shrink-0 text-[#60a5fa]"><IconFileText size={22}/></div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm text-[#60a5fa]">Schaltplan öffnen</div>
+                <div className="text-gray-600 text-xs mt-0.5">{asset.status==='FEHLER'?'⚠ Fehlerbereich markiert · Rev. 03/2026':'Rev. 03/2026 · Alle Systeme'}</div>
+              </div>
+              {asset.status==='FEHLER'&&<span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 flex-shrink-0">FEHLER</span>}
+              <IconChevLeft size={16} cls="text-gray-600 rotate-180 flex-shrink-0"/>
+            </button>
             {[
-              {icon:<IconFileText size={22}/>, label:'Schaltplan öffnen', sub:'PDF · Letztes Update 03/2026', color:'text-[#60a5fa]', bg:'bg-[#2979FF]/8 hover:bg-[#2979FF]/15 border-[#2979FF]/20'},
               {icon:<IconWrench size={22}/>, label:'Wartungshistorie', sub:`${asset.betriebsstunden.toLocaleString('de-DE')} Std. · Letzte: ${new Date(asset.letzteWartung).toLocaleDateString('de-DE')}`, color:'text-amber-400', bg:'bg-amber-500/8 hover:bg-amber-500/15 border-amber-500/20'},
               {icon:<IconBox size={22}/>, label:'Ersatzteil-Katalog', sub:'Kompatible Teile anzeigen', color:'text-purple-400', bg:'bg-purple-500/8 hover:bg-purple-500/15 border-purple-500/20'},
             ].map(({icon,label,sub,color,bg})=>(
@@ -619,6 +877,7 @@ function AssetDetailView({asset,onBack}){
 
       </div>
     </div>
+    {showSchaltplan&&<SchaltplanModal asset={asset} onClose={()=>setShowSchaltplan(false)}/>}
   );
 }
 
