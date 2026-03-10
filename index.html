@@ -646,46 +646,88 @@ header{
 .d-admin-topbar .d-page-title{font-size:20px;font-weight:800;color:var(--text);}
 .d-admin-topbar .d-page-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 
-/* ===== ADMIN REAL-TIME DASHBOARD ===== */
-.admin-dashboard-wrapper{display:none;}
-.adm-header{padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;}
-.adm-title{font-size:20px;font-weight:800;color:var(--text);}
-.adm-sub{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;align-items:center;gap:6px;}
-.adm-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0;}
-.adm-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px 0;}
-.adm-kpi{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
-.adm-kpi:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow-md);}
-.adm-kpi-val{font-size:30px;font-weight:900;line-height:1;color:var(--text);}
-.adm-kpi-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-top:5px;text-transform:uppercase;letter-spacing:.4px;}
-.adm-kpi-icon{position:absolute;right:14px;top:12px;font-size:22px;opacity:.4;}
-.adm-kpi.crit{border-left:3px solid var(--red);}.adm-kpi.crit .adm-kpi-val{color:var(--red);}
-.adm-kpi.warn{border-left:3px solid var(--warning);}.adm-kpi.warn .adm-kpi-val{color:var(--warning);}
-.adm-kpi.ok{border-left:3px solid var(--green);}
-.adm-kpi.info{border-left:3px solid var(--accent);}
-.adm-body{display:grid;grid-template-columns:1fr 300px;gap:14px;padding:14px 24px 24px;}
-.adm-section{background:#fff;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
-.adm-section-header{padding:13px 16px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.adm-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text);}
-.adm-section-badge{font-size:11px;font-weight:700;background:var(--accent-lt);color:var(--accent);padding:2px 8px;border-radius:10px;}
-.adm-wo-row{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .12s;}
+/* ===== ADMIN REAL-TIME DASHBOARD — Premium ===== */
+.admin-dashboard-wrapper{display:none;flex-direction:column;height:calc(100vh - var(--hdr-h));overflow:hidden;}
+/* dark header */
+.adm-header{background:linear-gradient(135deg,var(--primary-dk) 0%,var(--primary) 100%);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.adm-header-left{}
+.adm-label{font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;}
+.adm-clock{font-size:32px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-1px;}
+.adm-statusline{font-size:11px;color:rgba(255,255,255,.45);margin-top:5px;display:flex;align-items:center;gap:7px;}
+.adm-live-dot{width:6px;height:6px;border-radius:50%;background:#4CAF50;box-shadow:0 0 7px rgba(76,175,80,.7);flex-shrink:0;animation:pulse 1.5s ease-in-out infinite;}
+.adm-header-right{text-align:right;}
+.adm-date{font-size:13px;font-weight:700;color:rgba(255,255,255,.75);}
+.adm-user{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;}
+/* KPI strip */
+.adm-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;}
+.adm-kpi{padding:14px 20px 13px;cursor:pointer;transition:background .12s;border-right:1px solid var(--border);position:relative;}
+.adm-kpi:last-child{border-right:none;}
+.adm-kpi:hover{background:var(--bg);}
+.adm-kpi-bar{height:2px;border-radius:1px;margin-bottom:10px;}
+.adm-kpi.info .adm-kpi-bar{background:var(--accent);}
+.adm-kpi.ok .adm-kpi-bar{background:var(--green);}
+.adm-kpi.warn .adm-kpi-bar{background:var(--warning);}
+.adm-kpi.crit .adm-kpi-bar{background:var(--red);}
+.adm-kpi-val{font-size:24px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;line-height:1;}
+.adm-kpi.crit .adm-kpi-val{color:var(--red);}
+.adm-kpi.warn .adm-kpi-val{color:var(--warning);}
+.adm-kpi.ok .adm-kpi-val{color:var(--green);}
+.adm-kpi.info .adm-kpi-val{color:var(--accent);}
+.adm-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-top:4px;}
+/* body */
+.adm-body{display:grid;grid-template-columns:1fr 256px;flex:1;overflow:hidden;}
+.adm-col-main{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.adm-col-side{display:flex;flex-direction:column;overflow:hidden;}
+/* section header */
+.adm-sec-hdr{padding:8px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;}
+.adm-sec-title{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);}
+.adm-sec-count{font-size:10px;font-weight:700;color:var(--accent);}
+/* work order table */
+.adm-wo-table{flex:1;overflow-y:auto;}
+.adm-wo-thead{display:grid;grid-template-columns:10px 1fr 88px 24px 62px;align-items:center;gap:0;padding:0 14px;height:28px;background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;}
+.adm-wo-thead span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);}
+.adm-wo-row{display:grid;grid-template-columns:10px 1fr 88px 24px 62px;align-items:center;gap:0;padding:0 14px;height:38px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .08s;}
 .adm-wo-row:last-child{border-bottom:none;}
-.adm-wo-row:hover{background:var(--bg);}
-.adm-wo-icon{width:34px;height:34px;border-radius:9px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.adm-wo-body{flex:1;min-width:0;}
-.adm-wo-title{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.adm-wo-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
-.adm-tech-row{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.adm-wo-row:hover{background:var(--accent-lt);}
+.adm-wo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.adm-wo-dot.CRITICAL{background:#7B1FA2;}
+.adm-wo-dot.HIGH{background:var(--red);}
+.adm-wo-dot.MEDIUM{background:var(--accent);}
+.adm-wo-dot.LOW{background:var(--border);}
+.adm-wo-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px;}
+.adm-wo-machine{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px;}
+.adm-wo-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;}
+.adm-wo-chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-align:center;white-space:nowrap;}
+.adm-wo-chip.OPEN{background:var(--accent-lt);color:var(--accent);}
+.adm-wo-chip.IN_PROGRESS{background:var(--warn-bg);color:var(--warning);}
+.adm-wo-chip.COMPLETED{background:var(--green-bg);color:var(--green);}
+/* tech + asset side panels */
+.adm-side-panel{display:flex;flex-direction:column;overflow:hidden;border-bottom:1px solid var(--border);}
+.adm-side-panel:last-child{border-bottom:none;flex:1;}
+.adm-side-scroll{overflow-y:auto;}
+.adm-tech-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border);}
 .adm-tech-row:last-child{border-bottom:none;}
-.adm-tech-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
-.adm-tech-body{flex:1;min-width:0;}
-.adm-tech-name{font-size:13px;font-weight:700;color:var(--text);}
-.adm-tech-rolle{font-size:11px;color:var(--text-muted);margin-top:1px;}
-.adm-tech-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
-.adm-tech-badge.im-einsatz{background:var(--green-bg);color:var(--green);}
-.adm-tech-badge.verfuegbar{background:var(--accent-lt);color:var(--accent);}
-.adm-tech-badge.off{background:var(--bg3);color:var(--text-muted);}
-.adm-update-bar{padding:7px 24px 16px;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text-muted);}
-.adm-asset-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;flex-shrink:0;}
+.adm-tech-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;}
+.adm-tech-name{font-size:12px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm-tech-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.adm-tech-dot.im-einsatz{background:var(--green);box-shadow:0 0 5px rgba(46,125,50,.45);}
+.adm-tech-dot.verfuegbar{background:var(--accent);}
+.adm-tech-dot.off{background:var(--border);}
+.adm-tech-lbl{font-size:9px;font-weight:700;color:var(--text-muted);}
+.adm-asset-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.adm-asset-row:last-child{border-bottom:none;}
+.adm-asset-row:hover{background:var(--bg);}
+.adm-asset-bar{width:3px;height:24px;border-radius:2px;flex-shrink:0;}
+.adm-asset-bar.err{background:var(--red);}
+.adm-asset-bar.mnt{background:var(--warning);}
+.adm-asset-bar.ok{background:var(--green);}
+.adm-asset-name{font-size:12px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.adm-asset-code{font-size:9px;font-weight:700;font-variant-numeric:tabular-nums;font-family:'Courier New',monospace;white-space:nowrap;}
+.adm-asset-code.err{color:var(--red);}
+.adm-asset-code.mnt{color:var(--warning);}
+.adm-asset-code.ok{color:var(--green);}
+/* footer */
+.adm-footer{display:flex;align-items:center;gap:7px;padding:6px 14px;background:var(--bg);border-top:1px solid var(--border);font-size:10px;color:var(--text-muted);flex-shrink:0;}
 
 /* ===== GREETING BAR ===== */
 .greeting-bar{padding:20px 18px 0;}
@@ -2646,7 +2688,7 @@ nav.bottom-nav{
   .scan-section{display:none;}
   .d-stats-bar{display:block;padding:24px 24px 0;}
   .d-admin-topbar{display:block;padding:20px 24px 0;}
-  body.role-service-leader .admin-dashboard-wrapper{display:block;}
+  body.role-service-leader .admin-dashboard-wrapper{display:flex;}
   .d-feed{display:block;}
   .serial-search-section{display:block;padding:20px 24px 0;}
   .machines-section{padding:20px 24px 0;}
@@ -9064,120 +9106,120 @@ function renderAdminDashboard() {
   if (!el) return;
 
   var now = new Date();
-  var pad = function(n) { return n < 10 ? '0' + n : '' + n; };
-  var timeStr = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+  var pad = function(n){ return n < 10 ? '0' + n : '' + n; };
+  var clock = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  var secs  = pad(now.getSeconds());
+  var days  = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  var months= ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  var dateStr = days[now.getDay()] + ', ' + now.getDate() + '. ' + months[now.getMonth()] + ' ' + now.getFullYear();
 
   var machines = Object.entries(MACHINES);
-  var errMachines = machines.filter(function(e){ return e[1].status === 'err'; });
-  var mntMachines = machines.filter(function(e){ return e[1].status === 'mnt'; });
-  var wos = Object.values(WORK_ORDERS_DB);
-  var activeWos = wos.filter(function(wo){ return wo.status !== 'COMPLETED'; });
+  var errM = machines.filter(function(e){ return e[1].status==='err'; });
+  var wos  = Object.values(WORK_ORDERS_DB);
+  var activeWos = wos.filter(function(wo){ return wo.status!=='COMPLETED'; });
   var techs = Object.entries(MONTEURE_DB);
-  var techsOnDuty = techs.filter(function(e){ return e[1].status === 'im-einsatz'; });
-  var sortedWos = wos.slice().sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); }).slice(0,7);
+  var onDuty = techs.filter(function(e){ return e[1].status==='im-einsatz'; });
+  var sortedWos = wos.slice().sort(function(a,b){ return new Date(b.createdAt)-new Date(a.createdAt); });
 
-  var woPriColors = { CRITICAL:'var(--red)', HIGH:'var(--warning)', MEDIUM:'var(--accent)', LOW:'var(--text-muted)' };
-  var woStatusColors = { OPEN:'var(--accent)', IN_PROGRESS:'var(--warning)', COMPLETED:'var(--green)' };
+  var kpiWo  = activeWos.length > 0 ? 'warn' : 'ok';
+  var kpiErr = errM.length > 0 ? 'crit' : 'ok';
 
   var html = '';
 
-  // Header
+  // ── Header ──────────────────────────────────────
   html += '<div class="adm-header">' +
-    '<div><div class="adm-title">Dashboard</div>' +
-    '<div class="adm-sub"><div class="adm-live-dot"></div>Echtzeit-Übersicht &middot; Stand: ' + timeStr + '</div></div>' +
+    '<div class="adm-header-left">' +
+      '<div class="adm-label">AssetLogic · Echtzeit-Dashboard</div>' +
+      '<div class="adm-clock">' + clock + '<span style="font-size:18px;opacity:.5;font-weight:400">:' + secs + '</span></div>' +
+      '<div class="adm-statusline"><div class="adm-live-dot"></div>Live &middot; ERP aktiv &middot; Auto-Refresh 30s</div>' +
+    '</div>' +
+    '<div class="adm-header-right">' +
+      '<div class="adm-date">' + dateStr + '</div>' +
+      '<div class="adm-user">' + (CURRENT_USER ? _esc(CURRENT_USER.name) : '') + ' &middot; Service-Leiter</div>' +
+    '</div>' +
     '</div>';
 
-  // KPI row
-  var kpiErr = errMachines.length > 0 ? 'crit' : 'ok';
-  var kpiWo  = activeWos.length > 0 ? 'warn' : 'ok';
-  html += '<div class="adm-kpi-row">' +
-    _admKpi(machines.length, 'Assets gesamt', '📦', 'info', "setDNav(document.getElementById('dnav-assets'),'assets')") +
-    _admKpi(activeWos.length, 'Aktive Aufträge', '📋', kpiWo, "setDNav(document.getElementById('dnav-auftraege'),'auftraege')") +
-    _admKpi(errMachines.length, 'Aktive Fehler', '🔴', kpiErr, '') +
-    _admKpi(techsOnDuty.length + ' / ' + techs.length, 'Techniker im Einsatz', '👷', 'info', "setDNav(document.getElementById('dnav-technikerliste'),'technikerliste')") +
+  // ── KPI strip ────────────────────────────────────
+  html += '<div class="adm-kpi-strip">' +
+    _admKpi(machines.length,   'Assets gesamt',         'info', "setDNav(document.getElementById('dnav-assets'),'assets')") +
+    _admKpi(activeWos.length,  'Aktive Aufträge',        kpiWo, "setDNav(document.getElementById('dnav-auftraege'),'auftraege')") +
+    _admKpi(errM.length,       'Aktive Fehler',          kpiErr,'') +
+    _admKpi(onDuty.length+' / '+techs.length, 'Im Einsatz', 'info', "setDNav(document.getElementById('dnav-technikerliste'),'technikerliste')") +
     '</div>';
 
-  // Body
+  // ── Body ─────────────────────────────────────────
   html += '<div class="adm-body">';
 
-  // Left: Work Orders
-  html += '<div class="adm-section"><div class="adm-section-header">' +
-    '<div class="adm-section-title">Aktuelle Aufträge</div>' +
-    '<span class="adm-section-badge">' + wos.length + ' gesamt</span>' +
-    '</div>';
-  if (sortedWos.length === 0) {
-    html += '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">Keine Aufträge vorhanden</div>';
-  } else {
+  // Main: Aufträge
+  html += '<div class="adm-col-main">' +
+    '<div class="adm-sec-hdr"><span class="adm-sec-title">Aufträge</span><span class="adm-sec-count">' + sortedWos.length + ' gesamt</span></div>' +
+    '<div class="adm-wo-table">';
+  if (sortedWos.length > 0) {
+    // column headers
+    html += '<div class="adm-wo-thead">' +
+      '<span></span><span>Titel</span><span>Maschine</span><span></span><span>Status</span>' +
+      '</div>';
     sortedWos.forEach(function(wo) {
       var m = MACHINES[wo.assetId];
       var t = MONTEURE_DB[wo.technicianId];
-      var icon = (m && MACHINE_ICONS[m.type]) ? MACHINE_ICONS[m.type] : '🔧';
+      var tGrad = t ? t.grad : 'var(--border)';
+      var tInit = t ? t.initials : '?';
       html += '<div class="adm-wo-row" onclick="setDNav(document.getElementById(\'dnav-auftraege\'),\'auftraege\')">' +
-        '<div class="adm-wo-icon">' + icon + '</div>' +
-        '<div class="adm-wo-body">' +
-          '<div class="adm-wo-title">' + _esc(wo.title) + '</div>' +
-          '<div class="adm-wo-meta">' + _esc(m ? m.name : wo.assetId) + ' &middot; ' + _esc(t ? t.name : wo.technicianId) + '</div>' +
-        '</div>' +
-        '<div style="text-align:right;flex-shrink:0;">' +
-          '<div style="font-size:10px;font-weight:700;color:' + (woStatusColors[wo.status]||'var(--text-muted)') + ';">' + (WO_STATUS_LABEL[wo.status]||wo.status) + '</div>' +
-          '<div style="font-size:10px;color:' + (woPriColors[wo.priority]||'var(--text-muted)') + ';margin-top:2px;">' + (WO_PRIORITY_LABEL[wo.priority]||wo.priority) + '</div>' +
-        '</div>' +
+        '<div class="adm-wo-dot ' + wo.priority + '"></div>' +
+        '<div class="adm-wo-name">' + _esc(wo.title) + '</div>' +
+        '<div class="adm-wo-machine">' + _esc(m ? m.name : wo.assetId) + '</div>' +
+        '<div class="adm-wo-av" style="background:' + tGrad + '">' + _esc(tInit) + '</div>' +
+        '<div><span class="adm-wo-chip ' + wo.status + '">' + (WO_STATUS_LABEL[wo.status]||wo.status) + '</span></div>' +
         '</div>';
     });
+  } else {
+    html += '<div style="padding:20px;text-align:center;font-size:12px;color:var(--text-muted);">Keine Aufträge</div>';
   }
-  html += '</div>';
+  html += '</div></div>'; // adm-wo-table + adm-col-main
 
-  // Right column
-  html += '<div style="display:flex;flex-direction:column;gap:14px;">';
+  // Side column
+  html += '<div class="adm-col-side">';
 
-  // Technician status
-  html += '<div class="adm-section"><div class="adm-section-header">' +
-    '<div class="adm-section-title">Techniker</div>' +
-    '<span class="adm-section-badge">' + techsOnDuty.length + ' im Einsatz</span>' +
-    '</div>';
+  // Techniker
+  html += '<div class="adm-side-panel">' +
+    '<div class="adm-sec-hdr"><span class="adm-sec-title">Techniker</span><span class="adm-sec-count">' + onDuty.length + ' im Einsatz</span></div>' +
+    '<div class="adm-side-scroll">';
   techs.forEach(function(entry) {
     var t = entry[1];
-    var badgeCls = t.status === 'im-einsatz' ? 'im-einsatz' : (t.status === 'verfuegbar' ? 'verfuegbar' : 'off');
-    var badgeLbl = t.status === 'im-einsatz' ? 'Im Einsatz' : (t.status === 'verfuegbar' ? 'Verfügbar' : 'Offline');
+    var dotCls = t.status === 'im-einsatz' ? 'im-einsatz' : (t.status === 'verfuegbar' ? 'verfuegbar' : 'off');
+    var lbl = t.status === 'im-einsatz' ? 'Einsatz' : (t.status === 'verfuegbar' ? 'Frei' : 'Offline');
     html += '<div class="adm-tech-row">' +
-      '<div class="adm-tech-avatar" style="background:' + t.grad + '">' + _esc(t.initials) + '</div>' +
-      '<div class="adm-tech-body"><div class="adm-tech-name">' + _esc(t.name) + '</div>' +
-      '<div class="adm-tech-rolle">' + _esc(t.rolle) + '</div></div>' +
-      '<span class="adm-tech-badge ' + badgeCls + '">' + badgeLbl + '</span>' +
+      '<div class="adm-tech-av" style="background:' + t.grad + '">' + _esc(t.initials) + '</div>' +
+      '<div class="adm-tech-name">' + _esc(t.name) + '</div>' +
+      '<span class="adm-tech-lbl">' + lbl + '</span>' +
+      '<div class="adm-tech-dot ' + dotCls + '"></div>' +
       '</div>';
   });
-  html += '</div>';
+  html += '</div></div>'; // adm-side-scroll + adm-side-panel
 
-  // Asset health
-  html += '<div class="adm-section"><div class="adm-section-header">' +
-    '<div class="adm-section-title">Asset-Status</div>' +
-    '<span class="adm-section-badge">' + machines.length + ' Assets</span>' +
-    '</div>';
+  // Assets
+  html += '<div class="adm-side-panel">' +
+    '<div class="adm-sec-hdr"><span class="adm-sec-title">Asset-Status</span><span class="adm-sec-count">' + machines.length + ' Assets</span></div>' +
+    '<div class="adm-side-scroll">';
   machines.forEach(function(entry) {
     var id = entry[0], m = entry[1];
-    var icon = MACHINE_ICONS[m.type] || '🔧';
-    var statusDot = m.status === 'err' ? '🔴' : (m.status === 'mnt' ? '🟡' : '🟢');
-    var statusTxt = m.status === 'err' ? (m.activeCode || 'Fehler') : (m.status === 'mnt' ? 'Wartung fällig' : 'OK');
-    html += '<div class="adm-wo-row" onclick="openMachine(\'' + _esc(id) + '\')">' +
-      '<div class="adm-wo-icon">' + icon + '</div>' +
-      '<div class="adm-wo-body">' +
-        '<div class="adm-wo-title">' + _esc(m.name) + '</div>' +
-        '<div class="adm-wo-meta">' + _esc(m.location) + '</div>' +
-      '</div>' +
-      '<div class="adm-asset-status">' + statusDot + ' <span>' + _esc(statusTxt) + '</span></div>' +
+    var codeTxt = m.status === 'err' ? (m.activeCode||'FEHLER') : (m.status === 'mnt' ? 'WARTUNG' : 'OK');
+    html += '<div class="adm-asset-row" onclick="openMachine(\'' + _esc(id) + '\')">' +
+      '<div class="adm-asset-bar ' + m.status + '"></div>' +
+      '<div class="adm-asset-name">' + _esc(m.name) + '</div>' +
+      '<div class="adm-asset-code ' + m.status + '">' + codeTxt + '</div>' +
       '</div>';
   });
-  html += '</div>';
+  html += '</div></div>'; // adm-side-scroll + adm-side-panel
 
-  html += '</div>'; // end right col
-  html += '</div>'; // end adm-body
+  html += '</div>'; // adm-col-side
+  html += '</div>'; // adm-body
 
-  // Update bar
-  html += '<div class="adm-update-bar"><div class="adm-live-dot"></div>Auto-Refresh alle 30 s &middot; Zuletzt: ' + timeStr + '</div>';
+  // Footer
+  html += '<div class="adm-footer"><div class="adm-live-dot"></div>Zuletzt aktualisiert: ' + clock + ':' + secs + '</div>';
 
   el.innerHTML = html;
 
-  // Start auto-refresh
   if (!_dashInterval) {
     _dashInterval = setInterval(function() {
       var ap = document.querySelector('.page.active');
@@ -9188,9 +9230,9 @@ function renderAdminDashboard() {
   }
 }
 
-function _admKpi(val, label, icon, cls, onclick) {
+function _admKpi(val, label, cls, onclick) {
   return '<div class="adm-kpi ' + cls + '"' + (onclick ? ' onclick="' + onclick + '"' : '') + '>' +
-    '<div class="adm-kpi-icon">' + icon + '</div>' +
+    '<div class="adm-kpi-bar"></div>' +
     '<div class="adm-kpi-val">' + val + '</div>' +
     '<div class="adm-kpi-label">' + label + '</div>' +
     '</div>';
