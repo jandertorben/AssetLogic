@@ -1,1297 +1,747 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AssetLogic — Asset Management</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            sidebar: '#0d0e12',
-            surface: '#141519',
-            base: '#0f1115',
-            border: '#1f2128',
-            accent: '#6366f1',
-            'accent-dim': '#4f46e5',
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          }
-        }
-      }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>AssetLogic — Asset Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        mob: { bg:'#0d0d0d', card:'#1a1a1a', border:'#2a2a2a', blue:'#2979FF', 'blue-glow':'rgba(41,121,255,0.35)' },
+        desk: { sidebar:'#0d0e12', surface:'#141519', base:'#0f1115', border:'#1f2128', accent:'#6366f1', 'accent-dim':'#4f46e5' }
+      },
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+      borderRadius: { '2xl':'16px', '3xl':'24px' }
     }
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    * { box-sizing: border-box; }
-    body { background: #0f1115; font-family: 'Inter', system-ui, sans-serif; }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #0f1115; }
-    ::-webkit-scrollbar-thumb { background: #1f2128; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #2d2f3a; }
-
-    /* Placeholder color */
-    ::placeholder { color: #4b5563; }
-
-    /* Smooth transitions */
-    .nav-item { transition: color 0.15s, background 0.15s, border-color 0.15s; }
-    .page { transition: opacity 0.1s; }
-
-    /* Input select fix */
-    select option { background: #141519; color: #e5e7eb; }
-  </style>
+  }
+}
+</script>
+<style>
+*{box-sizing:border-box;}
+body{background:#0d0d0d;font-family:'Inter',sans-serif;margin:0;}
+.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px;}
+::placeholder{color:#555;}
+@keyframes scan-pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(41,121,255,0.4);}50%{opacity:0.7;box-shadow:0 0 0 12px rgba(41,121,255,0);}}
+.scan-frame{animation:scan-pulse 1.5s ease-in-out infinite;}
+@keyframes scan-line-anim{0%{top:10%;}100%{top:90%;}}
+.scan-line-el{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,#2979FF,transparent);animation:scan-line-anim 1.5s ease-in-out infinite alternate;box-shadow:0 0 10px #2979FF;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+.page-enter{animation:slideInRight 0.25s ease-out forwards;}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+.fade-in{animation:fadeIn 0.3s ease-out forwards;}
+@keyframes checkPop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+.check-pop{animation:checkPop 0.4s ease-out forwards;}
+.btn-press:active{transform:scale(0.97);}
+select option{background:#1a1a1a;color:#fff;}
+.toggle-track{transition:background 0.2s;}
+</style>
 </head>
-<body class="bg-base text-gray-100 antialiased">
+<body>
+<div id="root"></div>
+<script type="text/babel">
 
-  <!-- LOGIN SCREEN -->
-  <div id="login-screen" class="min-h-screen bg-base flex items-center justify-center px-4">
-    <div class="w-full max-w-sm bg-surface border border-border rounded-2xl p-8">
-      <!-- Logo -->
-      <div class="flex items-center gap-3 mb-8">
-        <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="2" y="2" width="7" height="7" rx="1" fill="#0f1115"/>
-            <rect x="11" y="2" width="7" height="7" rx="1" fill="#0f1115"/>
-            <rect x="2" y="11" width="7" height="7" rx="1" fill="#0f1115"/>
-            <rect x="11" y="11" width="7" height="7" rx="1" fill="#6366f1"/>
-          </svg>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const USERS_DB = [
+  {id:1,name:'Marco Köhler',   email:'m.koehler@betrieb.de', password:'demo',role:'TECHNIKER',    initials:'MK',techId:'mo-001'},
+  {id:2,name:'Stefan Baumann', email:'s.baumann@betrieb.de', password:'demo',role:'SERVICELEITER',initials:'SB',techId:null},
+  {id:3,name:'Anna Richter',   email:'a.richter@betrieb.de', password:'demo',role:'ADMIN',        initials:'AR',techId:null},
+  {id:4,name:'Thomas Voss',    email:'t.voss@betrieb.de',    password:'demo',role:'CEO',           initials:'TV',techId:null},
+];
+const WORK_ORDERS_INITIAL = [
+  {id:'WO-2024',title:'Hydraulikinspektion', asset:'Liebherr R 920',  techId:'mo-001',status:'OFFEN',         priority:'KRITISCH',desc:'Hydraulikdruck unter Grenzwert. Sofortinspektion erforderlich.'},
+  {id:'WO-2023',title:'Ölwechsel',           asset:'CAT 320 Bagger',  techId:'mo-001',status:'IN_BEARBEITUNG',priority:'MITTEL',  desc:'Planmäßiger Ölwechsel nach 500 Betriebsstunden.'},
+  {id:'WO-2022',title:'Jahresinspektion',    asset:'STILL RX 20-20',  techId:'mo-002',status:'OFFEN',         priority:'NIEDRIG', desc:'Jährliche Sicherheits- und Funktionsprüfung.'},
+  {id:'WO-2021',title:'Bremsinspektion',     asset:'Toyota 8FBN25',   techId:'mo-002',status:'ABGESCHLOSSEN', priority:'HOCH',    desc:'Bremsbeläge kontrolliert und erneuert.'},
+  {id:'WO-2020',title:'Reifenwechsel',       asset:'Komatsu WA 380',  techId:'mo-003',status:'ABGESCHLOSSEN', priority:'NIEDRIG', desc:'Alle 4 Reifen gewechselt.'},
+];
+const ASSETS_DB = [
+  {id:'STILL-001',name:'STILL RX 20-20',       type:'Gabelstapler',  location:'Halle A · Pos. 3', status:'OK',     lastEvent:'Normalbetrieb',          uptime:96},
+  {id:'LB-920',   name:'Liebherr R 920',        type:'Kettenbagger',  location:'Außengelände Ost', status:'FEHLER', lastEvent:'Hydraulikdruck kritisch', uptime:34},
+  {id:'CAT-320',  name:'CAT 320 Bagger',        type:'Kettenbagger',  location:'Halle B · Linie 2',status:'WARTUNG',lastEvent:'Ölwechsel fällig',        uptime:78},
+  {id:'HP-500',   name:'Hydraulikpresse HP-500',type:'Presse',        location:'Halle B · Pos. 8', status:'OK',     lastEvent:'Normalbetrieb',          uptime:91},
+  {id:'KPD-200',  name:'Kompressor KPD-200',    type:'Kompressor',    location:'Außenlager Nord',  status:'OK',     lastEvent:'Normalbetrieb',          uptime:88},
+];
+const TECHNIKER_DB = [
+  {id:'mo-001',name:'Marco Köhler',  role:'Techniker Sr.',  status:'AKTIV',   assignment:'CAT 320 Bagger'},
+  {id:'mo-002',name:'Jana Wolf',     role:'Techniker',      status:'AKTIV',   assignment:'Liebherr R 920'},
+  {id:'mo-003',name:'Dirk Müller',   role:'Techniker Sr.',  status:'PAUSE',   assignment:'–'},
+  {id:'mo-004',name:'Lisa Tran',     role:'Techniker',      status:'FREI',    assignment:'–'},
+  {id:'mo-005',name:'Ben Schmidt',   role:'Azubi',          status:'AKTIV',   assignment:'STILL RX 20-20'},
+  {id:'mo-006',name:'Petra Klein',   role:'Techniker',      status:'OFFLINE', assignment:'–'},
+];
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function isMobileDevice(){return window.innerWidth<768||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);}
+function greetingText(){const h=new Date().getHours();if(h<12)return'Guten Morgen,';if(h<18)return'Guten Tag,';return'Guten Abend,';}
+function getRoleLabel(r){return{TECHNIKER:'Techniker',SERVICELEITER:'Serviceleiter',ADMIN:'Admin',CEO:'CEO'}[r]||r;}
+function getRoleColor(r){return{TECHNIKER:'bg-blue-500/20 text-blue-400 border border-blue-500/30',SERVICELEITER:'bg-purple-500/20 text-purple-400 border border-purple-500/30',ADMIN:'bg-amber-500/20 text-amber-400 border border-amber-500/30',CEO:'bg-red-500/20 text-red-400 border border-red-500/30'}[r]||'';}
+function getPrioLeftBorder(p){return{KRITISCH:'border-l-red-500',HOCH:'border-l-amber-500',MITTEL:'border-l-yellow-500',NIEDRIG:'border-l-gray-500'}[p]||'border-l-gray-500';}
+function getPrioBadge(p){return{KRITISCH:'bg-red-500/20 text-red-400',HOCH:'bg-amber-500/20 text-amber-400',MITTEL:'bg-yellow-500/20 text-yellow-400',NIEDRIG:'bg-gray-500/20 text-gray-400'}[p]||'bg-gray-500/20 text-gray-400';}
+function getStatusBadge(s){return{OFFEN:'bg-blue-500/20 text-blue-400',IN_BEARBEITUNG:'bg-amber-500/20 text-amber-400',ABGESCHLOSSEN:'bg-green-500/20 text-green-400'}[s]||'bg-gray-500/20 text-gray-400';}
+function getAssetStatusColor(s){return{OK:'bg-green-500/20 text-green-400',FEHLER:'bg-red-500/20 text-red-400',WARTUNG:'bg-amber-500/20 text-amber-400'}[s]||'bg-gray-500/20 text-gray-400';}
+function getTechStatusColor(s){return{AKTIV:'bg-green-500/20 text-green-400',PAUSE:'bg-amber-500/20 text-amber-400',FREI:'bg-blue-500/20 text-blue-400',OFFLINE:'bg-gray-500/20 text-gray-400'}[s]||'bg-gray-500/20 text-gray-400';}
+
+// ── ICONS ─────────────────────────────────────────────────────────────────────
+const IconQR = ({size=24,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3v3m0-6h-3v3m6 3v.01M14 3v.01M14 8v3h3M14 14h.01M17 14h4"/></svg>;
+const IconClipboard = ({size=22,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>;
+const IconUser = ({size=22,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+const IconGrid = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>;
+const IconCube = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>;
+const IconUsers = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+const IconBell = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
+const IconGear = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
+const IconSearch = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
+const IconX = ({size=20}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+
+const LogoIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="6" fill="#fff"/>
+    <rect x="3" y="3" width="12" height="12" rx="2" fill="#222"/>
+    <rect x="17" y="3" width="12" height="12" rx="2" fill="#222"/>
+    <rect x="3" y="17" width="12" height="12" rx="2" fill="#222"/>
+    <rect x="17" y="17" width="12" height="12" rx="2" fill="#2979FF"/>
+  </svg>
+);
+
+// ── LOGIN SCREEN ──────────────────────────────────────────────────────────────
+function LoginScreen({onLogin}){
+  const [email,setEmail]=React.useState('');
+  const [pw,setPw]=React.useState('');
+  const [err,setErr]=React.useState('');
+  function submit(e){
+    e.preventDefault();
+    const u=USERS_DB.find(x=>x.email===email.trim()&&x.password===pw);
+    if(u){onLogin(u);}else{setErr('E-Mail oder Passwort falsch.');}
+  }
+  return(
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0d] px-4">
+      <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-8 w-full max-w-sm fade-in">
+        <div className="flex flex-col items-center mb-8">
+          <LogoIcon/>
+          <div className="mt-3 text-white font-bold tracking-widest text-lg">ASSETLOGIC</div>
+          <div className="text-gray-500 text-xs mt-1">Asset Management Platform</div>
         </div>
-        <div>
-          <div class="text-white font-bold text-sm tracking-widest">ASSETLOGIC</div>
-          <div class="text-gray-500 text-xs">Asset Management</div>
-        </div>
+        <form onSubmit={submit} className="space-y-4">
+          <input value={email} onChange={e=>{setEmail(e.target.value);setErr('');}} type="email" placeholder="E-Mail" autoComplete="username"
+            className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#2979FF] focus:ring-1 focus:ring-[#2979FF]/30"/>
+          <input value={pw} onChange={e=>{setPw(e.target.value);setErr('');}} type="password" placeholder="Passwort" autoComplete="current-password"
+            className="w-full bg-[#111] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#2979FF] focus:ring-1 focus:ring-[#2979FF]/30"/>
+          {err&&<div className="text-red-400 text-sm">{err}</div>}
+          <button type="submit" className="btn-press bg-[#2979FF] hover:bg-blue-700 text-white rounded-xl py-3 font-semibold w-full transition-colors text-sm">
+            Anmelden
+          </button>
+        </form>
       </div>
-
-      <h2 class="text-gray-100 font-semibold text-lg mb-1">Anmelden</h2>
-      <p class="text-gray-500 text-sm mb-6">Bitte melden Sie sich an, um fortzufahren.</p>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-gray-400 text-xs font-medium mb-1.5">E-Mail</label>
-          <input
-            id="login-email"
-            type="email"
-            placeholder="s.baumann@betrieb.de"
-            class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-        </div>
-        <div>
-          <label class="block text-gray-400 text-xs font-medium mb-1.5">Passwort</label>
-          <input
-            id="login-pass"
-            type="password"
-            placeholder="••••••••"
-            class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent"
-            onkeydown="if(event.key==='Enter') doLogin()"
-          />
-        </div>
-        <button
-          onclick="doLogin()"
-          class="w-full bg-accent hover:bg-accent-dim text-white font-medium rounded-lg py-2.5 text-sm transition-colors mt-2"
-        >
-          Anmelden
-        </button>
-      </div>
-
-      <div class="mt-6 p-3 bg-base border border-border rounded-lg">
-        <p class="text-gray-500 text-xs font-medium mb-1">Demo-Zugangsdaten</p>
-        <p class="text-gray-400 text-xs">s.baumann@betrieb.de / demo</p>
+      <div className="mt-6 text-center text-gray-600 text-xs space-y-1">
+        <div className="text-gray-500 mb-2">Demo-Zugänge (Passwort: demo)</div>
+        {[['m.koehler@betrieb.de','Techniker'],['s.baumann@betrieb.de','Serviceleiter'],['a.richter@betrieb.de','Admin'],['t.voss@betrieb.de','CEO']].map(([e,r])=>
+          <div key={e}><span className="text-gray-400">{e}</span> → {r}</div>
+        )}
       </div>
     </div>
-  </div>
+  );
+}
 
-  <!-- MAIN APP -->
-  <div id="app" class="hidden flex min-h-screen">
-
-    <!-- SIDEBAR -->
-    <aside class="w-[220px] bg-sidebar fixed left-0 top-0 h-full flex flex-col z-10 border-r border-border">
-      <!-- Logo -->
-      <div class="px-5 py-5 border-b border-border">
-        <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 bg-white rounded-md flex items-center justify-center flex-shrink-0">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-              <rect x="2" y="2" width="7" height="7" rx="1" fill="#0f1115"/>
-              <rect x="11" y="2" width="7" height="7" rx="1" fill="#0f1115"/>
-              <rect x="2" y="11" width="7" height="7" rx="1" fill="#0f1115"/>
-              <rect x="11" y="11" width="7" height="7" rx="1" fill="#6366f1"/>
-            </svg>
+// ── SCAN MODAL ────────────────────────────────────────────────────────────────
+function ScanModal({onClose}){
+  const [phase,setPhase]=React.useState('scanning');
+  React.useEffect(()=>{const t=setTimeout(()=>setPhase('found'),2000);return()=>clearTimeout(t);},[]);
+  return(
+    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center">
+      {phase==='scanning'?(
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative w-56 h-56 scan-frame" style={{border:'2px solid rgba(41,121,255,0.3)',borderRadius:'12px'}}>
+            <div className="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-[#2979FF] rounded-tl-xl"/>
+            <div className="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-[#2979FF] rounded-tr-xl"/>
+            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-[#2979FF] rounded-bl-xl"/>
+            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-[#2979FF] rounded-br-xl"/>
+            <div className="scan-line-el"/>
           </div>
-          <span class="text-white font-bold text-xs tracking-widest">ASSETLOGIC</span>
+          <div className="text-gray-400 text-sm animate-pulse">Kamera wird gestartet…</div>
+        </div>
+      ):(
+        <div className="flex flex-col items-center gap-5 fade-in px-6 text-center">
+          <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center check-pop">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div className="text-white font-bold text-xl mb-1">Asset erkannt!</div>
+            <div className="text-gray-400 text-sm">Liebherr R 920</div>
+            <div className="text-gray-600 text-xs mt-1">ID: LB-920 · Außengelände Ost</div>
+          </div>
+          <div className="bg-amber-500/20 border border-amber-500/30 rounded-xl px-4 py-2 text-amber-400 text-sm">
+            Offener Auftrag: Hydraulikinspektion
+          </div>
+          <div className="flex gap-3 w-full">
+            <button onClick={onClose} className="btn-press flex-1 bg-[#2979FF] text-white font-semibold py-3 rounded-xl text-sm">Auftrag öffnen</button>
+            <button onClick={onClose} className="btn-press flex-1 border border-[#2a2a2a] text-gray-400 py-3 rounded-xl text-sm">Schließen</button>
+          </div>
+        </div>
+      )}
+      <button onClick={onClose} className="absolute top-6 right-6 text-gray-600 hover:text-gray-400"><IconX size={24}/></button>
+    </div>
+  );
+}
+
+// ── MOBILE HOME ───────────────────────────────────────────────────────────────
+function MobileHome({user,onScan}){
+  const elevated=['SERVICELEITER','ADMIN','CEO'].includes(user.role);
+  return(
+    <div className="page-enter">
+      <div className="px-5 pt-8 pb-4 border-b border-mob-border flex items-center justify-between">
+        <div>
+          <div className="text-gray-400 text-sm">{greetingText()}</div>
+          <div className="text-white text-xl font-bold">{user.name.split(' ')[0]}</div>
+        </div>
+        <span className={`text-xs font-medium px-3 py-1 rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
+      </div>
+      <div className="px-5 py-6 space-y-5">
+        {elevated&&(
+          <div className="grid grid-cols-3 gap-3">
+            {[['Aktive Fehler','3','text-red-400'],['Wartungen','7','text-amber-400'],['Techniker','2','text-green-400']].map(([l,v,c])=>(
+              <div key={l} className="bg-mob-card border border-mob-border rounded-2xl p-3 text-center">
+                <div className={`text-2xl font-bold ${c}`}>{v}</div>
+                <div className="text-gray-500 text-xs mt-1">{l}</div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div>
+          <div className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2">Seriennummer</div>
+          <input className="bg-[#222] border border-mob-border rounded-2xl px-4 py-4 text-white text-lg w-full focus:outline-none focus:border-mob-blue focus:ring-2 focus:ring-mob-blue/20" placeholder="z.B. CAT-320-001"/>
+        </div>
+        <button onClick={onScan} className="btn-press bg-[#2979FF] rounded-2xl w-full py-5 flex items-center justify-center gap-3 text-white font-bold text-lg tracking-wide transition-all duration-200"
+          style={{boxShadow:'0 0 30px rgba(41,121,255,0.4)'}}>
+          <IconQR size={24}/>
+          MASCHINE SCANNEN
+        </button>
+        <div>
+          <div className="text-gray-400 text-xs uppercase tracking-wider mb-3">Letzte Aktivität</div>
+          <div className="space-y-2">
+            {ASSETS_DB.slice(0,3).map(a=>(
+              <div key={a.id} className="bg-mob-card border border-mob-border rounded-2xl p-4 flex items-center gap-3">
+                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${a.status==='OK'?'bg-green-500':a.status==='FEHLER'?'bg-red-500':'bg-amber-500'}`}/>
+                <div className="flex-1 min-w-0">
+                  <div className="text-white text-sm font-medium truncate">{a.name}</div>
+                  <div className="text-gray-500 text-xs truncate">{a.lastEvent}</div>
+                </div>
+                <div className="text-gray-600 text-xs flex-shrink-0">Heute</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <!-- Nav -->
-      <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="dashboard" onclick="showPage('dashboard')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-          </svg>
-          Dashboard
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="assets" onclick="showPage('assets')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
-          </svg>
-          Assets
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="auftraege" onclick="showPage('auftraege')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-            <rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
-          </svg>
-          Aufträge
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="techniker" onclick="showPage('techniker')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          Techniker
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="news" onclick="showPage('news')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          News
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="einstellungen" onclick="showPage('einstellungen')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-          Einstellungen
-        </button>
-      </nav>
+// ── MOBILE AUFTRÄGE ───────────────────────────────────────────────────────────
+function MobileAuftraege({user,orders}){
+  const [filter,setFilter]=React.useState('Alle');
+  const tabs=['Alle','Offen','In Bearbeitung','Abgeschlossen'];
+  const myOrders=user.role==='TECHNIKER'?orders.filter(o=>o.techId===user.techId):orders;
+  const statusMap={'Offen':'OFFEN','In Bearbeitung':'IN_BEARBEITUNG','Abgeschlossen':'ABGESCHLOSSEN'};
+  const filtered=filter==='Alle'?myOrders:myOrders.filter(o=>o.status===statusMap[filter]);
+  return(
+    <div className="page-enter">
+      <div className="px-5 pt-8 pb-4 border-b border-mob-border">
+        <div className="text-white text-xl font-bold">{user.role==='TECHNIKER'?'Meine Aufträge':'Alle Aufträge'}</div>
+      </div>
+      <div className="px-5 pt-4">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {tabs.map(t=>(
+            <button key={t} onClick={()=>setFilter(t)} className={`flex-shrink-0 px-4 py-1.5 text-sm rounded-full transition-all ${filter===t?'bg-[#2979FF]/20 text-[#2979FF] border border-[#2979FF]/30':'text-gray-500'}`}>{t}</button>
+          ))}
+        </div>
+        <div className="mt-4 space-y-3 pb-28">
+          {filtered.length===0&&<div className="text-gray-600 text-sm text-center py-8">Keine Aufträge</div>}
+          {filtered.map(o=>(
+            <div key={o.id} className={`bg-mob-card border border-mob-border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-2xl p-4`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-xs text-gray-500">{o.id}</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getPrioBadge(o.priority)}`}>{o.priority}</span>
+              </div>
+              <div className="text-white font-semibold text-base mb-1">{o.title}</div>
+              <div className="text-gray-400 text-sm mb-3">{o.asset}</div>
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(o.status)}`}>{o.status.replace('_',' ')}</span>
+                <span className="text-gray-600 text-xs">{o.techId}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      <!-- User -->
-      <div class="px-4 py-4 border-t border-border">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center flex-shrink-0">
-            <span class="text-accent text-xs font-semibold">SB</span>
+// ── MOBILE PROFIL ─────────────────────────────────────────────────────────────
+function MobileProfil({user,onLogout}){
+  const [notif,setNotif]=React.useState(true);
+  const [dark,setDark]=React.useState(true);
+  const myDone=WORK_ORDERS_INITIAL.filter(o=>o.techId===user.techId&&o.status==='ABGESCHLOSSEN').length;
+  const myActive=WORK_ORDERS_INITIAL.filter(o=>o.techId===user.techId&&o.status!=='ABGESCHLOSSEN').length;
+  return(
+    <div className="page-enter px-5 pt-8 pb-28 space-y-6">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-20 h-20 rounded-full bg-[#2979FF]/20 flex items-center justify-center text-[#2979FF] font-bold text-2xl">{user.initials}</div>
+        <div className="text-center">
+          <div className="text-white font-bold text-lg">{user.name}</div>
+          <span className={`text-xs font-medium px-3 py-1 rounded-full mt-1 inline-block ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
+          <div className="text-gray-500 text-sm mt-1">{user.email}</div>
+        </div>
+      </div>
+      <div className="bg-mob-card border border-mob-border rounded-2xl p-4">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-3">Meine Statistiken</div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center"><div className="text-green-400 text-2xl font-bold">{myDone}</div><div className="text-gray-500 text-xs">Abgeschlossen</div></div>
+          <div className="text-center"><div className="text-amber-400 text-2xl font-bold">{myActive}</div><div className="text-gray-500 text-xs">Aktiv</div></div>
+        </div>
+      </div>
+      <div className="bg-mob-card border border-mob-border rounded-2xl p-4 space-y-4">
+        <div className="text-gray-400 text-xs uppercase tracking-wider">Einstellungen</div>
+        {[['Benachrichtigungen',notif,setNotif],['Dark Mode',dark,setDark]].map(([label,val,setter])=>(
+          <div key={label} className="flex items-center justify-between">
+            <span className="text-white text-sm">{label}</span>
+            <button onClick={()=>setter(!val)} className={`w-12 h-6 rounded-full toggle-track relative ${val?'bg-[#2979FF]':'bg-[#2a2a2a]'}`}>
+              <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${val?'left-6':'left-0.5'}`}/>
+            </button>
           </div>
-          <div class="min-w-0">
-            <div class="text-gray-200 text-xs font-medium truncate">Admin</div>
-            <div class="text-gray-500 text-xs truncate">s.baumann@betrieb.de</div>
+        ))}
+      </div>
+      <button onClick={onLogout} className="btn-press w-full py-3 rounded-2xl border border-red-500/30 text-red-400 font-semibold text-sm bg-red-500/10 hover:bg-red-500/20 transition-colors">
+        Abmelden
+      </button>
+    </div>
+  );
+}
+
+// ── MOBILE APP ────────────────────────────────────────────────────────────────
+function MobileApp({user,onLogout}){
+  const [screen,setScreen]=React.useState('home');
+  const [showScan,setShowScan]=React.useState(false);
+  const [orders]=React.useState(WORK_ORDERS_INITIAL);
+  return(
+    <div className="bg-mob-bg min-h-screen text-white font-sans" style={{maxWidth:'448px',margin:'0 auto',position:'relative'}}>
+      <div className="overflow-y-auto" style={{paddingBottom:'90px'}}>
+        {screen==='home'&&<MobileHome user={user} onScan={()=>setShowScan(true)}/>}
+        {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders}/>}
+        {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout}/>}
+      </div>
+      <div className="fixed bottom-0 bg-[#111] border-t border-mob-border flex items-end justify-around pb-safe z-40"
+        style={{left:'50%',transform:'translateX(-50%)',width:'100%',maxWidth:'448px',height:'72px'}}>
+        <button onClick={()=>setScreen('auftraege')} className={`flex flex-col items-center justify-center gap-1 pt-2 w-16 transition-colors ${screen==='auftraege'?'text-[#2979FF]':'text-gray-600'}`}>
+          <IconClipboard size={22}/>
+          <span className="text-xs">Aufträge</span>
+        </button>
+        <button onClick={()=>setShowScan(true)} className="btn-press relative w-16 h-16 rounded-full bg-[#2979FF] flex items-center justify-center border-4 border-[#0d0d0d]"
+          style={{marginTop:'-24px',boxShadow:'0 0 24px rgba(41,121,255,0.5)'}}>
+          <IconQR size={26} cls="text-white"/>
+        </button>
+        <button onClick={()=>setScreen('profil')} className={`flex flex-col items-center justify-center gap-1 pt-2 w-16 transition-colors ${screen==='profil'?'text-[#2979FF]':'text-gray-600'}`}>
+          <IconUser size={22}/>
+          <span className="text-xs">Profil</span>
+        </button>
+      </div>
+      {showScan&&<ScanModal onClose={()=>setShowScan(false)}/>}
+    </div>
+  );
+}
+
+// ── DESKTOP PAGE: DASHBOARD ───────────────────────────────────────────────────
+function DashboardPage(){
+  const chartRef=React.useRef(null);
+  React.useEffect(()=>{
+    if(!chartRef.current)return;
+    const ctx=chartRef.current.getContext('2d');
+    const c=new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:['Mo','Di','Mi','Do','Fr','Sa','So'],
+        datasets:[
+          {label:'Auslastung %',data:[82,78,91,85,88,72,79],borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.1)',tension:0.4,fill:true,pointBackgroundColor:'#6366f1'},
+          {label:'Fehler',data:[1,3,0,2,1,0,2],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.05)',tension:0.4,fill:true,pointBackgroundColor:'#ef4444'},
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9ca3af',font:{family:'Inter',size:11}}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'},max:100,min:0}}}
+    });
+    return()=>c.destroy();
+  },[]);
+  return(
+    <div className="space-y-5">
+      <div className="grid grid-cols-4 gap-4">
+        {[['Aktive Fehler','3','text-red-400','bg-red-500'],['Wartungen fällig','7','text-amber-400','bg-amber-500'],['Gesamt Assets','142','text-indigo-400','bg-indigo-500'],['ERP-Sync','98%','text-green-400','bg-green-500']].map(([l,v,tc,bc])=>(
+          <div key={l} className="bg-desk-surface border border-desk-border rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <div className={`w-2 h-2 rounded-full ${bc}`}/>
+              <span className="text-gray-500 text-xs">{l}</span>
+            </div>
+            <div className={`text-3xl font-bold ${tc}`}>{v}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-2 bg-desk-surface border border-desk-border rounded-xl p-5">
+          <div className="text-white font-semibold mb-4">Maschinenauslastung — 7 Tage</div>
+          <div style={{height:'200px'}}><canvas ref={chartRef}/></div>
+        </div>
+        <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
+          <div className="text-white font-semibold mb-4">Asset-Status</div>
+          <div className="space-y-3">
+            {ASSETS_DB.slice(0,3).map(a=>(
+              <div key={a.id} className="flex items-center justify-between">
+                <div><div className="text-white text-sm">{a.name}</div><div className="text-gray-500 text-xs">{a.location}</div></div>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(a.status)}`}>{a.status}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <div class="flex-1 ml-[220px] flex flex-col min-h-screen">
-
-      <!-- TOPBAR -->
-      <header class="h-14 border-b border-border flex items-center px-6 justify-between bg-base/80 backdrop-blur-sm sticky top-0 z-10">
-        <h1 id="page-title" class="text-gray-100 font-semibold text-base">Dashboard</h1>
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input
-              type="text"
-              placeholder="Suchen…"
-              class="w-64 bg-surface border border-border text-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
-          <div class="w-8 h-8 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center">
-            <span class="text-accent text-xs font-semibold">SB</span>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
+          <div className="text-white font-semibold mb-4">Offene Aufträge</div>
+          <div className="space-y-3">
+            {WORK_ORDERS_INITIAL.filter(o=>o.status==='OFFEN').map(o=>(
+              <div key={o.id} className="flex items-center justify-between border-b border-desk-border pb-2">
+                <div><div className="text-white text-sm">{o.title}</div><div className="text-gray-500 text-xs">{o.asset}</div></div>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${getPrioBadge(o.priority)}`}>{o.priority}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </header>
+        <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
+          <div className="text-white font-semibold mb-4">Systemstatus</div>
+          <div className="space-y-3">
+            {[['ERP-Verbindung','Online','text-green-400'],['Datenbank','Sync','text-green-400'],['API-Gateway','Online','text-green-400'],['Backup','Läuft','text-amber-400']].map(([k,v,c])=>(
+              <div key={k} className="flex items-center justify-between">
+                <span className="text-gray-400 text-sm">{k}</span>
+                <span className={`text-sm font-medium ${c}`}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      <!-- PAGE CONTENT -->
-      <main id="page-content" class="flex-1 overflow-y-auto p-6">
+// ── DESKTOP PAGE: ASSETS ──────────────────────────────────────────────────────
+function AssetsPage(){
+  return(
+    <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
+      <div className="p-5 border-b border-desk-border flex items-center justify-between">
+        <div className="text-white font-semibold">Assets ({ASSETS_DB.length})</div>
+        <button className="bg-desk-accent/20 text-desk-accent border border-desk-accent/30 px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-desk-accent/30 transition-colors">+ Asset hinzufügen</button>
+      </div>
+      <table className="w-full">
+        <thead><tr className="border-b border-desk-border text-gray-500 text-xs uppercase tracking-wider">
+          {['ID','Name','Typ','Standort','Auslastung','Status'].map(h=><th key={h} className="text-left px-5 py-3 font-medium">{h}</th>)}
+        </tr></thead>
+        <tbody>
+          {ASSETS_DB.map((a,i)=>(
+            <tr key={a.id} className={`border-b border-desk-border hover:bg-white/[0.02] transition-colors ${i%2===0?'':'bg-white/[0.01]'}`}>
+              <td className="px-5 py-4 font-mono text-xs text-gray-500">{a.id}</td>
+              <td className="px-5 py-4 text-white text-sm font-medium">{a.name}</td>
+              <td className="px-5 py-4 text-gray-400 text-sm">{a.type}</td>
+              <td className="px-5 py-4 text-gray-400 text-sm">{a.location}</td>
+              <td className="px-5 py-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-[#1f2128] rounded-full h-1.5 w-20">
+                    <div className={`h-1.5 rounded-full ${a.uptime>80?'bg-green-500':a.uptime>50?'bg-amber-500':'bg-red-500'}`} style={{width:`${a.uptime}%`}}/>
+                  </div>
+                  <span className="text-gray-400 text-xs w-8">{a.uptime}%</span>
+                </div>
+              </td>
+              <td className="px-5 py-4"><span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(a.status)}`}>{a.status}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
-        <!-- ===== DASHBOARD PAGE ===== -->
-        <div id="page-dashboard" class="page">
-
-          <!-- KPI Row -->
-          <div class="grid grid-cols-4 gap-4 mb-6">
-            <!-- Aktive Fehler -->
-            <div class="bg-surface border border-border rounded-xl p-5 relative">
-              <div class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"></div>
-              <div class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">Aktive Fehler</div>
-              <div class="text-3xl font-bold text-gray-100 mb-1">3</div>
-              <div class="text-xs text-gray-500">2 kritisch</div>
+// ── DESKTOP PAGE: AUFTRÄGE (KANBAN) ──────────────────────────────────────────
+function AuftraegePage({orders,setOrders,showNew,setShowNew}){
+  const [form,setForm]=React.useState({asset:'',tech:'',title:'',desc:'',prio:'MITTEL'});
+  function submitNew(){
+    if(!form.title||!form.asset)return;
+    const id='WO-'+Math.floor(Math.random()*9000+1000);
+    setOrders(p=>[{id,title:form.title,asset:form.asset,techId:form.tech||'mo-001',status:'OFFEN',priority:form.prio,desc:form.desc},...p]);
+    setShowNew(false);
+    setForm({asset:'',tech:'',title:'',desc:'',prio:'MITTEL'});
+  }
+  const cols=[
+    ['OFFEN','Offen','border-blue-500/30 bg-blue-500/5'],
+    ['IN_BEARBEITUNG','In Bearbeitung','border-amber-500/30 bg-amber-500/5'],
+    ['ABGESCHLOSSEN','Abgeschlossen','border-green-500/30 bg-green-500/5'],
+  ];
+  return(
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <div className="text-white font-semibold text-lg">Auftragsmanagement</div>
+        <button onClick={()=>setShowNew(true)} className="bg-desk-accent hover:bg-desk-accent-dim text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">+ Neuer Auftrag</button>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {cols.map(([status,label,cls])=>(
+          <div key={status} className={`border ${cls} rounded-xl p-4`}>
+            <div className="text-white font-medium mb-3 flex items-center justify-between">
+              <span>{label}</span>
+              <span className="text-gray-500 text-xs bg-desk-border px-2 py-0.5 rounded-full">{orders.filter(o=>o.status===status).length}</span>
             </div>
-            <!-- Wartungen fällig -->
-            <div class="bg-surface border border-border rounded-xl p-5 relative">
-              <div class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-amber-400"></div>
-              <div class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">Wartungen fällig</div>
-              <div class="text-3xl font-bold text-gray-100 mb-1">7</div>
-              <div class="text-xs text-gray-500">3 überfällig</div>
-            </div>
-            <!-- Gesamt Assets -->
-            <div class="bg-surface border border-border rounded-xl p-5 relative">
-              <div class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-indigo-400"></div>
-              <div class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">Gesamt Assets</div>
-              <div class="text-3xl font-bold text-gray-100 mb-1">142</div>
-              <div class="text-xs text-gray-500">95% erfasst</div>
-            </div>
-            <!-- ERP-Sync -->
-            <div class="bg-surface border border-border rounded-xl p-5 relative">
-              <div class="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.4)]"></div>
-              <div class="text-gray-500 text-xs font-medium uppercase tracking-wider mb-3">ERP-Sync</div>
-              <div class="text-3xl font-bold text-gray-100 mb-1">98%</div>
-              <div class="text-xs text-gray-500">Letzte Sync: 14:22</div>
+            <div className="space-y-3">
+              {orders.filter(o=>o.status===status).map(o=>(
+                <div key={o.id} className={`bg-desk-surface border border-desk-border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-xl p-3`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-mono text-xs text-gray-600">{o.id}</span>
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${getPrioBadge(o.priority)}`}>{o.priority}</span>
+                  </div>
+                  <div className="text-white text-sm font-medium">{o.title}</div>
+                  <div className="text-gray-500 text-xs mt-1">{o.asset}</div>
+                </div>
+              ))}
             </div>
           </div>
-
-          <!-- Middle Row -->
-          <div class="grid grid-cols-3 gap-4 mb-6">
-            <!-- Chart Card -->
-            <div class="col-span-2 bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center justify-between mb-5">
-                <h2 class="text-gray-100 font-semibold text-sm">Maschinenauslastung</h2>
-                <span class="text-xs bg-base rounded px-2 py-0.5 text-gray-500 border border-border">Letzte 7 Tage</span>
-              </div>
-              <div style="height: 280px; position: relative;">
-                <canvas id="auslastung-chart"></canvas>
-              </div>
+        ))}
+      </div>
+      {showNew&&(
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-desk-surface border border-desk-border rounded-2xl p-6 w-full max-w-md fade-in">
+            <div className="flex items-center justify-between mb-5">
+              <div className="text-white font-semibold text-lg">Neuer Auftrag</div>
+              <button onClick={()=>setShowNew(false)} className="text-gray-600 hover:text-gray-400"><IconX size={20}/></button>
             </div>
-
-            <!-- Asset List Card -->
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center justify-between mb-4">
-                <h2 class="text-gray-100 font-semibold text-sm">Asset-Status</h2>
-                <span class="text-xs bg-base rounded-full px-2 py-0.5 text-gray-500 border border-border">142</span>
-              </div>
-
-              <!-- Asset Rows -->
-              <div class="divide-y divide-border">
-                <div class="flex items-center justify-between py-3">
-                  <div>
-                    <div class="text-gray-500 text-xs mb-0.5">AST-0041</div>
-                    <div class="text-gray-200 text-sm font-medium">STILL RX 20-20</div>
-                    <div class="text-gray-500 text-xs">Gabelstapler</div>
-                  </div>
-                  <span class="text-emerald-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-400/10 shadow-[0_0_8px_rgba(52,211,153,0.2)]">OK</span>
-                </div>
-                <div class="flex items-center justify-between py-3">
-                  <div>
-                    <div class="text-gray-500 text-xs mb-0.5">AST-0017</div>
-                    <div class="text-gray-200 text-sm font-medium">Liebherr R 920</div>
-                    <div class="text-gray-500 text-xs">Kettenbagger</div>
-                  </div>
-                  <span class="text-red-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-400/10 shadow-[0_0_8px_rgba(248,113,113,0.2)]">Fehler</span>
-                </div>
-                <div class="flex items-center justify-between py-3">
-                  <div>
-                    <div class="text-gray-500 text-xs mb-0.5">AST-0023</div>
-                    <div class="text-gray-200 text-sm font-medium">CAT 320 Bagger</div>
-                    <div class="text-gray-500 text-xs">Kettenbagger</div>
-                  </div>
-                  <span class="text-amber-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-400/10">Wartung</span>
+            <div className="space-y-4">
+              <input value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Titel *"
+                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent"/>
+              <select value={form.asset} onChange={e=>setForm({...form,asset:e.target.value})}
+                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent">
+                <option value="">Asset wählen</option>
+                {ASSETS_DB.map(a=><option key={a.id} value={a.name}>{a.name}</option>)}
+              </select>
+              <select value={form.tech} onChange={e=>setForm({...form,tech:e.target.value})}
+                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent">
+                <option value="">Techniker wählen</option>
+                {TECHNIKER_DB.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+              <textarea value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} placeholder="Beschreibung" rows={3}
+                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent resize-none"/>
+              <div>
+                <div className="text-gray-500 text-xs mb-2">Priorität</div>
+                <div className="flex gap-2">
+                  {['NIEDRIG','MITTEL','HOCH','KRITISCH'].map(p=>(
+                    <button key={p} onClick={()=>setForm({...form,prio:p})}
+                      className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${form.prio===p?getPrioBadge(p)+' border border-current/30':'bg-desk-base border border-desk-border text-gray-500 hover:text-gray-300'}`}>
+                      {p}
+                    </button>
+                  ))}
                 </div>
               </div>
-
-              <button onclick="showPage('assets')" class="mt-4 text-accent text-sm hover:text-indigo-300 transition-colors">
-                Alle 142 Assets anzeigen →
+              <button onClick={submitNew} className="btn-press w-full bg-desk-accent hover:bg-desk-accent-dim text-white font-semibold py-3 rounded-xl transition-colors">
+                Auftrag erstellen
               </button>
             </div>
           </div>
-
-          <!-- Bottom Row -->
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Aktuelle Aufträge -->
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center justify-between mb-4">
-                <h2 class="text-gray-100 font-semibold text-sm">Offene Aufträge</h2>
-                <button onclick="showPage('auftraege')" class="text-accent text-xs hover:text-indigo-300 transition-colors">Alle anzeigen →</button>
-              </div>
-              <div class="space-y-0">
-                <div class="flex items-center justify-between py-2.5 border-b border-border/50">
-                  <div>
-                    <div class="text-gray-500 text-xs mb-0.5">WO-2024</div>
-                    <div class="text-gray-200 text-sm font-medium">Hydraulikinspektion</div>
-                    <div class="text-gray-500 text-xs">Liebherr R 920</div>
-                  </div>
-                  <span class="text-red-400 text-xs font-medium px-2 py-0.5 rounded bg-red-400/10">KRITISCH</span>
-                </div>
-                <div class="flex items-center justify-between py-2.5 border-b border-border/50">
-                  <div>
-                    <div class="text-gray-500 text-xs mb-0.5">WO-2023</div>
-                    <div class="text-gray-200 text-sm font-medium">Ölwechsel</div>
-                    <div class="text-gray-500 text-xs">CAT 320 Bagger</div>
-                  </div>
-                  <span class="text-amber-400 text-xs font-medium px-2 py-0.5 rounded bg-amber-400/10">MITTEL</span>
-                </div>
-                <div class="flex items-center justify-between py-2.5">
-                  <div>
-                    <div class="text-gray-500 text-xs mb-0.5">WO-2022</div>
-                    <div class="text-gray-200 text-sm font-medium">Jahresinspektion</div>
-                    <div class="text-gray-500 text-xs">STILL RX 20-20</div>
-                  </div>
-                  <span class="text-gray-400 text-xs font-medium px-2 py-0.5 rounded bg-gray-400/10">NIEDRIG</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Systemstatus -->
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center justify-between mb-4">
-                <h2 class="text-gray-100 font-semibold text-sm">Systemstatus</h2>
-                <span class="text-emerald-400 text-xs">Alle Systeme nominal</span>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div class="bg-base rounded-lg p-3 border border-border">
-                  <div class="flex items-center gap-2 mb-1">
-                    <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.4)]"></div>
-                    <span class="text-gray-400 text-xs font-medium">API-Gateway</span>
-                  </div>
-                  <div class="text-emerald-400 text-xs">Online ✓</div>
-                </div>
-                <div class="bg-base rounded-lg p-3 border border-border">
-                  <div class="flex items-center gap-2 mb-1">
-                    <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.4)]"></div>
-                    <span class="text-gray-400 text-xs font-medium">ERP-Connector</span>
-                  </div>
-                  <div class="text-emerald-400 text-xs">Online ✓</div>
-                </div>
-                <div class="bg-base rounded-lg p-3 border border-border">
-                  <div class="flex items-center gap-2 mb-1">
-                    <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.4)]"></div>
-                    <span class="text-gray-400 text-xs font-medium">Datenbank</span>
-                  </div>
-                  <div class="text-emerald-400 text-xs">99.9% Uptime</div>
-                </div>
-                <div class="bg-base rounded-lg p-3 border border-border">
-                  <div class="flex items-center gap-2 mb-1">
-                    <div class="w-2 h-2 rounded-full bg-amber-400"></div>
-                    <span class="text-gray-400 text-xs font-medium">IoT-Broker</span>
-                  </div>
-                  <div class="text-amber-400 text-xs">3 Geräte offline</div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-
-        <!-- ===== ASSETS PAGE ===== -->
-        <div id="page-assets" class="page hidden">
-          <!-- Header -->
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h2 class="text-gray-100 font-semibold text-lg">Assets</h2>
-              <p class="text-gray-500 text-sm mt-0.5">142 Assets im System erfasst</p>
-            </div>
-            <button class="bg-accent hover:bg-accent-dim text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Asset hinzufügen
-            </button>
-          </div>
-
-          <!-- Filters -->
-          <div class="flex items-center gap-3 mb-5">
-            <div class="relative flex-1 max-w-xs">
-              <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <input type="text" placeholder="Asset suchen…" class="w-full bg-base border border-border text-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
-            </div>
-            <select class="bg-base border border-border text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-              <option>Alle Status</option>
-              <option>OK</option>
-              <option>Fehler</option>
-              <option>Wartung fällig</option>
-            </select>
-            <select class="bg-base border border-border text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-              <option>Alle Typen</option>
-              <option>Gabelstapler</option>
-              <option>Kettenbagger</option>
-              <option>Radlader</option>
-              <option>Kran</option>
-            </select>
-          </div>
-
-          <!-- Table -->
-          <div class="bg-surface border border-border rounded-xl overflow-hidden">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-border">
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">ID</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Name</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Typ</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Standort</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Status</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Letztes Update</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Aktionen</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-border/60">
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0041</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">STILL RX 20-20</td>
-                  <td class="px-5 py-3.5 text-gray-400">Gabelstapler</td>
-                  <td class="px-5 py-3.5 text-gray-400">Halle B, Zone 3</td>
-                  <td class="px-5 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 shadow-[0_0_8px_rgba(52,211,153,0.2)]">OK</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">10.03.2026, 09:14</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0017</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">Liebherr R 920</td>
-                  <td class="px-5 py-3.5 text-gray-400">Kettenbagger</td>
-                  <td class="px-5 py-3.5 text-gray-400">Außengelände Ost</td>
-                  <td class="px-5 py-3.5"><span class="text-red-400 text-xs font-medium px-2.5 py-1 rounded-full bg-red-400/10 shadow-[0_0_8px_rgba(248,113,113,0.2)]">Fehler: Hydraulik</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">10.03.2026, 07:52</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0023</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">CAT 320 Bagger</td>
-                  <td class="px-5 py-3.5 text-gray-400">Kettenbagger</td>
-                  <td class="px-5 py-3.5 text-gray-400">Baufeld C</td>
-                  <td class="px-5 py-3.5"><span class="text-amber-400 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-400/10">Wartung fällig</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">09.03.2026, 16:30</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0055</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">Volvo EC 220</td>
-                  <td class="px-5 py-3.5 text-gray-400">Kettenbagger</td>
-                  <td class="px-5 py-3.5 text-gray-400">Halle A</td>
-                  <td class="px-5 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10">OK</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">10.03.2026, 08:00</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0062</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">Liebherr LTM 1060</td>
-                  <td class="px-5 py-3.5 text-gray-400">Mobilkran</td>
-                  <td class="px-5 py-3.5 text-gray-400">Außengelände West</td>
-                  <td class="px-5 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10">OK</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">10.03.2026, 11:45</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0078</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">Komatsu WA 380</td>
-                  <td class="px-5 py-3.5 text-gray-400">Radlader</td>
-                  <td class="px-5 py-3.5 text-gray-400">Lagerhof Süd</td>
-                  <td class="px-5 py-3.5"><span class="text-amber-400 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-400/10">Wartung fällig</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">08.03.2026, 14:20</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0091</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">JCB 3CX Baggerlader</td>
-                  <td class="px-5 py-3.5 text-gray-400">Baggerlader</td>
-                  <td class="px-5 py-3.5 text-gray-400">Baustelle Nord</td>
-                  <td class="px-5 py-3.5"><span class="text-red-400 text-xs font-medium px-2.5 py-1 rounded-full bg-red-400/10">Fehler: Motor</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">10.03.2026, 06:40</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5 text-gray-500 text-xs font-mono">AST-0104</td>
-                  <td class="px-5 py-3.5 text-gray-200 font-medium">Toyota 8FBN25</td>
-                  <td class="px-5 py-3.5 text-gray-400">Elektrostapler</td>
-                  <td class="px-5 py-3.5 text-gray-400">Halle B, Zone 1</td>
-                  <td class="px-5 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10">OK</span></td>
-                  <td class="px-5 py-3.5 text-gray-500 text-xs">10.03.2026, 10:05</td>
-                  <td class="px-5 py-3.5"><button class="text-accent text-xs hover:text-indigo-300">Details</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ===== AUFTRÄGE PAGE ===== -->
-        <div id="page-auftraege" class="page hidden">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h2 class="text-gray-100 font-semibold text-lg">Auftragsmanagement</h2>
-              <p class="text-gray-500 text-sm mt-0.5">Alle Wartungs- und Serviceaufträge</p>
-            </div>
-            <button onclick="openNewOrderModal()" class="bg-accent hover:bg-accent-dim text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Neuer Auftrag
-            </button>
-          </div>
-
-          <!-- Kanban columns -->
-          <div class="grid grid-cols-3 gap-4">
-            <!-- Offen -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-2 h-2 rounded-full bg-gray-400"></div>
-                <span class="text-gray-400 text-sm font-medium">Offen</span>
-                <span class="ml-auto text-xs bg-base border border-border px-1.5 py-0.5 rounded text-gray-500">3</span>
-              </div>
-              <div class="space-y-3">
-                <div class="bg-surface border border-border rounded-xl p-4">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2024</span>
-                    <span class="text-red-400 text-xs font-medium px-2 py-0.5 rounded bg-red-400/10">KRITISCH</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Hydraulikinspektion</div>
-                  <div class="text-gray-500 text-xs mb-3">Liebherr R 920 · Außengelände Ost</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">TK</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">T. Kowalski</span>
-                  </div>
-                </div>
-                <div class="bg-surface border border-border rounded-xl p-4">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2020</span>
-                    <span class="text-amber-400 text-xs font-medium px-2 py-0.5 rounded bg-amber-400/10">MITTEL</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Kran-Seilprüfung</div>
-                  <div class="text-gray-500 text-xs mb-3">Liebherr LTM 1060 · Außengelände West</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">AM</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">A. Müller</span>
-                  </div>
-                </div>
-                <div class="bg-surface border border-border rounded-xl p-4">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2022</span>
-                    <span class="text-gray-400 text-xs font-medium px-2 py-0.5 rounded bg-gray-400/10">NIEDRIG</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Jahresinspektion</div>
-                  <div class="text-gray-500 text-xs mb-3">STILL RX 20-20 · Halle B</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">JS</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">J. Schmidt</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- In Bearbeitung -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-2 h-2 rounded-full bg-amber-400"></div>
-                <span class="text-gray-400 text-sm font-medium">In Bearbeitung</span>
-                <span class="ml-auto text-xs bg-base border border-border px-1.5 py-0.5 rounded text-gray-500">2</span>
-              </div>
-              <div class="space-y-3">
-                <div class="bg-surface border border-border rounded-xl p-4">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2023</span>
-                    <span class="text-amber-400 text-xs font-medium px-2 py-0.5 rounded bg-amber-400/10">MITTEL</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Ölwechsel & Filter</div>
-                  <div class="text-gray-500 text-xs mb-3">CAT 320 Bagger · Baufeld C</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">MK</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">M. Koehler</span>
-                  </div>
-                </div>
-                <div class="bg-surface border border-border rounded-xl p-4">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2019</span>
-                    <span class="text-red-400 text-xs font-medium px-2 py-0.5 rounded bg-red-400/10">KRITISCH</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Motordiagnose</div>
-                  <div class="text-gray-500 text-xs mb-3">JCB 3CX · Baustelle Nord</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">BW</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">B. Wagner</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Abgeschlossen -->
-            <div>
-              <div class="flex items-center gap-2 mb-3">
-                <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.4)]"></div>
-                <span class="text-gray-400 text-sm font-medium">Abgeschlossen</span>
-                <span class="ml-auto text-xs bg-base border border-border px-1.5 py-0.5 rounded text-gray-500">2</span>
-              </div>
-              <div class="space-y-3">
-                <div class="bg-surface border border-border rounded-xl p-4 opacity-70">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2018</span>
-                    <span class="text-emerald-400 text-xs font-medium px-2 py-0.5 rounded bg-emerald-400/10">ERLEDIGT</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Bremsinspektion</div>
-                  <div class="text-gray-500 text-xs mb-3">Toyota 8FBN25 · Halle B</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">TK</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">T. Kowalski</span>
-                  </div>
-                </div>
-                <div class="bg-surface border border-border rounded-xl p-4 opacity-70">
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-gray-500 text-xs font-mono">WO-2017</span>
-                    <span class="text-emerald-400 text-xs font-medium px-2 py-0.5 rounded bg-emerald-400/10">ERLEDIGT</span>
-                  </div>
-                  <div class="text-gray-200 text-sm font-medium mb-1">Reifenwechsel</div>
-                  <div class="text-gray-500 text-xs mb-3">Komatsu WA 380 · Lagerhof Süd</div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-                      <span class="text-indigo-300 text-xs">AM</span>
-                    </div>
-                    <span class="text-gray-500 text-xs">A. Müller</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== TECHNIKER PAGE ===== -->
-        <div id="page-techniker" class="page hidden">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <h2 class="text-gray-100 font-semibold text-lg">Techniker-Übersicht</h2>
-              <p class="text-gray-500 text-sm mt-0.5">Status und Einsätze aller Techniker</p>
-            </div>
-            <button onclick="showPage('auftraege')" class="bg-accent hover:bg-accent-dim text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Auftrag erstellen
-            </button>
-          </div>
-
-          <!-- KPI Strip -->
-          <div class="grid grid-cols-4 gap-4 mb-6">
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="text-gray-500 text-xs uppercase tracking-wider mb-1">Gesamt</div>
-              <div class="text-3xl font-bold text-gray-100">6</div>
-              <div class="text-gray-500 text-xs mt-1">Techniker registriert</div>
-            </div>
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wider mb-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]"></span>Im Einsatz
-              </div>
-              <div class="text-3xl font-bold text-gray-100">3</div>
-              <div class="text-gray-500 text-xs mt-1">Aktive Zuweisungen</div>
-            </div>
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wider mb-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>Verfügbar
-              </div>
-              <div class="text-3xl font-bold text-gray-100">2</div>
-              <div class="text-gray-500 text-xs mt-1">Bereit für Einsatz</div>
-            </div>
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wider mb-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Pause
-              </div>
-              <div class="text-3xl font-bold text-gray-100">1</div>
-              <div class="text-gray-500 text-xs mt-1">Aktuell nicht verfügbar</div>
-            </div>
-          </div>
-
-          <!-- Techniker Tabelle -->
-          <div class="bg-surface border border-border rounded-xl overflow-hidden">
-            <div class="px-5 py-4 border-b border-border flex items-center justify-between">
-              <span class="text-gray-200 text-sm font-semibold">Alle Techniker</span>
-              <input type="text" placeholder="Suchen..." class="bg-base border border-border text-gray-200 rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-1 focus:ring-accent" />
-            </div>
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-border">
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Techniker</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Status</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Aktueller Auftrag</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Asset</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Seit</th>
-                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Abgeschl.</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">MS</div>
-                      <div><div class="text-gray-200 font-medium">M. Schulz</div><div class="text-gray-500 text-xs">mo-001</div></div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]"></span>Im Einsatz</span></td>
-                  <td class="px-4 py-3.5 text-gray-300 font-mono text-xs">WO-2024</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs">Liebherr R 920</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">13:45</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">14</td>
-                </tr>
-                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">JF</div>
-                      <div><div class="text-gray-200 font-medium">J. Fischer</div><div class="text-gray-500 text-xs">mo-002</div></div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]"></span>Im Einsatz</span></td>
-                  <td class="px-4 py-3.5 text-gray-300 font-mono text-xs">WO-2023</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs">CAT 320 Bagger</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">14:10</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">9</td>
-                </tr>
-                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">AW</div>
-                      <div><div class="text-gray-200 font-medium">A. Weber</div><div class="text-gray-500 text-xs">mo-003</div></div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]"></span>Im Einsatz</span></td>
-                  <td class="px-4 py-3.5 text-gray-300 font-mono text-xs">WO-2022</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs">STILL RX 20-20</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">09:30</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">22</td>
-                </tr>
-                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-indigo-400/20 flex items-center justify-center text-indigo-300 text-xs font-bold flex-shrink-0">KM</div>
-                      <div><div class="text-gray-200 font-medium">K. Müller</div><div class="text-gray-500 text-xs">mo-004</div></div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3.5"><span class="text-indigo-400 text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-400/10 w-fit block">Verfügbar</span></td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">31</td>
-                </tr>
-                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-indigo-400/20 flex items-center justify-center text-indigo-300 text-xs font-bold flex-shrink-0">TK</div>
-                      <div><div class="text-gray-200 font-medium">T. Kowalski</div><div class="text-gray-500 text-xs">mo-005</div></div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3.5"><span class="text-indigo-400 text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-400/10 w-fit block">Verfügbar</span></td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">18</td>
-                </tr>
-                <tr class="hover:bg-base/50 transition-colors">
-                  <td class="px-5 py-3.5">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-300 text-xs font-bold flex-shrink-0">AM</div>
-                      <div><div class="text-gray-200 font-medium">A. Müller</div><div class="text-gray-500 text-xs">mo-006</div></div>
-                    </div>
-                  </td>
-                  <td class="px-4 py-3.5"><span class="text-amber-400 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-400/10 w-fit block">Pause</span></td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
-                  <td class="px-4 py-3.5 text-gray-500 text-xs">seit 14:20</td>
-                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">7</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ===== NEWS PAGE ===== -->
-        <div id="page-news" class="page hidden">
-          <div class="mb-6">
-            <h2 class="text-gray-100 font-semibold text-lg">News & Updates</h2>
-            <p class="text-gray-500 text-sm mt-0.5">Systemupdates, Changelog und Ankündigungen</p>
-          </div>
-
-          <div class="space-y-4 max-w-2xl">
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-start gap-4">
-                <div class="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-gray-100 text-sm font-semibold">AssetLogic v3.2 — Release</span>
-                    <span class="text-gray-500 text-xs">10.03.2026</span>
-                  </div>
-                  <span class="inline-block text-xs bg-accent/10 text-accent px-2 py-0.5 rounded mb-2">Release</span>
-                  <p class="text-gray-400 text-sm leading-relaxed">Neues Kanban-Board für Auftragsmanagement, verbessertes Chart-Dashboard, IoT-Sensor-Integration für 12 neue Gerätetypen.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-start gap-4">
-                <div class="w-9 h-9 rounded-lg bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-gray-100 text-sm font-semibold">ERP-Connector Update</span>
-                    <span class="text-gray-500 text-xs">07.03.2026</span>
-                  </div>
-                  <span class="inline-block text-xs bg-emerald-400/10 text-emerald-400 px-2 py-0.5 rounded mb-2">Verbesserung</span>
-                  <p class="text-gray-400 text-sm leading-relaxed">SAP-Schnittstelle auf API v4.1 aktualisiert. Sync-Zeiten um 40% reduziert. Automatische Fehlerkorrektur bei Datenkonflikten.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-start gap-4">
-                <div class="w-9 h-9 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-gray-100 text-sm font-semibold">Geplante Wartung: Datenbankserver</span>
-                    <span class="text-gray-500 text-xs">05.03.2026</span>
-                  </div>
-                  <span class="inline-block text-xs bg-amber-400/10 text-amber-400 px-2 py-0.5 rounded mb-2">Wartung</span>
-                  <p class="text-gray-400 text-sm leading-relaxed">Am 15.03.2026 zwischen 02:00–04:00 Uhr findet eine geplante Datenbankwartung statt. Das System ist in diesem Zeitraum eingeschränkt verfügbar.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-start gap-4">
-                <div class="w-9 h-9 rounded-lg bg-indigo-400/10 border border-indigo-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-gray-100 text-sm font-semibold">Neue Funktion: QR-Code Scanner</span>
-                    <span class="text-gray-500 text-xs">01.03.2026</span>
-                  </div>
-                  <span class="inline-block text-xs bg-indigo-400/10 text-indigo-400 px-2 py-0.5 rounded mb-2">Feature</span>
-                  <p class="text-gray-400 text-sm leading-relaxed">Techniker können Assets jetzt direkt per QR-Code scannen. Automatische Auftragszuweisung und Statusaktualisierung via Mobile-App.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-start gap-4">
-                <div class="w-9 h-9 rounded-lg bg-red-400/10 border border-red-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                </div>
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-1">
-                    <span class="text-gray-100 text-sm font-semibold">Bugfix: Berichts-Export</span>
-                    <span class="text-gray-500 text-xs">25.02.2026</span>
-                  </div>
-                  <span class="inline-block text-xs bg-red-400/10 text-red-400 px-2 py-0.5 rounded mb-2">Bugfix</span>
-                  <p class="text-gray-400 text-sm leading-relaxed">Fehler beim PDF-Export von Wartungsberichten mit Sonderzeichen behoben. Export-Funktion für alle Berichtstypen wieder vollständig verfügbar.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ===== EINSTELLUNGEN PAGE ===== -->
-        <div id="page-einstellungen" class="page hidden">
-          <div class="mb-6">
-            <h2 class="text-gray-100 font-semibold text-lg">Einstellungen</h2>
-            <p class="text-gray-500 text-sm mt-0.5">Systemkonfiguration und Verbindungen</p>
-          </div>
-
-          <div class="max-w-2xl space-y-6">
-            <!-- Allgemein -->
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <h3 class="text-gray-200 font-semibold text-sm mb-4">Allgemein</h3>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">Unternehmensname</label>
-                  <input type="text" value="Betrieb GmbH & Co. KG" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
-                </div>
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">Systemsprache</label>
-                  <select class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-                    <option selected>Deutsch (DE)</option>
-                    <option>English (EN)</option>
-                    <option>Français (FR)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">Zeitzone</label>
-                  <select class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-                    <option selected>Europe/Berlin (UTC+1)</option>
-                    <option>Europe/London (UTC)</option>
-                    <option>America/New_York (UTC-5)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- ERP-Verbindung -->
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-gray-200 font-semibold text-sm">ERP-Verbindung</h3>
-                <span class="text-emerald-400 text-xs flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.4)]"></span>
-                  Verbunden
-                </span>
-              </div>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">ERP-System</label>
-                  <select class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-                    <option selected>SAP S/4HANA</option>
-                    <option>SAP ECC 6.0</option>
-                    <option>Microsoft Dynamics 365</option>
-                    <option>Oracle ERP Cloud</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">API-Endpunkt</label>
-                  <input type="text" value="https://erp.betrieb.internal/api/v4" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
-                </div>
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">API-Schlüssel</label>
-                  <input type="password" value="sk-prod-••••••••••••••••" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
-                </div>
-                <div>
-                  <label class="block text-gray-400 text-xs font-medium mb-1.5">Sync-Intervall</label>
-                  <select class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-                    <option>Alle 5 Minuten</option>
-                    <option selected>Alle 15 Minuten</option>
-                    <option>Alle 30 Minuten</option>
-                    <option>Stündlich</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Benachrichtigungen -->
-            <div class="bg-surface border border-border rounded-xl p-5">
-              <h3 class="text-gray-200 font-semibold text-sm mb-4">Benachrichtigungen</h3>
-              <div class="space-y-3">
-                <label class="flex items-center justify-between cursor-pointer">
-                  <div>
-                    <div class="text-gray-200 text-sm">Kritische Fehler</div>
-                    <div class="text-gray-500 text-xs">Sofortige E-Mail bei kritischen Systemfehlern</div>
-                  </div>
-                  <div class="relative">
-                    <input type="checkbox" checked class="sr-only peer" />
-                    <div class="w-10 h-5 bg-border rounded-full peer peer-checked:bg-accent transition-colors cursor-pointer" onclick="this.previousElementSibling.checked = !this.previousElementSibling.checked"></div>
-                    <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5 pointer-events-none"></div>
-                  </div>
-                </label>
-                <div class="border-t border-border/50 pt-3">
-                  <label class="flex items-center justify-between cursor-pointer">
-                    <div>
-                      <div class="text-gray-200 text-sm">Wartungserinnerungen</div>
-                      <div class="text-gray-500 text-xs">7 Tage vor fälligen Wartungen</div>
-                    </div>
-                    <div class="relative">
-                      <input type="checkbox" checked class="sr-only peer" />
-                      <div class="w-10 h-5 bg-border rounded-full peer peer-checked:bg-accent transition-colors cursor-pointer" onclick="this.previousElementSibling.checked = !this.previousElementSibling.checked"></div>
-                      <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5 pointer-events-none"></div>
-                    </div>
-                  </label>
-                </div>
-                <div class="border-t border-border/50 pt-3">
-                  <label class="flex items-center justify-between cursor-pointer">
-                    <div>
-                      <div class="text-gray-200 text-sm">ERP-Sync-Status</div>
-                      <div class="text-gray-500 text-xs">Benachrichtigung bei Sync-Fehlern</div>
-                    </div>
-                    <div class="relative">
-                      <input type="checkbox" class="sr-only peer" />
-                      <div class="w-10 h-5 bg-border rounded-full peer peer-checked:bg-accent transition-colors cursor-pointer" onclick="this.previousElementSibling.checked = !this.previousElementSibling.checked"></div>
-                      <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5 pointer-events-none"></div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Save button -->
-            <div class="flex justify-end gap-3">
-              <button class="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors">Abbrechen</button>
-              <button class="bg-accent hover:bg-accent-dim text-white rounded-lg px-5 py-2 text-sm font-medium transition-colors">Einstellungen speichern</button>
-            </div>
-          </div>
-        </div>
-
-      </main>
+      )}
     </div>
-  </div>
+  );
+}
 
-  <!-- ===== NEUER AUFTRAG MODAL ===== -->
-  <div id="modal-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
-    <div class="bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl">
-      <div class="flex items-center justify-between px-6 py-5 border-b border-border">
-        <div>
-          <h3 class="text-gray-100 font-semibold">Neuer Auftrag</h3>
-          <p class="text-gray-500 text-xs mt-0.5">Wartungs- oder Serviceauftrag erstellen</p>
-        </div>
-        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-300 transition-colors p-1">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+// ── DESKTOP PAGE: TECHNIKER ───────────────────────────────────────────────────
+function TechnikerPage(){
+  return(
+    <div className="space-y-5">
+      <div className="grid grid-cols-4 gap-4">
+        {[['Gesamt','6'],['Aktiv','3'],['Pause','1'],['Offline','2']].map(([l,v])=>(
+          <div key={l} className="bg-desk-surface border border-desk-border rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-white">{v}</div>
+            <div className="text-gray-500 text-xs mt-1">{l}</div>
+          </div>
+        ))}
       </div>
-      <div class="px-6 py-5 space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-gray-400 text-xs font-medium mb-1.5">Asset *</label>
-            <select id="mo-asset" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-              <option value="">Asset wählen...</option>
-              <option value="STILL RX 20-20">STILL RX 20-20</option>
-              <option value="Liebherr R 920">Liebherr R 920</option>
-              <option value="CAT 320 Bagger">CAT 320 Bagger</option>
-              <option value="Hydraulikpresse HP-500">Hydraulikpresse HP-500</option>
-              <option value="Kompressor KPD-200">Kompressor KPD-200</option>
-              <option value="Kran KR-50">Kran KR-50</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-gray-400 text-xs font-medium mb-1.5">Techniker *</label>
-            <select id="mo-techniker" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
-              <option value="">Techniker wählen...</option>
-              <option value="M. Schulz">M. Schulz</option>
-              <option value="J. Fischer">J. Fischer</option>
-              <option value="A. Weber">A. Weber</option>
-              <option value="K. Müller">K. Müller</option>
-              <option value="T. Kowalski">T. Kowalski</option>
-              <option value="A. Müller">A. Müller</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-gray-400 text-xs font-medium mb-1.5">Titel *</label>
-          <input id="mo-titel" type="text" placeholder="z.B. Hydraulikinspektion" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
-        </div>
-        <div>
-          <label class="block text-gray-400 text-xs font-medium mb-1.5">Beschreibung</label>
-          <textarea id="mo-beschreibung" rows="3" placeholder="Optionale Beschreibung des Auftrags..." class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent resize-none"></textarea>
-        </div>
-        <div>
-          <label class="block text-gray-400 text-xs font-medium mb-1.5">Priorität</label>
-          <div class="grid grid-cols-4 gap-2" id="mo-prioritaet">
-            <button type="button" data-prio="NIEDRIG" onclick="selectPrio(this)" class="prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-gray-400 transition-colors">Niedrig</button>
-            <button type="button" data-prio="MITTEL" onclick="selectPrio(this)" class="prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-amber-400 hover:text-amber-400 transition-colors">Mittel</button>
-            <button type="button" data-prio="HOCH" onclick="selectPrio(this)" class="prio-btn border border-amber-400/50 rounded-lg px-3 py-2 text-xs font-medium text-amber-400 prio-selected">Hoch</button>
-            <button type="button" data-prio="KRITISCH" onclick="selectPrio(this)" class="prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-red-400 hover:text-red-400 transition-colors">Kritisch</button>
-          </div>
-        </div>
-      </div>
-      <div class="px-6 pb-5 flex justify-end gap-3">
-        <button onclick="closeModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors">Abbrechen</button>
-        <button onclick="submitNewOrder()" class="bg-accent hover:bg-accent-dim text-white rounded-lg px-5 py-2 text-sm font-medium transition-colors flex items-center gap-2">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Auftrag erstellen
-        </button>
+      <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
+        <div className="p-5 border-b border-desk-border text-white font-semibold">Techniker-Übersicht</div>
+        <table className="w-full">
+          <thead><tr className="border-b border-desk-border text-gray-500 text-xs uppercase tracking-wider">
+            {['Name','Rolle','Status','Zuweisung'].map(h=><th key={h} className="text-left px-5 py-3 font-medium">{h}</th>)}
+          </tr></thead>
+          <tbody>
+            {TECHNIKER_DB.map((t,i)=>(
+              <tr key={t.id} className={`border-b border-desk-border hover:bg-white/[0.02] transition-colors ${i%2===0?'':'bg-white/[0.01]'}`}>
+                <td className="px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-desk-accent/20 flex items-center justify-center text-desk-accent text-xs font-bold">
+                      {t.name.split(' ').map(n=>n[0]).join('')}
+                    </div>
+                    <span className="text-white text-sm">{t.name}</span>
+                  </div>
+                </td>
+                <td className="px-5 py-4 text-gray-400 text-sm">{t.role}</td>
+                <td className="px-5 py-4"><span className={`text-xs px-2 py-0.5 rounded-full ${getTechStatusColor(t.status)}`}>{t.status}</span></td>
+                <td className="px-5 py-4 text-gray-400 text-sm">{t.assignment}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
-  </div>
+  );
+}
 
-  <script>
-    // ─── Navigation ───────────────────────────────────────────────────────────
-    function showPage(name) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('.nav-item').forEach(n => {
-        n.classList.remove('bg-accent/10', 'text-accent', 'border-l-2', 'border-accent');
-        n.classList.add('text-gray-500');
-      });
-      const page = document.getElementById('page-' + name);
-      if (page) page.classList.remove('hidden');
-      const navItem = document.querySelector('[data-page="' + name + '"]');
-      if (navItem) {
-        navItem.classList.add('bg-accent/10', 'text-accent', 'border-l-2', 'border-accent');
-        navItem.classList.remove('text-gray-500');
-      }
-      const titles = {
-        dashboard: 'Dashboard',
-        assets: 'Assets',
-        auftraege: 'Auftragsmanagement',
-        techniker: 'Techniker-Übersicht',
-        news: 'News & Updates',
-        einstellungen: 'Einstellungen'
-      };
-      const titleEl = document.getElementById('page-title');
-      if (titleEl) titleEl.textContent = titles[name] || name;
-    }
-
-    // ─── Login ────────────────────────────────────────────────────────────────
-    function doLogin() {
-      const email = document.getElementById('login-email').value.trim();
-      const pass = document.getElementById('login-pass').value.trim();
-      if (!email || !pass) return;
-      document.getElementById('login-screen').classList.add('hidden');
-      const app = document.getElementById('app');
-      app.classList.remove('hidden');
-      app.style.display = 'flex';
-      // Small timeout to ensure canvas is rendered before chart init
-      setTimeout(initChart, 50);
-      showPage('dashboard');
-    }
-
-    // ─── Chart.js ─────────────────────────────────────────────────────────────
-    function initChart() {
-      const canvas = document.getElementById('auslastung-chart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
-          datasets: [
-            {
-              label: 'Auslastung %',
-              data: [72, 85, 68, 91, 78, 45, 62],
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99,102,241,0.08)',
-              fill: true,
-              tension: 0.4,
-              pointBackgroundColor: '#6366f1',
-              pointBorderColor: '#6366f1',
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              borderWidth: 2,
-            },
-            {
-              label: 'Fehlerstunden',
-              data: [2, 1, 4, 0, 3, 1, 2],
-              borderColor: '#ef4444',
-              backgroundColor: 'transparent',
-              fill: false,
-              tension: 0.4,
-              pointBackgroundColor: '#ef4444',
-              pointBorderColor: '#ef4444',
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              borderWidth: 2,
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: {
-              labels: {
-                color: '#9ca3af',
-                font: { size: 12, family: 'Inter' },
-                usePointStyle: true,
-                pointStyleWidth: 8,
-                padding: 16,
-              }
-            },
-            tooltip: {
-              backgroundColor: '#141519',
-              borderColor: '#1f2128',
-              borderWidth: 1,
-              titleColor: '#e5e7eb',
-              bodyColor: '#9ca3af',
-              padding: 10,
-            }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-              ticks: { color: '#6b7280', font: { size: 11, family: 'Inter' } },
-              border: { display: false }
-            },
-            y: {
-              grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-              ticks: { color: '#6b7280', font: { size: 11, family: 'Inter' } },
-              border: { display: false }
-            }
-          }
-        }
-      });
-    }
-
-    // ─── Auftrag Modal ────────────────────────────────────────────────────────
-    let selectedPrio = 'HOCH';
-    let orderCounter = 2025;
-
-    function openNewOrderModal() {
-      document.getElementById('modal-overlay').classList.remove('hidden');
-      document.getElementById('modal-overlay').style.display = 'flex';
-      document.getElementById('mo-asset').value = '';
-      document.getElementById('mo-techniker').value = '';
-      document.getElementById('mo-titel').value = '';
-      document.getElementById('mo-beschreibung').value = '';
-      selectedPrio = 'HOCH';
-      document.querySelectorAll('.prio-btn').forEach(b => {
-        b.className = 'prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-gray-400 transition-colors';
-      });
-      const hochBtn = document.querySelector('[data-prio="HOCH"]');
-      if (hochBtn) hochBtn.className = 'prio-btn border border-amber-400/50 rounded-lg px-3 py-2 text-xs font-medium text-amber-400 transition-colors';
-    }
-
-    function closeModal() {
-      const overlay = document.getElementById('modal-overlay');
-      overlay.classList.add('hidden');
-      overlay.style.display = '';
-    }
-
-    function selectPrio(btn) {
-      selectedPrio = btn.dataset.prio;
-      const colorMap = {
-        NIEDRIG:  'border-gray-400/50 text-gray-400',
-        MITTEL:   'border-amber-400/50 text-amber-400',
-        HOCH:     'border-amber-400/50 text-amber-400',
-        KRITISCH: 'border-red-400/50 text-red-400',
-      };
-      document.querySelectorAll('.prio-btn').forEach(b => {
-        b.className = 'prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-gray-400 transition-colors';
-      });
-      btn.className = `prio-btn border ${colorMap[selectedPrio]} rounded-lg px-3 py-2 text-xs font-medium transition-colors`;
-    }
-
-    function submitNewOrder() {
-      const asset     = document.getElementById('mo-asset').value;
-      const techniker = document.getElementById('mo-techniker').value;
-      const titel     = document.getElementById('mo-titel').value.trim();
-      if (!asset || !techniker || !titel) {
-        alert('Bitte Asset, Techniker und Titel ausfüllen.');
-        return;
-      }
-      orderCounter++;
-      const prioColors = {
-        NIEDRIG:  'text-gray-400 bg-gray-400/10',
-        MITTEL:   'text-amber-400 bg-amber-400/10',
-        HOCH:     'text-amber-400 bg-amber-400/10',
-        KRITISCH: 'text-red-400 bg-red-400/10',
-      };
-      const initials = techniker.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-      const card = document.createElement('div');
-      card.className = 'bg-surface border border-border rounded-xl p-4';
-      card.innerHTML = `
-        <div class="flex items-start justify-between mb-2">
-          <span class="text-gray-500 text-xs font-mono">WO-${orderCounter}</span>
-          <span class="text-xs font-medium px-2 py-0.5 rounded ${prioColors[selectedPrio]}">${selectedPrio}</span>
-        </div>
-        <div class="text-gray-200 text-sm font-medium mb-1">${titel}</div>
-        <div class="text-gray-500 text-xs mb-3">${asset}</div>
-        <div class="flex items-center gap-2">
-          <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
-            <span class="text-indigo-300 text-xs">${initials}</span>
+// ── DESKTOP PAGE: NEWS ────────────────────────────────────────────────────────
+function NewsPage(){
+  const items=[
+    ['v2.4.0','Neues Kanban-Board für Auftragsmanagement eingeführt','10. Mär 2026'],
+    ['v2.3.5','Performance-Optimierungen im Asset-Tracking','5. Mär 2026'],
+    ['v2.3.0','ERP-Schnittstelle erweitert — SAP-Anbindung verbessert','28. Feb 2026'],
+    ['v2.2.1','Bugfix: Mobile Scan-Funktion auf iOS-Geräten','20. Feb 2026'],
+    ['v2.2.0','Techniker-App vollständig überarbeitet','15. Feb 2026'],
+  ];
+  return(
+    <div className="space-y-4 max-w-2xl">
+      {items.map(([v,msg,date])=>(
+        <div key={v} className="bg-desk-surface border border-desk-border rounded-xl p-5">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="bg-desk-accent/20 text-desk-accent text-xs font-medium px-2.5 py-0.5 rounded-full border border-desk-accent/30">{v}</span>
+            <span className="text-gray-500 text-xs">{date}</span>
           </div>
-          <span class="text-gray-500 text-xs">${techniker}</span>
-        </div>`;
-      // Insert into Offen column (first kanban column's space-y-3)
-      const offenCol = document.querySelector('#page-auftraege .grid.grid-cols-3 > div:first-child .space-y-3');
-      if (offenCol) {
-        offenCol.prepend(card);
-        // update counter badge
-        const badge = document.querySelector('#page-auftraege .grid.grid-cols-3 > div:first-child .ml-auto');
-        if (badge) badge.textContent = offenCol.children.length;
-      }
-      closeModal();
-      showPage('auftraege');
-    }
+          <div className="text-white text-sm">{msg}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-    // ─── Init: activate dashboard nav on load ─────────────────────────────────
-    document.addEventListener('DOMContentLoaded', function () {
-      // Pre-select dashboard nav item visually (but don't show app yet)
-      const dashNav = document.querySelector('[data-page="dashboard"]');
-      if (dashNav) {
-        dashNav.classList.add('bg-accent/10', 'text-accent', 'border-l-2', 'border-accent');
-        dashNav.classList.remove('text-gray-500');
-      }
-    });
-  </script>
+// ── DESKTOP PAGE: EINSTELLUNGEN ───────────────────────────────────────────────
+function EinstellungenPage(){
+  const [n1,sN1]=React.useState(true);
+  const [n2,sN2]=React.useState(false);
+  const [n3,sN3]=React.useState(true);
+  const Toggle=({val,set})=>(
+    <button onClick={()=>set(!val)} className={`w-11 h-6 rounded-full toggle-track relative flex-shrink-0 ${val?'bg-desk-accent':'bg-[#2a2a2a]'}`}>
+      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${val?'left-5':'left-0.5'}`}/>
+    </button>
+  );
+  return(
+    <div className="space-y-5 max-w-2xl">
+      <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
+        <div className="text-white font-semibold mb-4">Allgemein</div>
+        <div className="space-y-4">
+          {[['Unternehmensname','FieldFix GmbH'],['Zeitzone','Europe/Berlin'],['Sprache','Deutsch']].map(([l,v])=>(
+            <div key={l} className="flex items-center justify-between">
+              <label className="text-gray-400 text-sm">{l}</label>
+              <input defaultValue={v} className="bg-desk-base border border-desk-border rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-desk-accent w-48"/>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
+        <div className="text-white font-semibold mb-4">Benachrichtigungen</div>
+        <div className="space-y-4">
+          {[['Kritische Alarme per E-Mail',n1,sN1],['Wartungserinnerungen',n2,sN2],['Tagesberichte',n3,sN3]].map(([l,v,s])=>(
+            <div key={l} className="flex items-center justify-between">
+              <span className="text-gray-400 text-sm">{l}</span>
+              <Toggle val={v} set={s}/>
+            </div>
+          ))}
+        </div>
+      </div>
+      <button className="btn-press bg-desk-accent hover:bg-desk-accent-dim text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors">Speichern</button>
+    </div>
+  );
+}
+
+// ── DESKTOP DASHBOARD ─────────────────────────────────────────────────────────
+function DesktopDashboard({user,onLogout}){
+  const [activePage,setActivePage]=React.useState('dashboard');
+  const [orders,setOrders]=React.useState(WORK_ORDERS_INITIAL);
+  const [showNew,setShowNew]=React.useState(false);
+  const navItems=[
+    ['dashboard','Dashboard',<IconGrid size={18}/>],
+    ['assets','Assets',<IconCube size={18}/>],
+    ['auftraege','Aufträge',<IconClipboard size={18}/>],
+    ['techniker','Techniker',<IconUsers size={18}/>],
+    ['news','News',<IconBell size={18}/>],
+    ['einstellungen','Einstellungen',<IconGear size={18}/>],
+  ];
+  const pageTitle={dashboard:'Dashboard',assets:'Asset-Verwaltung',auftraege:'Auftragsmanagement',techniker:'Techniker',news:'News & Updates',einstellungen:'Einstellungen'}[activePage]||'';
+  return(
+    <div className="bg-desk-base min-h-screen flex font-sans text-white">
+      <div className="w-[220px] bg-desk-sidebar border-r border-desk-border fixed left-0 top-0 bottom-0 flex flex-col z-30">
+        <div className="p-5 flex items-center gap-3 border-b border-desk-border">
+          <LogoIcon/>
+          <span className="font-bold text-white tracking-widest text-sm">ASSETLOGIC</span>
+        </div>
+        <nav className="flex-1 p-3 space-y-1">
+          {navItems.map(([id,label,icon])=>(
+            <button key={id} onClick={()=>setActivePage(id)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activePage===id?'bg-desk-accent/10 text-desk-accent border-l-2 border-desk-accent pl-[10px]':'text-gray-500 hover:text-gray-300'}`}>
+              {icon}{label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-desk-border">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-desk-accent/20 flex items-center justify-center text-desk-accent text-xs font-bold flex-shrink-0">{user.initials}</div>
+            <div className="min-w-0 flex-1">
+              <div className="text-white text-xs font-medium truncate">{user.name}</div>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="ml-[220px] flex-1 flex flex-col min-h-screen">
+        <div className="h-14 border-b border-desk-border flex items-center px-6 justify-between bg-desk-base/80 backdrop-blur sticky top-0 z-20">
+          <div className="text-white font-semibold">{pageTitle}</div>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <IconSearch size={14} cls="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"/>
+              <input placeholder="Suchen…" className="bg-desk-surface border border-desk-border rounded-lg pl-8 pr-4 py-1.5 text-white text-sm focus:outline-none focus:border-desk-accent w-48"/>
+            </div>
+            <button onClick={onLogout} title="Abmelden" className="w-8 h-8 rounded-full bg-desk-accent/20 flex items-center justify-center text-desk-accent text-xs font-bold hover:bg-desk-accent/30 transition-colors">
+              {user.initials}
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 page-enter" key={activePage}>
+          {activePage==='dashboard'&&<DashboardPage/>}
+          {activePage==='assets'&&<AssetsPage/>}
+          {activePage==='auftraege'&&<AuftraegePage orders={orders} setOrders={setOrders} showNew={showNew} setShowNew={setShowNew}/>}
+          {activePage==='techniker'&&<TechnikerPage/>}
+          {activePage==='news'&&<NewsPage/>}
+          {activePage==='einstellungen'&&<EinstellungenPage/>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── APP ROUTER & ROOT ─────────────────────────────────────────────────────────
+function AppRouter({user,onLogout}){
+  const forcesMobile=isMobileDevice()||user.role==='TECHNIKER';
+  if(forcesMobile)return<MobileApp user={user} onLogout={onLogout}/>;
+  return<DesktopDashboard user={user} onLogout={onLogout}/>;
+}
+
+function App(){
+  const [user,setUser]=React.useState(null);
+  if(!user)return<LoginScreen onLogin={setUser}/>;
+  return<AppRouter user={user} onLogout={()=>setUser(null)}/>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
 </body>
 </html>
