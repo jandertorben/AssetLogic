@@ -150,6 +150,12 @@
           </svg>
           Aufträge
         </button>
+        <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="techniker" onclick="showPage('techniker')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Techniker
+        </button>
         <button class="nav-item w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-gray-500 hover:text-gray-300 text-sm font-medium text-left" data-page="news" onclick="showPage('news')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -505,7 +511,7 @@
               <h2 class="text-gray-100 font-semibold text-lg">Auftragsmanagement</h2>
               <p class="text-gray-500 text-sm mt-0.5">Alle Wartungs- und Serviceaufträge</p>
             </div>
-            <button class="bg-accent hover:bg-accent-dim text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
+            <button onclick="openNewOrderModal()" class="bg-accent hover:bg-accent-dim text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Neuer Auftrag
             </button>
@@ -643,6 +649,150 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ===== TECHNIKER PAGE ===== -->
+        <div id="page-techniker" class="page hidden">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-gray-100 font-semibold text-lg">Techniker-Übersicht</h2>
+              <p class="text-gray-500 text-sm mt-0.5">Status und Einsätze aller Techniker</p>
+            </div>
+            <button onclick="showPage('auftraege')" class="bg-accent hover:bg-accent-dim text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Auftrag erstellen
+            </button>
+          </div>
+
+          <!-- KPI Strip -->
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-surface border border-border rounded-xl p-5">
+              <div class="text-gray-500 text-xs uppercase tracking-wider mb-1">Gesamt</div>
+              <div class="text-3xl font-bold text-gray-100">6</div>
+              <div class="text-gray-500 text-xs mt-1">Techniker registriert</div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl p-5">
+              <div class="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wider mb-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]"></span>Im Einsatz
+              </div>
+              <div class="text-3xl font-bold text-gray-100">3</div>
+              <div class="text-gray-500 text-xs mt-1">Aktive Zuweisungen</div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl p-5">
+              <div class="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wider mb-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>Verfügbar
+              </div>
+              <div class="text-3xl font-bold text-gray-100">2</div>
+              <div class="text-gray-500 text-xs mt-1">Bereit für Einsatz</div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl p-5">
+              <div class="flex items-center gap-1.5 text-gray-500 text-xs uppercase tracking-wider mb-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Pause
+              </div>
+              <div class="text-3xl font-bold text-gray-100">1</div>
+              <div class="text-gray-500 text-xs mt-1">Aktuell nicht verfügbar</div>
+            </div>
+          </div>
+
+          <!-- Techniker Tabelle -->
+          <div class="bg-surface border border-border rounded-xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+              <span class="text-gray-200 text-sm font-semibold">Alle Techniker</span>
+              <input type="text" placeholder="Suchen..." class="bg-base border border-border text-gray-200 rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-1 focus:ring-accent" />
+            </div>
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-border">
+                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">Techniker</th>
+                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Status</th>
+                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Aktueller Auftrag</th>
+                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Asset</th>
+                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Seit</th>
+                  <th class="text-left text-gray-500 text-xs font-medium uppercase tracking-wider px-4 py-3">Abgeschl.</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">MS</div>
+                      <div><div class="text-gray-200 font-medium">M. Schulz</div><div class="text-gray-500 text-xs">mo-001</div></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]"></span>Im Einsatz</span></td>
+                  <td class="px-4 py-3.5 text-gray-300 font-mono text-xs">WO-2024</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs">Liebherr R 920</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">13:45</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">14</td>
+                </tr>
+                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">JF</div>
+                      <div><div class="text-gray-200 font-medium">J. Fischer</div><div class="text-gray-500 text-xs">mo-002</div></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]"></span>Im Einsatz</span></td>
+                  <td class="px-4 py-3.5 text-gray-300 font-mono text-xs">WO-2023</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs">CAT 320 Bagger</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">14:10</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">9</td>
+                </tr>
+                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent text-xs font-bold flex-shrink-0">AW</div>
+                      <div><div class="text-gray-200 font-medium">A. Weber</div><div class="text-gray-500 text-xs">mo-003</div></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-400/10 flex items-center gap-1.5 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]"></span>Im Einsatz</span></td>
+                  <td class="px-4 py-3.5 text-gray-300 font-mono text-xs">WO-2022</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs">STILL RX 20-20</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">09:30</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">22</td>
+                </tr>
+                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-indigo-400/20 flex items-center justify-center text-indigo-300 text-xs font-bold flex-shrink-0">KM</div>
+                      <div><div class="text-gray-200 font-medium">K. Müller</div><div class="text-gray-500 text-xs">mo-004</div></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="text-indigo-400 text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-400/10 w-fit block">Verfügbar</span></td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">31</td>
+                </tr>
+                <tr class="border-b border-border/50 hover:bg-base/50 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-indigo-400/20 flex items-center justify-center text-indigo-300 text-xs font-bold flex-shrink-0">TK</div>
+                      <div><div class="text-gray-200 font-medium">T. Kowalski</div><div class="text-gray-500 text-xs">mo-005</div></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="text-indigo-400 text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-400/10 w-fit block">Verfügbar</span></td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">18</td>
+                </tr>
+                <tr class="hover:bg-base/50 transition-colors">
+                  <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-300 text-xs font-bold flex-shrink-0">AM</div>
+                      <div><div class="text-gray-200 font-medium">A. Müller</div><div class="text-gray-500 text-xs">mo-006</div></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3.5"><span class="text-amber-400 text-xs font-medium px-2.5 py-1 rounded-full bg-amber-400/10 w-fit block">Pause</span></td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">—</td>
+                  <td class="px-4 py-3.5 text-gray-500 text-xs">seit 14:20</td>
+                  <td class="px-4 py-3.5 text-gray-400 text-xs font-medium">7</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -866,6 +1016,73 @@
     </div>
   </div>
 
+  <!-- ===== NEUER AUFTRAG MODAL ===== -->
+  <div id="modal-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+    <div class="bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-border">
+        <div>
+          <h3 class="text-gray-100 font-semibold">Neuer Auftrag</h3>
+          <p class="text-gray-500 text-xs mt-0.5">Wartungs- oder Serviceauftrag erstellen</p>
+        </div>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-300 transition-colors p-1">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-400 text-xs font-medium mb-1.5">Asset *</label>
+            <select id="mo-asset" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
+              <option value="">Asset wählen...</option>
+              <option value="STILL RX 20-20">STILL RX 20-20</option>
+              <option value="Liebherr R 920">Liebherr R 920</option>
+              <option value="CAT 320 Bagger">CAT 320 Bagger</option>
+              <option value="Hydraulikpresse HP-500">Hydraulikpresse HP-500</option>
+              <option value="Kompressor KPD-200">Kompressor KPD-200</option>
+              <option value="Kran KR-50">Kran KR-50</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 text-xs font-medium mb-1.5">Techniker *</label>
+            <select id="mo-techniker" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent">
+              <option value="">Techniker wählen...</option>
+              <option value="M. Schulz">M. Schulz</option>
+              <option value="J. Fischer">J. Fischer</option>
+              <option value="A. Weber">A. Weber</option>
+              <option value="K. Müller">K. Müller</option>
+              <option value="T. Kowalski">T. Kowalski</option>
+              <option value="A. Müller">A. Müller</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-gray-400 text-xs font-medium mb-1.5">Titel *</label>
+          <input id="mo-titel" type="text" placeholder="z.B. Hydraulikinspektion" class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
+        </div>
+        <div>
+          <label class="block text-gray-400 text-xs font-medium mb-1.5">Beschreibung</label>
+          <textarea id="mo-beschreibung" rows="3" placeholder="Optionale Beschreibung des Auftrags..." class="w-full bg-base border border-border text-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-accent resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-gray-400 text-xs font-medium mb-1.5">Priorität</label>
+          <div class="grid grid-cols-4 gap-2" id="mo-prioritaet">
+            <button type="button" data-prio="NIEDRIG" onclick="selectPrio(this)" class="prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-gray-400 transition-colors">Niedrig</button>
+            <button type="button" data-prio="MITTEL" onclick="selectPrio(this)" class="prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-amber-400 hover:text-amber-400 transition-colors">Mittel</button>
+            <button type="button" data-prio="HOCH" onclick="selectPrio(this)" class="prio-btn border border-amber-400/50 rounded-lg px-3 py-2 text-xs font-medium text-amber-400 prio-selected">Hoch</button>
+            <button type="button" data-prio="KRITISCH" onclick="selectPrio(this)" class="prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-red-400 hover:text-red-400 transition-colors">Kritisch</button>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 pb-5 flex justify-end gap-3">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors">Abbrechen</button>
+        <button onclick="submitNewOrder()" class="bg-accent hover:bg-accent-dim text-white rounded-lg px-5 py-2 text-sm font-medium transition-colors flex items-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Auftrag erstellen
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ─── Navigation ───────────────────────────────────────────────────────────
     function showPage(name) {
@@ -885,6 +1102,7 @@
         dashboard: 'Dashboard',
         assets: 'Assets',
         auftraege: 'Auftragsmanagement',
+        techniker: 'Techniker-Übersicht',
         news: 'News & Updates',
         einstellungen: 'Einstellungen'
       };
@@ -981,6 +1199,88 @@
           }
         }
       });
+    }
+
+    // ─── Auftrag Modal ────────────────────────────────────────────────────────
+    let selectedPrio = 'HOCH';
+    let orderCounter = 2025;
+
+    function openNewOrderModal() {
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('mo-asset').value = '';
+      document.getElementById('mo-techniker').value = '';
+      document.getElementById('mo-titel').value = '';
+      document.getElementById('mo-beschreibung').value = '';
+      selectedPrio = 'HOCH';
+      document.querySelectorAll('.prio-btn').forEach(b => {
+        b.className = 'prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-gray-400 transition-colors';
+      });
+      const hochBtn = document.querySelector('[data-prio="HOCH"]');
+      if (hochBtn) hochBtn.className = 'prio-btn border border-amber-400/50 rounded-lg px-3 py-2 text-xs font-medium text-amber-400 transition-colors';
+    }
+
+    function closeModal() {
+      const overlay = document.getElementById('modal-overlay');
+      overlay.classList.add('hidden');
+      overlay.style.display = '';
+    }
+
+    function selectPrio(btn) {
+      selectedPrio = btn.dataset.prio;
+      const colorMap = {
+        NIEDRIG:  'border-gray-400/50 text-gray-400',
+        MITTEL:   'border-amber-400/50 text-amber-400',
+        HOCH:     'border-amber-400/50 text-amber-400',
+        KRITISCH: 'border-red-400/50 text-red-400',
+      };
+      document.querySelectorAll('.prio-btn').forEach(b => {
+        b.className = 'prio-btn border border-border rounded-lg px-3 py-2 text-xs font-medium text-gray-500 hover:border-gray-400 transition-colors';
+      });
+      btn.className = `prio-btn border ${colorMap[selectedPrio]} rounded-lg px-3 py-2 text-xs font-medium transition-colors`;
+    }
+
+    function submitNewOrder() {
+      const asset     = document.getElementById('mo-asset').value;
+      const techniker = document.getElementById('mo-techniker').value;
+      const titel     = document.getElementById('mo-titel').value.trim();
+      if (!asset || !techniker || !titel) {
+        alert('Bitte Asset, Techniker und Titel ausfüllen.');
+        return;
+      }
+      orderCounter++;
+      const prioColors = {
+        NIEDRIG:  'text-gray-400 bg-gray-400/10',
+        MITTEL:   'text-amber-400 bg-amber-400/10',
+        HOCH:     'text-amber-400 bg-amber-400/10',
+        KRITISCH: 'text-red-400 bg-red-400/10',
+      };
+      const initials = techniker.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const card = document.createElement('div');
+      card.className = 'bg-surface border border-border rounded-xl p-4';
+      card.innerHTML = `
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-gray-500 text-xs font-mono">WO-${orderCounter}</span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded ${prioColors[selectedPrio]}">${selectedPrio}</span>
+        </div>
+        <div class="text-gray-200 text-sm font-medium mb-1">${titel}</div>
+        <div class="text-gray-500 text-xs mb-3">${asset}</div>
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded-full bg-indigo-400/20 flex items-center justify-center">
+            <span class="text-indigo-300 text-xs">${initials}</span>
+          </div>
+          <span class="text-gray-500 text-xs">${techniker}</span>
+        </div>`;
+      // Insert into Offen column (first kanban column's space-y-3)
+      const offenCol = document.querySelector('#page-auftraege .grid.grid-cols-3 > div:first-child .space-y-3');
+      if (offenCol) {
+        offenCol.prepend(card);
+        // update counter badge
+        const badge = document.querySelector('#page-auftraege .grid.grid-cols-3 > div:first-child .ml-auto');
+        if (badge) badge.textContent = offenCol.children.length;
+      }
+      closeModal();
+      showPage('auftraege');
     }
 
     // ─── Init: activate dashboard nav on load ─────────────────────────────────
