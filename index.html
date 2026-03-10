@@ -292,7 +292,7 @@ function AssetDetailView({asset,onBack}){
                 <span className={`text-sm font-bold font-mono-tech ${oelLow?'text-red-400 glow-red':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>{asset.hydraulikDruck} bar</span>
               </div>
               <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden mb-2">
-                <div className={`h-full rounded-full transition-all duration-700 ${oelLow?'bg-red-500':'hydraulikPct>75?bg-green-500 text-green-500':'bg-orange-500'}`}
+                <div className="h-full rounded-full transition-all duration-700"
                   style={{width:`${hydraulikPct}%`, background: oelLow?'#ef4444': hydraulikPct>75?'#22c55e':'#f97316',
                   boxShadow: oelLow?'0 0 8px rgba(239,68,68,0.6)': hydraulikPct>75?'0 0 8px rgba(34,197,94,0.5)':'0 0 8px rgba(249,115,22,0.5)'}}/>
               </div>
@@ -589,7 +589,7 @@ function MobileAuftraege({user,orders,onSelectAsset}){
                 </div>
                 <div className="text-white font-semibold text-base mb-1">{o.title}</div>
                 <div className="text-gray-400 text-sm mb-1">{o.asset}</div>
-                {o.desc&&<div className="text-gray-600 text-xs mb-3 line-clamp-1">{o.desc}</div>}
+                {o.desc&&<div className="text-gray-600 text-xs mb-3 overflow-hidden" style={{display:'-webkit-box',WebkitLineClamp:1,WebkitBoxOrient:'vertical'}}>{o.desc}</div>}
                 <div className="flex items-center justify-between">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(o.status)}`}>{o.status.replace('_',' ')}</span>
                   {linkedAsset&&<span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(linkedAsset.status)}`}>{linkedAsset.status}</span>}
@@ -1124,6 +1124,25 @@ function DesktopDashboard({user,onLogout}){
   );
 }
 
+// ── ERROR BOUNDARY ────────────────────────────────────────────────────────────
+class ErrorBoundary extends React.Component {
+  constructor(props){super(props);this.state={error:null};}
+  static getDerivedStateFromError(e){return{error:e};}
+  render(){
+    if(this.state.error) return(
+      <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center px-4">
+        <div className="bg-[#1a1a1a] border border-red-500/30 rounded-2xl p-8 max-w-sm w-full text-center">
+          <div className="text-red-400 text-4xl mb-4">⚠</div>
+          <div className="text-white font-bold mb-2">Rendering-Fehler</div>
+          <div className="text-gray-400 text-sm mb-4">{this.state.error.message}</div>
+          <button onClick={()=>this.setState({error:null})} className="bg-[#2979FF] text-white rounded-xl px-6 py-2 text-sm font-semibold">Neu laden</button>
+        </div>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 // ── APP ROUTER & ROOT ─────────────────────────────────────────────────────────
 function AppRouter({user,onLogout}){
   const forcesMobile=isMobileDevice()||user.role==='TECHNIKER';
@@ -1137,7 +1156,9 @@ function App(){
   return<AppRouter user={user} onLogout={()=>setUser(null)}/>;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <ErrorBoundary><App/></ErrorBoundary>
+);
 </script>
 </body>
 </html>
