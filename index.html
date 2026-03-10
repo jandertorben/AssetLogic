@@ -38,7 +38,7 @@
   --warning:    #E65100;
   --warn-bg:    #FFF3E0;
   --r:          10px;
-  --nav-h:      64px;
+  --nav-h:      70px;
   --hdr-h:      70px;
   --sidebar-w:  224px;
   --shadow:     0 1px 3px rgba(0,45,90,.07), 0 4px 14px rgba(0,45,90,.06);
@@ -837,10 +837,12 @@ header{
 .machines-list{display:flex;flex-direction:column;gap:10px;}
 .machine-card{
   background:#fff;border:1px solid var(--border);border-radius:var(--r);
-  padding:15px 16px;cursor:pointer;transition:all .2s;
+  padding:17px 16px;cursor:pointer;transition:all .18s;
   position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;
-  box-shadow:var(--shadow);
+  box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;
+  min-height:72px;
 }
+.machine-card:active{transform:scale(.985);border-color:var(--accent);}
 .machine-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;}
 .machine-card.err::after{background:var(--red);}
 .machine-card.ok::after{background:var(--green);}
@@ -877,11 +879,14 @@ header{
 .md-back{
   display:inline-flex;align-items:center;gap:6px;
   font-size:12px;font-weight:700;color:rgba(255,255,255,.65);
-  cursor:pointer;margin-bottom:16px;background:none;border:none;padding:0;
-  transition:color .15s;
+  cursor:pointer;margin-bottom:16px;background:rgba(255,255,255,.08);border:none;
+  padding:9px 14px 9px 10px;border-radius:20px;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;
+  min-height:40px;
 }
-.md-back svg{width:16px;height:16px;}
-.md-back:hover{color:#fff;}
+.md-back svg{width:18px;height:18px;}
+.md-back:active{background:rgba(255,255,255,.2);transform:scale(.96);}
+.md-back:hover{color:#fff;background:rgba(255,255,255,.15);}
 .md-type-badge{
   display:inline-flex;align-items:center;gap:6px;
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
@@ -1355,9 +1360,11 @@ header{
 .settings-list{display:flex;flex-direction:column;gap:2px;}
 .set-item{
   display:flex;align-items:center;gap:14px;
-  background:#fff;border-radius:9px;padding:14px 16px;
-  cursor:pointer;transition:all .2s;border:1px solid transparent;
+  background:#fff;border-radius:9px;padding:17px 16px;
+  cursor:pointer;transition:all .15s;border:1px solid transparent;
+  min-height:56px;-webkit-tap-highlight-color:transparent;
 }
+.set-item:active{background:var(--bg);border-color:var(--border);transform:scale(.985);}
 .set-item:hover{background:var(--bg);border-color:var(--border);}
 .set-icon{width:34px;height:34px;background:var(--accent-lt);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .set-icon svg{width:17px;height:17px;color:var(--accent);}
@@ -1372,20 +1379,22 @@ nav.bottom-nav{
   padding-bottom:env(safe-area-inset-bottom,0px);
   box-shadow:0 -2px 12px rgba(0,45,90,.07);
 }
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;}
-.nav-item svg{width:22px;height:22px;color:#C5CDD8;transition:color .15s;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;background:none;border:none;padding:0;min-height:52px;}
+.nav-item svg{width:24px;height:24px;color:#C5CDD8;transition:color .15s;}
 .nav-item span{font-size:10px;font-weight:600;color:var(--text-muted);letter-spacing:.2px;transition:color .15s;}
 .nav-item.active svg,.nav-item.active span{color:var(--primary);}
-.nav-item.scan-btn{flex:none;width:68px;position:relative;top:-16px;}
+.nav-item:active:not(.scan-btn) svg{transform:scale(.9);color:var(--primary);}
+.nav-item.scan-btn{flex:none;width:80px;position:relative;top:-22px;}
 .nav-item.scan-btn .scan-fab{
-  width:56px;height:56px;background:var(--primary);color:#fff;
+  width:64px;height:64px;background:var(--primary);color:#fff;
   border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;box-shadow:0 4px 16px rgba(0,45,90,.32);
+  gap:3px;box-shadow:0 6px 20px rgba(0,45,90,.38);
   border:3px solid #fff;transition:all .15s;
 }
-.nav-item.scan-btn .scan-fab svg{color:#fff;width:22px;height:22px;}
+.nav-item.scan-btn .scan-fab svg{color:#fff;width:24px;height:24px;}
 .nav-item.scan-btn .scan-fab span{font-size:8px;font-weight:900;color:#fff;letter-spacing:1px;}
-.nav-item.scan-btn .scan-fab:hover{transform:scale(1.06);box-shadow:0 6px 22px rgba(0,45,90,.42);}
+.nav-item.scan-btn .scan-fab:active{transform:scale(.94);box-shadow:0 3px 12px rgba(0,45,90,.32);}
+.nav-item.scan-btn .scan-fab:hover{transform:scale(1.06);box-shadow:0 8px 24px rgba(0,45,90,.44);}
 
 /* ===== SCAN OVERLAY ===== */
 #scanOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:9999;flex-direction:column;align-items:center;justify-content:center;}
@@ -2005,12 +2014,13 @@ nav.bottom-nav{
 }
 .einsatz-timer.show{display:flex;}
 .einsatz-timer-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0;}
-/* Tech Action Bar */
-.tech-action-bar{display:flex;gap:10px;padding:16px 0 4px;}
+/* Tech Action Bar — sticky so it's always in thumb reach */
+.tech-action-bar{display:flex;gap:10px;padding:12px 18px;margin:0 -18px;position:sticky;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,45,90,.09);}
 .tech-action-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  padding:15px 8px;border-radius:12px;border:none;cursor:pointer;touch-action:manipulation;
-  font-size:11px;font-weight:800;letter-spacing:.3px;line-height:1.2;transition:all .18s;
+  padding:17px 8px;border-radius:12px;border:none;cursor:pointer;touch-action:manipulation;
+  font-size:11px;font-weight:800;letter-spacing:.3px;line-height:1.2;transition:all .15s;
+  min-height:64px;
 }
 .tech-action-btn svg{width:22px;height:22px;flex-shrink:0;}
 .tech-action-btn.start{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(0,45,90,.28);}
@@ -2950,8 +2960,9 @@ body.role-service-leader nav.bottom-nav{display:none!important;}
 .einsatz-empty-icon{font-size:46px;opacity:.3;}
 .einsatz-empty-text{font-size:15px;font-weight:600;color:var(--text-muted);}
 .einsatz-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin:16px 0 8px;}
-.einsatz-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:13px;cursor:pointer;transition:border-color .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;}
-.einsatz-card:active,.einsatz-card:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(21,101,192,.12);}
+.einsatz-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:13px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;min-height:72px;}
+.einsatz-card:active{border-color:var(--accent);box-shadow:0 2px 10px rgba(21,101,192,.12);transform:scale(.985);}
+.einsatz-card:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(21,101,192,.12);}
 .einsatz-card-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--accent-lt);}
 .einsatz-card.CRITICAL .einsatz-card-icon{background:#F3E5F5;}
 .einsatz-card.HIGH .einsatz-card-icon{background:var(--red-bg);}
@@ -9233,6 +9244,28 @@ setupLoginContext();
     var errEl = document.getElementById('loginRoleError');
     if (errEl) errEl.classList.remove('show');
   });
+})();
+
+// ── Einhandbedienung: Swipe-Back-Geste (linker Rand → zurück) ──
+(function() {
+  var startX = 0, startY = 0, tracking = false;
+  document.addEventListener('touchstart', function(e) {
+    var t = e.touches[0];
+    tracking = t.clientX < 40; // nur vom linken Rand
+    if (tracking) { startX = t.clientX; startY = t.clientY; }
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (!tracking) return;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - startX;
+    var dy = Math.abs(t.clientY - startY);
+    tracking = false;
+    if (dx > 80 && dy < 60) {
+      var active = document.querySelector('.page.active');
+      if (!active) return;
+      if (active.id === 'page-machine') { machineBackNav(); }
+    }
+  }, { passive: true });
 })();
 </script>
 
