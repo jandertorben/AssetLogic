@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>AssetLogic — Asset Management Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -45,6 +45,21 @@ body{background:#0d0d0d;font-family:'Inter',sans-serif;margin:0;}
 .btn-press:active{transform:scale(0.97);}
 select option{background:#1a1a1a;color:#fff;}
 .toggle-track{transition:background 0.2s;}
+.font-mono-tech{font-family:'JetBrains Mono',monospace;}
+@keyframes pulse-critical{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.5);}50%{box-shadow:0 0 0 10px rgba(239,68,68,0);}}
+.pulse-critical{animation:pulse-critical 2s ease-in-out infinite;}
+@keyframes pulse-warning{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.45);}50%{box-shadow:0 0 0 10px rgba(245,158,11,0);}}
+.pulse-warning{animation:pulse-warning 2s ease-in-out infinite;}
+@keyframes statusGlow{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.status-pulse{animation:statusGlow 2s ease-in-out infinite;}
+.glow-green{text-shadow:0 0 8px rgba(34,197,94,0.7),0 0 20px rgba(34,197,94,0.3);}
+.glow-red{text-shadow:0 0 8px rgba(239,68,68,0.7),0 0 20px rgba(239,68,68,0.3);}
+.glow-amber{text-shadow:0 0 8px rgba(245,158,11,0.7),0 0 20px rgba(245,158,11,0.3);}
+.glow-blue{text-shadow:0 0 8px rgba(41,121,255,0.7),0 0 20px rgba(41,121,255,0.3);}
+.asset-hero{background:linear-gradient(135deg,#0a0a0a 0%,#111 40%,#0d0d0d 100%);}
+.tile-glass{background:rgba(15,15,15,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.06);}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.slide-up{animation:slideUp 0.3s ease-out forwards;}
 </style>
 </head>
 <body>
@@ -66,11 +81,31 @@ const WORK_ORDERS_INITIAL = [
   {id:'WO-2020',title:'Reifenwechsel',       asset:'Komatsu WA 380',  techId:'mo-003',status:'ABGESCHLOSSEN', priority:'NIEDRIG', desc:'Alle 4 Reifen gewechselt.'},
 ];
 const ASSETS_DB = [
-  {id:'STILL-001',name:'STILL RX 20-20',       type:'Gabelstapler',  location:'Halle A · Pos. 3', status:'OK',     lastEvent:'Normalbetrieb',          uptime:96},
-  {id:'LB-920',   name:'Liebherr R 920',        type:'Kettenbagger',  location:'Außengelände Ost', status:'FEHLER', lastEvent:'Hydraulikdruck kritisch', uptime:34},
-  {id:'CAT-320',  name:'CAT 320 Bagger',        type:'Kettenbagger',  location:'Halle B · Linie 2',status:'WARTUNG',lastEvent:'Ölwechsel fällig',        uptime:78},
-  {id:'HP-500',   name:'Hydraulikpresse HP-500',type:'Presse',        location:'Halle B · Pos. 8', status:'OK',     lastEvent:'Normalbetrieb',          uptime:91},
-  {id:'KPD-200',  name:'Kompressor KPD-200',    type:'Kompressor',    location:'Außenlager Nord',  status:'OK',     lastEvent:'Normalbetrieb',          uptime:88},
+  {id:'STILL-001',name:'STILL RX 20-20',       type:'Gabelstapler',  location:'Halle A · Pos. 3', status:'OK',     lastEvent:'Normalbetrieb',          uptime:96,
+   betriebsstunden:4820, hydraulikDruck:192, hydraulikMax:210, oelstand:81, oelKritisch:false,
+   temperatur:62, naechsteUVV:'2026-06-15', letzteWartung:'2025-12-03',
+   seriennummer:'SRX-2020-DE-44821', baujahr:2020, hersteller:'STILL GmbH', modell:'RX 20-20',
+   gewicht:'4.200 kg', hubhoehe:'5.000 mm', tragkraft:'2.000 kg'},
+  {id:'LB-920',   name:'Liebherr R 920',        type:'Kettenbagger',  location:'Außengelände Ost', status:'FEHLER', lastEvent:'Hydraulikdruck kritisch', uptime:34,
+   betriebsstunden:12340, hydraulikDruck:148, hydraulikMax:220, oelstand:31, oelKritisch:true,
+   temperatur:94, naechsteUVV:'2026-04-02', letzteWartung:'2025-09-18',
+   seriennummer:'LBH-R920-08-19376', baujahr:2019, hersteller:'Liebherr-France SAS', modell:'R 920',
+   gewicht:'22.400 kg', hubhoehe:'–', tragkraft:'–'},
+  {id:'CAT-320',  name:'CAT 320 Bagger',        type:'Kettenbagger',  location:'Halle B · Linie 2',status:'WARTUNG',lastEvent:'Ölwechsel fällig',        uptime:78,
+   betriebsstunden:8670, hydraulikDruck:178, hydraulikMax:220, oelstand:52, oelKritisch:false,
+   temperatur:78, naechsteUVV:'2026-05-20', letzteWartung:'2025-07-11',
+   seriennummer:'CAT-320D-DE-72204', baujahr:2021, hersteller:'Caterpillar Inc.', modell:'320D GC',
+   gewicht:'20.300 kg', hubhoehe:'–', tragkraft:'–'},
+  {id:'HP-500',   name:'Hydraulikpresse HP-500',type:'Presse',        location:'Halle B · Pos. 8', status:'OK',     lastEvent:'Normalbetrieb',          uptime:91,
+   betriebsstunden:2190, hydraulikDruck:205, hydraulikMax:210, oelstand:88, oelKritisch:false,
+   temperatur:55, naechsteUVV:'2026-08-30', letzteWartung:'2026-01-22',
+   seriennummer:'HP500-DE-10038', baujahr:2022, hersteller:'Rexroth Bosch Group', modell:'HP-500 Pro',
+   gewicht:'1.850 kg', hubhoehe:'–', tragkraft:'500 kN'},
+  {id:'KPD-200',  name:'Kompressor KPD-200',    type:'Kompressor',    location:'Außenlager Nord',  status:'OK',     lastEvent:'Normalbetrieb',          uptime:88,
+   betriebsstunden:6440, hydraulikDruck:8, hydraulikMax:12, oelstand:74, oelKritisch:false,
+   temperatur:48, naechsteUVV:'2026-07-10', letzteWartung:'2025-11-05',
+   seriennummer:'KPD-200-DE-33917', baujahr:2018, hersteller:'Kaeser Kompressoren', modell:'KPD 200',
+   gewicht:'890 kg', hubhoehe:'–', tragkraft:'–'},
 ];
 const TECHNIKER_DB = [
   {id:'mo-001',name:'Marco Köhler',  role:'Techniker Sr.',  status:'AKTIV',   assignment:'CAT 320 Bagger'},
@@ -103,6 +138,241 @@ const IconBell = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="
 const IconGear = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
 const IconSearch = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
 const IconX = ({size=20}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+const IconCamera = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>;
+const IconWrench = ({size=22,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>;
+const IconFileText = ({size=22,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
+const IconBox = ({size=22,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>;
+const IconPlay = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><polygon points="5 3 19 12 5 21 5 3"/></svg>;
+const IconStop = ({size=18,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><rect x="3" y="3" width="18" height="18" rx="2"/></svg>;
+const IconChevLeft = ({size=20,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><polyline points="15 18 9 12 15 6"/></svg>;
+const IconThermometer = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>;
+const IconCalendar = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+
+// ── ASSET MACHINE ILLUSTRATION ────────────────────────────────────────────────
+function MachineIllustration({type}){
+  const illustrations={
+    Gabelstapler:(
+      <svg viewBox="0 0 200 120" className="w-full h-full opacity-20">
+        <rect x="20" y="60" width="100" height="45" rx="4" fill="#6366f1"/>
+        <rect x="120" y="75" width="60" height="30" rx="3" fill="#4f46e5"/>
+        <circle cx="45" cy="108" r="12" fill="none" stroke="#6366f1" strokeWidth="3"/>
+        <circle cx="45" cy="108" r="5" fill="#6366f1"/>
+        <circle cx="140" cy="108" r="12" fill="none" stroke="#6366f1" strokeWidth="3"/>
+        <circle cx="140" cy="108" r="5" fill="#6366f1"/>
+        <rect x="20" y="30" width="8" height="35" fill="#818cf8"/>
+        <rect x="16" y="28" width="16" height="6" rx="1" fill="#818cf8"/>
+        <rect x="28" y="55" width="50" height="5" rx="1" fill="#818cf8"/>
+      </svg>
+    ),
+    Kettenbagger:(
+      <svg viewBox="0 0 200 120" className="w-full h-full opacity-20">
+        <rect x="10" y="80" width="180" height="20" rx="3" fill="#6366f1"/>
+        <ellipse cx="30" cy="90" rx="15" ry="12" fill="none" stroke="#4f46e5" strokeWidth="3"/>
+        <ellipse cx="170" cy="90" rx="15" ry="12" fill="none" stroke="#4f46e5" strokeWidth="3"/>
+        <rect x="40" y="50" width="80" height="35" rx="5" fill="#4f46e5"/>
+        <circle cx="100" cy="55" rx="20" ry="18" fill="#6366f1" cx="80" cy="52" r="18"/>
+        <line x1="80" y1="52" x2="100" y2="35" stroke="#818cf8" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="100" y1="35" x2="130" y2="20" stroke="#818cf8" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="130" y1="20" x2="150" y2="40" stroke="#818cf8" strokeWidth="3" strokeLinecap="round"/>
+      </svg>
+    ),
+  };
+  return illustrations[type]||(
+    <svg viewBox="0 0 200 120" className="w-full h-full opacity-20">
+      <rect x="40" y="30" width="120" height="60" rx="8" fill="#6366f1"/>
+      <rect x="60" y="50" width="80" height="30" rx="4" fill="#4f46e5"/>
+    </svg>
+  );
+}
+
+// ── COUNTDOWN HELPER ──────────────────────────────────────────────────────────
+function daysUntil(dateStr){
+  const diff=new Date(dateStr)-new Date();
+  return Math.ceil(diff/(1000*60*60*24));
+}
+
+// ── ASSET DETAIL VIEW ─────────────────────────────────────────────────────────
+function AssetDetailView({asset,onBack}){
+  const hydraulikPct=Math.round((asset.hydraulikDruck/asset.hydraulikMax)*100);
+  const uvvDays=daysUntil(asset.naechsteUVV);
+  const uvvUrgent=uvvDays<30;
+  const tempCritical=asset.temperatur>85;
+  const oelLow=asset.oelstand<40;
+
+  const statusConfig={
+    OK:    {label:'Einsatzbereit',  cls:'bg-green-500/20 text-green-400 border border-green-500/40',  glow:'glow-green',  dot:'bg-green-400'},
+    FEHLER:{label:'Fehler aktiv',   cls:'bg-red-500/20 text-red-400 border border-red-500/40 pulse-critical', glow:'glow-red', dot:'bg-red-400 status-pulse'},
+    WARTUNG:{label:'Wartung fällig',cls:'bg-amber-500/20 text-amber-400 border border-amber-500/40', glow:'glow-amber',dot:'bg-amber-400 status-pulse'},
+  };
+  const sc=statusConfig[asset.status]||statusConfig.OK;
+
+  return(
+    <div className="fixed inset-0 z-50 bg-black overflow-y-auto slide-up" style={{fontFamily:'Inter,sans-serif'}}>
+
+      {/* ── STICKY HEADER ── */}
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur border-b border-slate-800">
+        {/* Hero image area */}
+        <div className="relative h-36 asset-hero overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <MachineIllustration type={asset.type}/>
+          </div>
+          {/* gradient overlay */}
+          <div className="absolute inset-0" style={{background:'linear-gradient(to bottom, transparent 30%, #000 100%)'}}/>
+          {/* back btn */}
+          <button onClick={onBack} className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/60 hover:bg-black/80 border border-slate-700 rounded-xl px-3 py-2 text-gray-300 text-sm transition-all">
+            <IconChevLeft size={16}/> Zurück
+          </button>
+          {/* status badge */}
+          <div className="absolute top-3 right-3">
+            <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${sc.cls}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`}/>
+              {sc.label}
+            </span>
+          </div>
+          {/* asset name bottom */}
+          <div className="absolute bottom-3 left-4 right-4">
+            <div className="text-white font-bold text-xl leading-tight drop-shadow-lg">{asset.name}</div>
+            <div className="text-gray-400 text-xs mt-0.5">{asset.type} · {asset.location}</div>
+          </div>
+        </div>
+
+        {/* Action buttons row */}
+        <div className="grid grid-cols-3 gap-2 px-4 py-3">
+          <button className="btn-press flex items-center justify-center gap-2 bg-green-500/15 hover:bg-green-500/25 border border-green-500/30 rounded-xl py-2.5 text-green-400 text-xs font-semibold transition-all" style={{boxShadow:'0 0 12px rgba(34,197,94,0.1)'}}>
+            <IconPlay size={14}/> Wartung starten
+          </button>
+          <button className="btn-press flex items-center justify-center gap-2 bg-[#2979FF]/15 hover:bg-[#2979FF]/25 border border-[#2979FF]/30 rounded-xl py-2.5 text-[#60a5fa] text-xs font-semibold transition-all" style={{boxShadow:'0 0 12px rgba(41,121,255,0.1)'}}>
+            <IconQR size={14}/> Ersatzteil-Scan
+          </button>
+          <button className="btn-press flex items-center justify-center gap-2 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 rounded-xl py-2.5 text-red-400 text-xs font-semibold transition-all" style={{boxShadow:'0 0 12px rgba(239,68,68,0.1)'}}>
+            <IconStop size={14}/> Einsatz beenden
+          </button>
+        </div>
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div className="px-4 pb-10 space-y-5 mt-4">
+
+        {/* Telemetry Grid */}
+        <div>
+          <div className="text-gray-500 text-xs uppercase tracking-widest mb-3 font-semibold">Telemetrie</div>
+          <div className="grid grid-cols-2 gap-3">
+
+            {/* Tile 1: Betriebsstunden */}
+            <div className="tile-glass rounded-2xl p-4 col-span-1">
+              <div className="flex items-start justify-between mb-1">
+                <div className="text-gray-500 text-xs uppercase tracking-wider">Betriebsstunden</div>
+                <button className="p-1 rounded-lg bg-[#2979FF]/10 hover:bg-[#2979FF]/20 text-[#60a5fa] transition-colors" title="OCR-Scan">
+                  <IconCamera size={13}/>
+                </button>
+              </div>
+              <div className={`font-mono-tech text-3xl font-bold mt-1 ${sc.glow==='glow-green'?'text-white':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>
+                {asset.betriebsstunden.toLocaleString('de-DE')}
+              </div>
+              <div className="text-gray-600 text-xs mt-1">Stunden gesamt</div>
+            </div>
+
+            {/* Tile 2: Temperatur */}
+            <div className={`tile-glass rounded-2xl p-4 ${tempCritical?'pulse-critical':''}`}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <IconThermometer size={13} cls="text-gray-500"/>
+                <div className="text-gray-500 text-xs uppercase tracking-wider">Temperatur</div>
+              </div>
+              <div className={`font-mono-tech text-3xl font-bold mt-1 ${tempCritical?'text-red-400 glow-red':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>
+                {asset.temperatur}°C
+              </div>
+              <div className={`text-xs mt-1 ${tempCritical?'text-red-500':'text-gray-600'}`}>{tempCritical?'⚠ Kritisch — Grenzwert überschritten':'Normalbetrieb'}</div>
+            </div>
+
+            {/* Tile 3: Hydraulik/Öl — volle Breite */}
+            <div className={`tile-glass rounded-2xl p-4 col-span-2 ${oelLow?'pulse-critical':''}`}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-gray-500 text-xs uppercase tracking-wider">Hydraulik / Öldruck</div>
+                <span className={`text-sm font-bold font-mono-tech ${oelLow?'text-red-400 glow-red':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>{asset.hydraulikDruck} bar</span>
+              </div>
+              <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden mb-2">
+                <div className={`h-full rounded-full transition-all duration-700 ${oelLow?'bg-red-500':'hydraulikPct>75?bg-green-500 text-green-500':'bg-orange-500'}`}
+                  style={{width:`${hydraulikPct}%`, background: oelLow?'#ef4444': hydraulikPct>75?'#22c55e':'#f97316',
+                  boxShadow: oelLow?'0 0 8px rgba(239,68,68,0.6)': hydraulikPct>75?'0 0 8px rgba(34,197,94,0.5)':'0 0 8px rgba(249,115,22,0.5)'}}/>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className={oelLow?'text-red-400':'text-gray-500'}>{hydraulikPct}% von {asset.hydraulikMax} bar max.</span>
+                <span className={`font-semibold ${oelLow?'text-red-400':'text-orange-400'}`}>{oelLow?'KRITISCH':'Safety-Orange'}</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="text-gray-500 text-xs uppercase tracking-wider">Ölstand</div>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full" style={{width:`${asset.oelstand}%`,background:asset.oelstand<40?'#ef4444':asset.oelstand<60?'#f97316':'#22c55e'}}/>
+                  </div>
+                  <span className={`text-xs font-mono-tech font-semibold ${oelLow?'text-red-400':'text-gray-300'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>{asset.oelstand}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tile 4: Nächste UVV */}
+            <div className={`tile-glass rounded-2xl p-4 ${uvvUrgent?'pulse-warning':''}`}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <IconCalendar size={13} cls="text-gray-500"/>
+                <div className="text-gray-500 text-xs uppercase tracking-wider">Nächste UVV</div>
+              </div>
+              <div className={`font-mono-tech text-lg font-bold mt-2 ${uvvUrgent?'text-amber-400 glow-amber':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>
+                {new Date(asset.naechsteUVV).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})}
+              </div>
+              <div className={`text-xs mt-1 font-semibold ${uvvDays<0?'text-red-400':uvvUrgent?'text-amber-400':'text-gray-500'}`}>
+                {uvvDays<0?`${Math.abs(uvvDays)} Tage überfällig`:`in ${uvvDays} Tagen`}
+              </div>
+            </div>
+
+            {/* Tile 5: Modell/Seriennummer */}
+            <div className="tile-glass rounded-2xl p-4">
+              <div className="text-gray-500 text-xs uppercase tracking-wider mb-2">Seriennummer</div>
+              <div className="text-[#60a5fa] font-bold text-sm break-all glow-blue" style={{fontFamily:'JetBrains Mono,monospace'}}>{asset.seriennummer}</div>
+              <div className="text-gray-600 text-xs mt-2">{asset.hersteller}</div>
+              <div className="text-gray-500 text-xs">Bj. {asset.baujahr}</div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Technische Daten */}
+        <div className="tile-glass rounded-2xl p-4">
+          <div className="text-gray-500 text-xs uppercase tracking-widest mb-3 font-semibold">Technische Daten</div>
+          <div className="grid grid-cols-2 gap-y-3 gap-x-4">
+            {[['Modell',asset.modell],['Typ',asset.type],['Gewicht',asset.gewicht],['Baujahr',String(asset.baujahr)],['Tragkraft',asset.tragkraft],['Letzte Wartung',new Date(asset.letzteWartung).toLocaleDateString('de-DE')]].map(([k,v])=>(
+              <div key={k}>
+                <div className="text-gray-600 text-xs mb-0.5">{k}</div>
+                <div className="text-gray-200 text-sm font-medium" style={k==='Modell'||k==='Typ'?{}:{fontFamily:'JetBrains Mono,monospace'}}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <div className="text-gray-500 text-xs uppercase tracking-widest mb-3 font-semibold">Aktionen</div>
+          <div className="space-y-2">
+            {[
+              {icon:<IconFileText size={22}/>, label:'Schaltplan öffnen', sub:'PDF · Letztes Update 03/2026', color:'text-[#60a5fa]', bg:'bg-[#2979FF]/8 hover:bg-[#2979FF]/15 border-[#2979FF]/20'},
+              {icon:<IconWrench size={22}/>, label:'Wartungshistorie', sub:`${asset.betriebsstunden.toLocaleString('de-DE')} Std. · Letzte: ${new Date(asset.letzteWartung).toLocaleDateString('de-DE')}`, color:'text-amber-400', bg:'bg-amber-500/8 hover:bg-amber-500/15 border-amber-500/20'},
+              {icon:<IconBox size={22}/>, label:'Ersatzteil-Katalog', sub:'Kompatible Teile anzeigen', color:'text-purple-400', bg:'bg-purple-500/8 hover:bg-purple-500/15 border-purple-500/20'},
+            ].map(({icon,label,sub,color,bg})=>(
+              <button key={label} className={`btn-press w-full flex items-center gap-4 px-4 border rounded-2xl transition-all text-left ${bg}`} style={{minHeight:'64px',background:'rgba(255,255,255,0.02)'}}>
+                <div className={`flex-shrink-0 ${color}`}>{icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className={`font-semibold text-sm ${color}`}>{label}</div>
+                  <div className="text-gray-600 text-xs mt-0.5 truncate">{sub}</div>
+                </div>
+                <IconChevLeft size={16} cls="text-gray-600 rotate-180 flex-shrink-0"/>
+              </button>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
 
 const LogoIcon = () => (
   <svg width="32" height="32" viewBox="0 0 32 32">
@@ -154,7 +424,7 @@ function LoginScreen({onLogin}){
 }
 
 // ── SCAN MODAL ────────────────────────────────────────────────────────────────
-function ScanModal({onClose}){
+function ScanModal({onClose,onFound}){
   const [phase,setPhase]=React.useState('scanning');
   React.useEffect(()=>{const t=setTimeout(()=>setPhase('found'),2000);return()=>clearTimeout(t);},[]);
   return(
@@ -184,7 +454,7 @@ function ScanModal({onClose}){
             Offener Auftrag: Hydraulikinspektion
           </div>
           <div className="flex gap-3 w-full">
-            <button onClick={onClose} className="btn-press flex-1 bg-[#2979FF] text-white font-semibold py-3 rounded-xl text-sm">Auftrag öffnen</button>
+            <button onClick={()=>onFound?onFound('Liebherr R 920'):onClose()} className="btn-press flex-1 bg-[#2979FF] text-white font-semibold py-3 rounded-xl text-sm">Auftrag öffnen</button>
             <button onClick={onClose} className="btn-press flex-1 border border-[#2a2a2a] text-gray-400 py-3 rounded-xl text-sm">Schließen</button>
           </div>
         </div>
@@ -332,11 +602,13 @@ function MobileApp({user,onLogout}){
   const [screen,setScreen]=React.useState('home');
   const [showScan,setShowScan]=React.useState(false);
   const [orders]=React.useState(WORK_ORDERS_INITIAL);
+  const [selectedAsset,setSelectedAsset]=React.useState(null);
+  if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
   return(
     <div className="bg-mob-bg min-h-screen text-white font-sans" style={{maxWidth:'448px',margin:'0 auto',position:'relative'}}>
       <div className="overflow-y-auto" style={{paddingBottom:'90px'}}>
         {screen==='home'&&<MobileHome user={user} onScan={()=>setShowScan(true)}/>}
-        {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders}/>}
+        {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders} onSelectAsset={name=>{const a=ASSETS_DB.find(x=>x.name===name);if(a)setSelectedAsset(a);}}/>}
         {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout}/>}
       </div>
       <div className="fixed bottom-0 bg-[#111] border-t border-mob-border flex items-end justify-around pb-safe z-40"
@@ -354,7 +626,7 @@ function MobileApp({user,onLogout}){
           <span className="text-xs">Profil</span>
         </button>
       </div>
-      {showScan&&<ScanModal onClose={()=>setShowScan(false)}/>}
+      {showScan&&<ScanModal onClose={()=>setShowScan(false)} onFound={name=>{setShowScan(false);const a=ASSETS_DB.find(x=>x.name===name);if(a)setSelectedAsset(a);}}/>}
     </div>
   );
 }
@@ -437,7 +709,7 @@ function DashboardPage(){
 }
 
 // ── DESKTOP PAGE: ASSETS ──────────────────────────────────────────────────────
-function AssetsPage(){
+function AssetsPage({onSelect}){
   return(
     <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
       <div className="p-5 border-b border-desk-border flex items-center justify-between">
@@ -446,13 +718,13 @@ function AssetsPage(){
       </div>
       <table className="w-full">
         <thead><tr className="border-b border-desk-border text-gray-500 text-xs uppercase tracking-wider">
-          {['ID','Name','Typ','Standort','Auslastung','Status'].map(h=><th key={h} className="text-left px-5 py-3 font-medium">{h}</th>)}
+          {['ID','Name','Typ','Standort','Auslastung','Status',''].map(h=><th key={h} className="text-left px-5 py-3 font-medium">{h}</th>)}
         </tr></thead>
         <tbody>
           {ASSETS_DB.map((a,i)=>(
-            <tr key={a.id} className={`border-b border-desk-border hover:bg-white/[0.02] transition-colors ${i%2===0?'':'bg-white/[0.01]'}`}>
+            <tr key={a.id} onClick={()=>onSelect&&onSelect(a)} className={`border-b border-desk-border hover:bg-white/[0.04] transition-colors cursor-pointer group ${i%2===0?'':'bg-white/[0.01]'}`}>
               <td className="px-5 py-4 font-mono text-xs text-gray-500">{a.id}</td>
-              <td className="px-5 py-4 text-white text-sm font-medium">{a.name}</td>
+              <td className="px-5 py-4 text-white text-sm font-medium group-hover:text-desk-accent transition-colors">{a.name}</td>
               <td className="px-5 py-4 text-gray-400 text-sm">{a.type}</td>
               <td className="px-5 py-4 text-gray-400 text-sm">{a.location}</td>
               <td className="px-5 py-4">
@@ -464,6 +736,7 @@ function AssetsPage(){
                 </div>
               </td>
               <td className="px-5 py-4"><span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(a.status)}`}>{a.status}</span></td>
+              <td className="px-5 py-4 text-gray-600 group-hover:text-desk-accent transition-colors"><IconChevLeft size={16} cls="rotate-180"/></td>
             </tr>
           ))}
         </tbody>
@@ -668,6 +941,8 @@ function DesktopDashboard({user,onLogout}){
   const [activePage,setActivePage]=React.useState('dashboard');
   const [orders,setOrders]=React.useState(WORK_ORDERS_INITIAL);
   const [showNew,setShowNew]=React.useState(false);
+  const [selectedAsset,setSelectedAsset]=React.useState(null);
+  if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
   const navItems=[
     ['dashboard','Dashboard',<IconGrid size={18}/>],
     ['assets','Assets',<IconCube size={18}/>],
@@ -717,7 +992,7 @@ function DesktopDashboard({user,onLogout}){
         </div>
         <div className="flex-1 overflow-y-auto p-6 page-enter" key={activePage}>
           {activePage==='dashboard'&&<DashboardPage/>}
-          {activePage==='assets'&&<AssetsPage/>}
+          {activePage==='assets'&&<AssetsPage onSelect={setSelectedAsset}/>}
           {activePage==='auftraege'&&<AuftraegePage orders={orders} setOrders={setOrders} showNew={showNew} setShowNew={setShowNew}/>}
           {activePage==='techniker'&&<TechnikerPage/>}
           {activePage==='news'&&<NewsPage/>}
