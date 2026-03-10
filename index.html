@@ -700,7 +700,7 @@ function AssetDetailView({asset,onBack}){
   };
   const sc=statusConfig[asset.status]||statusConfig.OK;
 
-  return(
+  return(<>
     <div className="fixed inset-0 z-50 bg-black overflow-y-auto slide-up" style={{fontFamily:'Inter,sans-serif'}}>
 
       {/* ── STICKY HEADER ── */}
@@ -878,7 +878,7 @@ function AssetDetailView({asset,onBack}){
       </div>
     </div>
     {showSchaltplan&&<SchaltplanModal asset={asset} onClose={()=>setShowSchaltplan(false)}/>}
-  );
+  </>);
 }
 
 const LogoIcon = () => (
