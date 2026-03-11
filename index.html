@@ -91,6 +91,8 @@ const WORK_ORDERS_INITIAL = [
 ];
 // Global cid Logic config store — admin writes, technician app reads
 let CID_LOGIC_CONFIG = {};
+// Track IDs of orders created this session so they get a "NEU" badge
+const _newOrderIds = new Set();
 // Global shared orders store — keeps admin + technician in sync within same session
 let _globalOrders = [...WORK_ORDERS_INITIAL];
 const _ordersListeners = new Set();
@@ -1243,7 +1245,7 @@ function ScanModal({onClose,onFound}){
 }
 
 // ── MOBILE HOME ───────────────────────────────────────────────────────────────
-function MobileHome({user,onScan,onNavigate,onSelectAsset}){
+function MobileHome({user,orders,onScan,onNavigate,onSelectAsset}){
   const elevated=['SERVICELEITER','ADMIN','CEO'].includes(user.role);
   const kpiTiles=[
     {label:'Aktive Fehler',value:'3',color:'text-red-400',border:'border-red-500/20',nav:'auftraege',sub:'2 kritisch',
@@ -1282,6 +1284,46 @@ function MobileHome({user,onScan,onNavigate,onSelectAsset}){
           <div className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2">Seriennummer</div>
           <input className="bg-[#222] border border-mob-border rounded-2xl px-4 py-4 text-white text-lg w-full focus:outline-none focus:border-mob-blue focus:ring-2 focus:ring-mob-blue/20" placeholder="z.B. CAT-320-001"/>
         </div>
+        {/* Meine Aufträge — nur für Techniker sichtbar */}
+        {user.role==='TECHNIKER'&&(()=>{
+          const myOrders=(orders||[]).filter(o=>o.techId===user.techId&&o.status!=='ABGESCHLOSSEN');
+          if(!myOrders.length) return null;
+          return(
+            <div>
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="text-gray-400 text-xs font-semibold uppercase tracking-wider">Meine Aufträge</div>
+                  {myOrders.filter(o=>_newOrderIds.has(o.id)).length>0&&(
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#2979FF] text-white animate-pulse">
+                      {myOrders.filter(o=>_newOrderIds.has(o.id)).length} NEU
+                    </span>
+                  )}
+                </div>
+                <button onClick={()=>onNavigate&&onNavigate('auftraege')} className="text-[#2979FF] text-xs">Alle →</button>
+              </div>
+              <div className="space-y-2">
+                {myOrders.slice(0,3).map(o=>{
+                  const a=ASSETS_DB.find(x=>x.name===o.asset);
+                  const isNew=_newOrderIds.has(o.id);
+                  return(
+                    <button key={o.id} onClick={()=>a&&onSelectAsset&&onSelectAsset(a)}
+                      className={`btn-press w-full text-left bg-mob-card border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-2xl p-4 transition-all hover:border-[#2979FF]/30 ${isNew?'border-[#2979FF]/30':''}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white text-sm font-semibold truncate flex-1 mr-2">{o.title}</span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {isNew&&<span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#2979FF]/20 border border-[#2979FF]/40 text-[#60a5fa]">NEU</span>}
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${getPrioBadge(o.priority)}`}>{o.priority}</span>
+                        </div>
+                      </div>
+                      <div className="text-gray-500 text-xs">{o.asset}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
         <button onClick={onScan} className="btn-press bg-[#2979FF] rounded-2xl w-full py-5 flex items-center justify-center gap-3 text-white font-bold text-lg tracking-wide transition-all duration-200"
           style={{boxShadow:'0 0 30px rgba(41,121,255,0.4)'}}>
           <IconQR size={24}/>
@@ -1355,7 +1397,10 @@ function MobileAuftraege({user,orders,onSelectAsset}){
               <button key={o.id} onClick={()=>linkedAsset&&onSelectAsset&&onSelectAsset(linkedAsset)}
                 className={`btn-press w-full text-left bg-mob-card border border-mob-border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-2xl p-4 transition-all ${linkedAsset?'hover:border-[#2979FF]/30 cursor-pointer':'cursor-default'} ${isCriticalOrder?'pulse-critical':''}`}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs text-gray-500">{o.id}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-gray-500">{o.id}</span>
+                    {_newOrderIds.has(o.id)&&<span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#2979FF]/20 border border-[#2979FF]/40 text-[#60a5fa] animate-pulse">NEU</span>}
+                  </div>
                   <div className="flex items-center gap-2">
                     <span onClick={isCriticalOrder?e=>{e.stopPropagation();openDiagnostic({title:o.title,severity:'KRITISCH',message:o.desc||'Kritischer Auftrag erfordert sofortiges Handeln.',ursache:'Maschinenstatus FEHLER — Betrieb nicht sicher.',loesung:'Maschine sofort inspizieren. Reparaturauftrag priorisieren.',asset:o.asset});}:undefined}
                       className={`text-xs font-medium px-2 py-0.5 rounded-full ${getPrioBadge(o.priority)} ${isCriticalOrder?'cursor-pointer hover:opacity-80':''}`}>{o.priority}</span>
@@ -1562,11 +1607,14 @@ function MobileApp({user,onLogout}){
   const [orders]=useSharedOrders();
   const [selectedAsset,setSelectedAsset]=React.useState(null);
   React.useEffect(()=>{_navigateToAsset=setSelectedAsset;return()=>{_navigateToAsset=null;};},[]);
+  const myOpenOrders=orders.filter(o=>o.techId===user.techId&&o.status==='OFFEN');
+  const newCount=myOpenOrders.filter(o=>_newOrderIds.has(o.id)).length;
+  const badgeCount=myOpenOrders.length;
   if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
   return(
     <div className="bg-mob-bg min-h-screen text-white font-sans" style={{maxWidth:'448px',margin:'0 auto',position:'relative'}}>
       <div className="overflow-y-auto" style={{paddingBottom:'90px'}}>
-        {screen==='home'&&<MobileHome user={user} onScan={()=>setShowScan(true)} onNavigate={setScreen} onSelectAsset={setSelectedAsset}/>}
+        {screen==='home'&&<MobileHome user={user} orders={orders} onScan={()=>setShowScan(true)} onNavigate={setScreen} onSelectAsset={setSelectedAsset}/>}
         {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders} onSelectAsset={setSelectedAsset}/>}
         {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout} onNavigate={setScreen}/>}
       </div>
@@ -1578,7 +1626,7 @@ function MobileApp({user,onLogout}){
           <IconHome size={22}/>
           <span className="text-xs">Home</span>
         </button>
-        {/* Scan FAB — zwischen Home & Aufträge, leicht darüber */}
+        {/* Scan FAB */}
         <div className="flex flex-col items-center" style={{marginBottom:'26px'}}>
           <button onClick={()=>setShowScan(true)} className="btn-press flex items-center justify-center rounded-full bg-[#2979FF]"
             style={{width:'60px',height:'60px',boxShadow:'0 0 22px rgba(41,121,255,0.55)',border:'3px solid #0d0d0d'}}>
@@ -1591,9 +1639,12 @@ function MobileApp({user,onLogout}){
           </button>
           <span className="text-xs text-gray-500 mt-0.5">Scan</span>
         </div>
-        {/* Aufträge */}
+        {/* Aufträge — mit Badge */}
         <button onClick={()=>setScreen('auftraege')} className={`flex flex-col items-center justify-center gap-1 flex-1 pb-2 transition-colors ${screen==='auftraege'?'text-[#2979FF]':'text-gray-600'}`}>
-          <IconClipboard size={22}/>
+          <div className="relative">
+            <IconClipboard size={22}/>
+            {badgeCount>0&&<span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 bg-[#2979FF] rounded-full text-white text-[9px] font-bold flex items-center justify-center px-0.5">{badgeCount}</span>}
+          </div>
           <span className="text-xs">Aufträge</span>
         </button>
         {/* Profil */}
@@ -1789,6 +1840,7 @@ function AuftraegePage({orders,setOrders,showNew,setShowNew}){
   function submitNew(){
     if(!form.title||!form.asset)return;
     const id='WO-'+Math.floor(Math.random()*9000+1000);
+    _newOrderIds.add(id);
     setOrders(p=>[{id,title:form.title,asset:form.asset,techId:form.tech||'mo-001',status:'OFFEN',priority:form.prio,desc:form.expectedIssue},...p]);
     const assetObj=ASSETS_DB.find(a=>a.name===form.asset);
     if(assetObj){
