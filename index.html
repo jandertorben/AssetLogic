@@ -61,6 +61,14 @@ select option{background:#1a1a1a;color:#fff;}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
 .slide-up{animation:slideUp 0.3s ease-out forwards;}
 @keyframes fabPulse{0%{transform:scale(1);opacity:0.7;}70%{transform:scale(1.6);opacity:0;}100%{transform:scale(1.6);opacity:0;}}
+@keyframes diagSlideIn{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:translateY(0);}}
+.diag-slide-in{animation:diagSlideIn 0.28s cubic-bezier(.34,1.4,.64,1) forwards;}
+@keyframes borderPulseRed{0%,100%{border-color:rgba(239,68,68,0.6);}50%{border-color:rgba(239,68,68,0.15);}}
+@keyframes borderPulseAmber{0%,100%{border-color:rgba(245,158,11,0.55);}50%{border-color:rgba(245,158,11,0.12);}}
+.diag-border-crit{animation:borderPulseRed 1.8s ease-in-out infinite;}
+.diag-border-warn{animation:borderPulseAmber 2s ease-in-out infinite;}
+.clickable-tile{cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;}
+.clickable-tile:active{transform:scale(0.97);}
 </style>
 </head>
 <body>
@@ -438,6 +446,77 @@ function daysUntil(dateStr){
 
 // ── ASSET DETAIL VIEW ─────────────────────────────────────────────────────────
 // ── SCHALTPLAN MODAL ──────────────────────────────────────────────────────────
+// ── GLOBAL DIAGNOSTIC POPUP ───────────────────────────────────────────────────
+// Module-level setter — allows any component to open the popup without prop drilling
+let _setDiagnostic=null;
+function openDiagnostic(data){if(_setDiagnostic)_setDiagnostic(data);}
+
+function DiagnosticPopup({data,onClose}){
+  if(!data)return null;
+  const isCrit=data.severity==='KRITISCH';
+  const isWarn=data.severity==='WARNUNG'||data.severity==='HOCH';
+  const accentCls=isCrit?'text-red-400 bg-red-500/15 border-red-500/30':isWarn?'text-amber-400 bg-amber-500/15 border-amber-500/30':'text-blue-400 bg-blue-500/15 border-blue-500/30';
+  const solveCls=isCrit?'bg-red-500/5 border-red-500/20 text-red-400':'bg-amber-500/5 border-amber-500/20 text-amber-400';
+  const btnCls=isCrit?'bg-red-600 hover:bg-red-700':isWarn?'bg-amber-600 hover:bg-amber-700':'bg-[#2979FF] hover:bg-blue-700';
+  const borderAnimCls=isCrit?'diag-border-crit':isWarn?'diag-border-warn':'';
+  return(
+    <div className="fixed inset-0 z-[90] flex items-end justify-center"
+      style={{background:'rgba(0,0,0,0.72)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)'}}
+      onClick={onClose}>
+      <div className={`w-full max-w-lg rounded-t-3xl border-t border-x border-slate-700 diag-slide-in ${borderAnimCls}`}
+        style={{background:'rgba(10,14,26,0.98)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)'}}
+        onClick={e=>e.stopPropagation()}>
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1 rounded-full bg-slate-700"/></div>
+        {/* Header */}
+        <div className="px-5 pt-2 pb-3 flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              {data.code&&<span className="text-xs font-bold px-2 py-0.5 rounded bg-black border border-slate-700 text-[#60a5fa]" style={{fontFamily:'JetBrains Mono,monospace'}}>{data.code}</span>}
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${accentCls}`}>{data.severity}</span>
+            </div>
+            <div className="text-white font-bold text-lg leading-tight">{data.title}</div>
+          </div>
+          <button onClick={onClose} className="ml-3 mt-0.5 w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800 text-gray-500 hover:text-white hover:bg-slate-700 transition-colors flex-shrink-0">
+            <IconX size={15}/>
+          </button>
+        </div>
+        <div className="mx-5 h-px bg-slate-800"/>
+        {/* Body */}
+        <div className="px-5 py-4 space-y-4 max-h-[55vh] overflow-y-auto">
+          {/* Fehlermeldung */}
+          <div>
+            <div className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 font-semibold">Fehlermeldung</div>
+            <div className="text-gray-300 text-sm leading-relaxed">{data.message}</div>
+            {data.wert&&(
+              <div className="mt-2.5 inline-flex items-center gap-2 bg-black border border-slate-800 rounded-lg px-3 py-1.5">
+                <span className="text-slate-500 text-xs">Messwert:</span>
+                <span className="text-white font-bold text-sm" style={{fontFamily:'JetBrains Mono,monospace'}}>{data.wert}</span>
+              </div>
+            )}
+          </div>
+          {/* Ursache */}
+          <div>
+            <div className="text-slate-500 text-xs uppercase tracking-wider mb-1.5 font-semibold">Mögliche Ursache</div>
+            <div className="text-gray-400 text-sm leading-relaxed">{data.ursache}</div>
+          </div>
+          {/* Lösung */}
+          <div className={`rounded-xl p-3.5 border ${solveCls}`}>
+            <div className={`text-xs uppercase tracking-wider mb-2 font-semibold`}>Lösungsvorschlag</div>
+            <div className="text-gray-300 text-sm leading-relaxed">{data.loesung}</div>
+          </div>
+          {data.asset&&<div className="text-slate-600 text-xs" style={{fontFamily:'JetBrains Mono,monospace'}}>Asset: {data.asset}</div>}
+        </div>
+        {/* Actions */}
+        <div className="px-5 pb-8 pt-2 flex gap-3">
+          <button className={`btn-press flex-1 py-3 rounded-xl font-semibold text-sm text-white transition-all ${btnCls}`} onClick={onClose}>Diagnose öffnen</button>
+          <button onClick={onClose} className="btn-press px-5 py-3 rounded-xl border border-slate-700 text-slate-400 text-sm hover:bg-slate-800 transition-colors">Schließen</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Maps asset status + type to the relevant circuit section
 function getSchaltplanSection(asset){
   if(asset.status==='FEHLER'){
@@ -767,10 +846,12 @@ function AssetDetailView({asset,onBack}){
             </div>
 
             {/* Tile 2: Temperatur */}
-            <div className={`tile-glass rounded-2xl p-4 ${tempCritical?'pulse-critical':''}`}>
+            <div onClick={tempCritical?()=>openDiagnostic({title:'Motortemperatur kritisch',severity:'KRITISCH',code:'E-002',message:`Motortemperatur ${asset.temperatur}°C überschreitet den kritischen Grenzwert von 90°C. Sofortiger Betriebsstopp empfohlen.`,ursache:'Kühlflüssigkeitsmangel, defekter Thermostat oder Ausfall des Kühlerlüfters.',loesung:'Betrieb sofort einstellen. Kühlsystem prüfen bevor Neustart erlaubt wird.',wert:`${asset.temperatur}°C (Grenzwert: 90°C)`,asset:asset.name}):undefined}
+              className={`tile-glass rounded-2xl p-4 ${tempCritical?'pulse-critical clickable-tile':''}`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <IconThermometer size={13} cls="text-gray-500"/>
                 <div className="text-gray-500 text-xs uppercase tracking-wider">Temperatur</div>
+                {tempCritical&&<span className="ml-auto text-red-400 text-xs font-bold animate-pulse">TIPPEN</span>}
               </div>
               <div className={`font-mono-tech text-3xl font-bold mt-1 ${tempCritical?'text-red-400 glow-red':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>
                 {asset.temperatur}°C
@@ -779,7 +860,8 @@ function AssetDetailView({asset,onBack}){
             </div>
 
             {/* Tile 3: Hydraulik/Öl — volle Breite */}
-            <div className={`tile-glass rounded-2xl p-4 col-span-2 ${oelLow?'pulse-critical':''}`}>
+            <div onClick={oelLow?()=>openDiagnostic({title:'Hydraulikdruck / Ölstand kritisch',severity:'KRITISCH',code:'E-001',message:`Hydraulikdruck ${asset.hydraulikDruck} bar unterschreitet den Mindestwert. Ölstand bei ${asset.oelstand}% — Maschinenbetrieb nicht zulässig.`,ursache:'Möglicher Leck im Hydrauliksystem, verschlissene Pumpe oder defekter Drucksensor DS-200.',loesung:'Sofortige Leckageprüfung. Alle Leitungen auf Undichtigkeiten prüfen. Druckregelventil kalibrieren.',wert:`${asset.hydraulikDruck} bar (Soll: ${asset.hydraulikMax} bar) · Öl: ${asset.oelstand}%`,asset:asset.name}):undefined}
+              className={`tile-glass rounded-2xl p-4 col-span-2 ${oelLow?'pulse-critical clickable-tile':''}`}>
               <div className="flex items-center justify-between mb-3">
                 <div className="text-gray-500 text-xs uppercase tracking-wider">Hydraulik / Öldruck</div>
                 <span className={`text-sm font-bold font-mono-tech ${oelLow?'text-red-400 glow-red':'text-white'}`} style={{fontFamily:'JetBrains Mono,monospace'}}>{asset.hydraulikDruck} bar</span>
@@ -805,7 +887,8 @@ function AssetDetailView({asset,onBack}){
             </div>
 
             {/* Tile 4: Nächste UVV */}
-            <div className={`tile-glass rounded-2xl p-4 ${uvvUrgent?'pulse-warning':''}`}>
+            <div onClick={uvvUrgent?()=>openDiagnostic({title:'UVV-Prüfung dringend erforderlich',severity:'WARNUNG',message:`Die nächste UVV-Prüfung ist ${uvvDays<0?`${Math.abs(uvvDays)} Tage überfällig`:`in ${uvvDays} Tagen fällig`}. Betrieb ohne gültige UVV-Prüfung ist rechtlich unzulässig (DGUV Vorschrift 68).`,ursache:'Planmäßiges Prüfintervall läuft ab oder wurde bereits überschritten.',loesung:'Prüftermin innerhalb 7 Tage beim zugelassenen Prüfer vereinbaren. Maschine ggf. sperren.',wert:new Date(asset.naechsteUVV).toLocaleDateString('de-DE'),asset:asset.name}):undefined}
+              className={`tile-glass rounded-2xl p-4 ${uvvUrgent?'pulse-warning clickable-tile':''}`}>
               <div className="flex items-center gap-1.5 mb-1">
                 <IconCalendar size={13} cls="text-gray-500"/>
                 <div className="text-gray-500 text-xs uppercase tracking-wider">Nächste UVV</div>
@@ -998,9 +1081,11 @@ function ScanModal({onClose,onFound}){
 function MobileHome({user,onScan,onNavigate,onSelectAsset}){
   const elevated=['SERVICELEITER','ADMIN','CEO'].includes(user.role);
   const kpiTiles=[
-    {label:'Aktive Fehler',value:'3',color:'text-red-400',border:'border-red-500/20',nav:'auftraege',sub:'2 kritisch'},
-    {label:'Wartungen',value:'7',color:'text-amber-400',border:'border-amber-500/20',nav:'auftraege',sub:'3 überfällig'},
-    {label:'Techniker',value:'2',color:'text-green-400',border:'border-green-500/20',nav:'auftraege',sub:'im Einsatz'},
+    {label:'Aktive Fehler',value:'3',color:'text-red-400',border:'border-red-500/20',nav:'auftraege',sub:'2 kritisch',
+      diag:{title:'Aktive Systemfehler',severity:'KRITISCH',code:'E-001',message:'3 Maschinen melden aktive Fehler. 2 davon sind kritisch und erfordern sofortigen Betriebsstopp.',ursache:'Hydraulikdruckabfall und Sensorausfall an CAT 320 sowie Liebherr R920.',loesung:'Sofortige Inspektion der markierten Maschinen. Betrieb bis zur Freigabe durch Serviceleiter gesperrt.'}},
+    {label:'Wartungen',value:'7',color:'text-amber-400',border:'border-amber-500/20',nav:'auftraege',sub:'3 überfällig',
+      diag:{title:'Wartungsintervalle überfällig',severity:'WARNUNG',code:'W-101',message:'7 Maschinen haben fällige Wartungsintervalle. 3 davon sind mehr als 50 Betriebsstunden überschritten.',ursache:'Planmäßige Wartungsintervalle wurden nicht eingehalten — Ressourcenengpass.',loesung:'Wartungsplanung prüfen. Servicetermine für alle überfälligen Maschinen innerhalb 48h vergeben.'}},
+    {label:'Techniker',value:'2',color:'text-green-400',border:'border-green-500/20',nav:'auftraege',sub:'im Einsatz',diag:null},
   ];
   return(
     <div className="page-enter">
@@ -1014,9 +1099,10 @@ function MobileHome({user,onScan,onNavigate,onSelectAsset}){
       <div className="px-5 py-6 space-y-5">
         {elevated&&(
           <div className="grid grid-cols-3 gap-3">
-            {kpiTiles.map(({label,value,color,border,nav,sub})=>(
-              <button key={label} onClick={()=>onNavigate&&onNavigate(nav)}
-                className={`btn-press bg-mob-card border ${border} rounded-2xl p-3 text-center transition-all hover:border-opacity-60 active:scale-95`}>
+            {kpiTiles.map(({label,value,color,border,nav,sub,diag})=>(
+              <button key={label}
+                onClick={()=>diag?openDiagnostic(diag):onNavigate&&onNavigate(nav)}
+                className={`btn-press bg-mob-card border ${border} rounded-2xl p-3 text-center transition-all hover:border-opacity-60 active:scale-95 ${diag&&label.includes('Fehler')?'pulse-critical':diag&&label.includes('Wart')?'pulse-warning':''}`}>
                 <div className={`text-2xl font-bold ${color}`}>{value}</div>
                 <div className="text-gray-500 text-xs mt-0.5">{label}</div>
                 <div className={`text-xs mt-0.5 ${color} opacity-70`}>{sub}</div>
@@ -1048,7 +1134,20 @@ function MobileHome({user,onScan,onNavigate,onSelectAsset}){
                   <div className="text-gray-500 text-xs truncate">{a.lastEvent}</div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(a.status)}`}>{a.status}</span>
+                  {a.status!=='OK'?(
+                    <span onClick={e=>{e.stopPropagation();openDiagnostic({
+                      title:a.status==='FEHLER'?'Maschinenfehler aktiv':'Wartung erforderlich',
+                      severity:a.status==='FEHLER'?'KRITISCH':'WARNUNG',
+                      code:a.status==='FEHLER'?'E-001':'W-101',
+                      message:a.lastEvent,
+                      ursache:a.status==='FEHLER'?'Hydrauliksystem oder Sensorausfall — sofortige Diagnose erforderlich.':'Planmäßiges Wartungsintervall überschritten.',
+                      loesung:a.status==='FEHLER'?'Betrieb einstellen. Maschine sperren und Servicetechniker anfordern.':'Wartungstermin innerhalb von 48 Stunden einplanen.',
+                      asset:a.name
+                    });}}
+                    className={`text-xs px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 transition-opacity ${getAssetStatusColor(a.status)}`}>{a.status}</span>
+                  ):(
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(a.status)}`}>{a.status}</span>
+                  )}
                   <IconChevLeft size={14} cls="text-gray-600 rotate-180"/>
                 </div>
               </button>
@@ -1083,13 +1182,15 @@ function MobileAuftraege({user,orders,onSelectAsset}){
           {filtered.length===0&&<div className="text-gray-600 text-sm text-center py-8">Keine Aufträge</div>}
           {filtered.map(o=>{
             const linkedAsset=ASSETS_DB.find(a=>a.name===o.asset);
+            const isCriticalOrder=o.priority==='KRITISCH';
             return(
               <button key={o.id} onClick={()=>linkedAsset&&onSelectAsset&&onSelectAsset(linkedAsset)}
-                className={`btn-press w-full text-left bg-mob-card border border-mob-border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-2xl p-4 transition-all ${linkedAsset?'hover:border-[#2979FF]/30 cursor-pointer':'cursor-default'}`}>
+                className={`btn-press w-full text-left bg-mob-card border border-mob-border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-2xl p-4 transition-all ${linkedAsset?'hover:border-[#2979FF]/30 cursor-pointer':'cursor-default'} ${isCriticalOrder?'pulse-critical':''}`}>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-xs text-gray-500">{o.id}</span>
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getPrioBadge(o.priority)}`}>{o.priority}</span>
+                    <span onClick={isCriticalOrder?e=>{e.stopPropagation();openDiagnostic({title:o.title,severity:'KRITISCH',message:o.desc||'Kritischer Auftrag erfordert sofortiges Handeln.',ursache:'Maschinenstatus FEHLER — Betrieb nicht sicher.',loesung:'Maschine sofort inspizieren. Reparaturauftrag priorisieren.',asset:o.asset});}:undefined}
+                      className={`text-xs font-medium px-2 py-0.5 rounded-full ${getPrioBadge(o.priority)} ${isCriticalOrder?'cursor-pointer hover:opacity-80':''}`}>{o.priority}</span>
                     {linkedAsset&&<IconChevLeft size={14} cls="text-gray-600 rotate-180"/>}
                   </div>
                 </div>
@@ -1098,7 +1199,12 @@ function MobileAuftraege({user,orders,onSelectAsset}){
                 {o.desc&&<div className="text-gray-600 text-xs mb-3 overflow-hidden" style={{display:'-webkit-box',WebkitLineClamp:1,WebkitBoxOrient:'vertical'}}>{o.desc}</div>}
                 <div className="flex items-center justify-between">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(o.status)}`}>{o.status.replace('_',' ')}</span>
-                  {linkedAsset&&<span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(linkedAsset.status)}`}>{linkedAsset.status}</span>}
+                  {linkedAsset&&linkedAsset.status!=='OK'?(
+                    <span onClick={e=>{e.stopPropagation();openDiagnostic({title:`${linkedAsset.name} — ${linkedAsset.status}`,severity:linkedAsset.status==='FEHLER'?'KRITISCH':'WARNUNG',message:linkedAsset.lastEvent,ursache:'Asset meldet aktiven Fehler oder überfällige Wartung.',loesung:'Maschine öffnen und Diagnose durchführen.',asset:linkedAsset.name});}}
+                      className={`text-xs px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 ${getAssetStatusColor(linkedAsset.status)}`}>{linkedAsset.status}</span>
+                  ):linkedAsset?(
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(linkedAsset.status)}`}>{linkedAsset.status}</span>
+                  ):null}
                 </div>
               </button>
             );
@@ -1353,19 +1459,21 @@ function DashboardPage({onNavigate,onSelectAsset}){
   },[]);
 
   const kpiCards=[
-    {l:'Aktive Fehler',  v:'3',   tc:'text-red-400',    bc:'bg-red-500',    sub:'2 kritisch',     nav:'auftraege'},
-    {l:'Wartungen fällig',v:'7',  tc:'text-amber-400',  bc:'bg-amber-500',  sub:'3 überfällig',   nav:'auftraege'},
-    {l:'Gesamt Assets',  v:'142', tc:'text-indigo-400', bc:'bg-indigo-500', sub:'5 aktiv erfasst',nav:'assets'},
-    {l:'ERP-Sync',       v:'98%', tc:'text-green-400',  bc:'bg-green-500',  sub:'Letzte: 14:22',  nav:'einstellungen'},
+    {l:'Aktive Fehler',  v:'3',   tc:'text-red-400',    bc:'bg-red-500',    sub:'2 kritisch',     nav:'auftraege', pulseCls:'pulse-critical',
+      diag:{title:'Aktive Systemfehler',severity:'KRITISCH',code:'E-001',message:'3 Maschinen melden aktive Fehler. 2 davon sind kritisch und erfordern sofortigen Betriebsstopp.',ursache:'Hydraulikdruckabfall und Sensorausfälle an CAT 320 und Liebherr R920.',loesung:'Sofortige Inspektion. Maschinen bis zur Freigabe durch Serviceleiter gesperrt.'}},
+    {l:'Wartungen fällig',v:'7',  tc:'text-amber-400',  bc:'bg-amber-500',  sub:'3 überfällig',   nav:'auftraege', pulseCls:'pulse-warning',
+      diag:{title:'Wartungsintervalle überfällig',severity:'WARNUNG',code:'W-101',message:'7 Maschinen haben überfällige Wartungsintervalle. 3 davon sind mehr als 50 Betriebsstunden überschritten.',ursache:'Ressourcenengpass — planmäßige Wartungen wurden verschoben.',loesung:'Servicetermine für alle überfälligen Maschinen innerhalb 48h vergeben.'}},
+    {l:'Gesamt Assets',  v:'142', tc:'text-indigo-400', bc:'bg-indigo-500', sub:'5 aktiv erfasst',nav:'assets',    pulseCls:'', diag:null},
+    {l:'ERP-Sync',       v:'98%', tc:'text-green-400',  bc:'bg-green-500',  sub:'Letzte: 14:22',  nav:'einstellungen',pulseCls:'',diag:null},
   ];
 
   return(
     <div className="space-y-5">
       {/* KPI — klickbar */}
       <div className="grid grid-cols-4 gap-4">
-        {kpiCards.map(({l,v,tc,bc,sub,nav})=>(
-          <button key={l} onClick={()=>onNavigate(nav)}
-            className="btn-press bg-desk-surface border border-desk-border rounded-xl p-5 text-left transition-all hover:border-desk-accent/40 hover:bg-desk-surface/80 group">
+        {kpiCards.map(({l,v,tc,bc,sub,nav,pulseCls,diag})=>(
+          <button key={l} onClick={()=>diag?openDiagnostic(diag):onNavigate(nav)}
+            className={`btn-press bg-desk-surface border border-desk-border rounded-xl p-5 text-left transition-all hover:border-desk-accent/40 hover:bg-desk-surface/80 group ${pulseCls}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${bc}`}/>
@@ -1787,8 +1895,12 @@ function AppRouter({user,onLogout}){
 
 function App(){
   const [user,setUser]=React.useState(null);
-  if(!user)return<LoginScreen onLogin={setUser}/>;
-  return<AppRouter user={user} onLogout={()=>setUser(null)}/>;
+  const [diagData,setDiagData]=React.useState(null);
+  React.useEffect(()=>{_setDiagnostic=setDiagData;return()=>{_setDiagnostic=null;};},[]);
+  return(<>
+    {user?<AppRouter user={user} onLogout={()=>setUser(null)}/>:<LoginScreen onLogin={setUser}/>}
+    <DiagnosticPopup data={diagData} onClose={()=>setDiagData(null)}/>
+  </>);
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
