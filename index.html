@@ -89,6 +89,14 @@ const WORK_ORDERS_INITIAL = [
   {id:'WO-2021',title:'Bremsinspektion',     asset:'Toyota 8FBN25',   techId:'mo-002',status:'ABGESCHLOSSEN', priority:'HOCH',    desc:'Bremsbeläge kontrolliert und erneuert.'},
   {id:'WO-2020',title:'Reifenwechsel',       asset:'Komatsu WA 380',  techId:'mo-003',status:'ABGESCHLOSSEN', priority:'NIEDRIG', desc:'Alle 4 Reifen gewechselt.'},
 ];
+// Global cid Logic config store — admin writes, technician app reads
+let CID_LOGIC_CONFIG = {};
+const SPARE_PARTS_DEFAULT = [
+  {id:'sp-1',name:'Hydraulik-Sensor',    artNr:'9920', available:true},
+  {id:'sp-2',name:'Druckventil PV-220',  artNr:'7741', available:false},
+  {id:'sp-3',name:'Hydraulikpumpe HP-440',artNr:'5530',available:false},
+  {id:'sp-4',name:'Dichtungssatz DS-200', artNr:'3310', available:false},
+];
 const ASSETS_DB = [
   {id:'STILL-001',name:'STILL RX 20-20',       type:'Gabelstapler',  location:'Halle A · Pos. 3', status:'OK',     lastEvent:'Normalbetrieb',          uptime:96,
    betriebsstunden:4820, hydraulikDruck:192, hydraulikMax:210, oelstand:81, oelKritisch:false,
@@ -784,6 +792,44 @@ function SchaltplanModal({asset,onClose}){
   );
 }
 
+function SmartTagsSection(){
+  const rows=[
+    ['Geprüft','Druck','Temperatur'],
+    ['Sensor','Pumpe','Leckage'],
+    ['Folgetermin','Dokumentation','Fotos'],
+  ];
+  const [selected,setSelected]=React.useState(new Set(['Geprüft','Sensor','Folgetermin']));
+  function toggle(t){setSelected(prev=>{const s=new Set(prev);s.has(t)?s.delete(t):s.add(t);return s;});}
+  return(
+    <div className="tile-glass rounded-2xl p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <span className="text-green-400 text-xs font-semibold uppercase tracking-wider">Smart-Tags</span>
+        <span className="ml-auto text-gray-600 text-xs">{selected.size} ausgewählt</span>
+      </div>
+      <div className="space-y-2">
+        {rows.map((row,i)=>(
+          <div key={i} className="flex flex-wrap gap-2">
+            {row.map(t=>{
+              const active=selected.has(t);
+              return(
+                <button key={t} onClick={()=>toggle(t)}
+                  className={`btn-press text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${active?'bg-green-500/20 border-green-500/40 text-green-400':'bg-black border-slate-700 text-slate-500 hover:border-slate-600'}`}>
+                  {active&&<span className="mr-1">✓</span>}{t}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <button className="btn-press mt-3 w-full py-2.5 rounded-xl bg-green-500/15 hover:bg-green-500/25 border border-green-500/30 text-green-400 text-xs font-semibold transition-all flex items-center justify-center gap-2">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Tags speichern
+      </button>
+    </div>
+  );
+}
+
 function AssetDetailView({asset,onBack}){
   const [showSchaltplan,setShowSchaltplan]=React.useState(false);
   const hydraulikPct=Math.round((asset.hydraulikDruck/asset.hydraulikMax)*100);
@@ -932,6 +978,86 @@ function AssetDetailView({asset,onBack}){
           </div>
         </div>
 
+        {/* cid Logic Insight — reads from CID_LOGIC_CONFIG if admin has configured */}
+        {(()=>{
+          const cfg=CID_LOGIC_CONFIG[asset.id];
+          const lastService=new Date(asset.letzteWartung).toLocaleDateString('de-DE');
+          return(
+            <div style={{background:'rgba(0,16,8,0.85)',border:'1px solid rgba(34,197,94,0.3)',borderRadius:'16px',padding:'16px',boxShadow:'0 0 24px rgba(34,197,94,0.1),0 0 48px rgba(34,197,94,0.05)'}}>
+              <div className="flex items-center gap-2 mb-2.5">
+                <img src="img/as_logo.png" style={{width:'18px',height:'18px',objectFit:'contain',borderRadius:'4px'}}/>
+                <span style={{color:'#4ade80',fontSize:'10px',fontWeight:'700',textTransform:'uppercase',letterSpacing:'0.12em'}}>cid Logic Insight</span>
+                {cfg&&<span style={{marginLeft:'4px',background:'rgba(34,197,94,0.2)',border:'1px solid rgba(34,197,94,0.4)',borderRadius:'5px',padding:'1px 7px',color:'#4ade80',fontSize:'9px',fontWeight:'700'}}>LIVE</span>}
+                <span className="ml-auto text-[9px] font-semibold px-2 py-0.5 rounded-md" style={{background:'rgba(34,197,94,0.15)',border:'1px solid rgba(34,197,94,0.3)',color:'#4ade80'}}>KI-Analyse</span>
+              </div>
+              {cfg?(
+                <>
+                  <p style={{color:'#bbf7d0',fontSize:'13px',lineHeight:'1.65',margin:'0 0 8px 0'}}>
+                    <span style={{color:'#4ade80',fontWeight:'600'}}>Admin-Konfiguration aktiv:</span> {cfg.expectedIssue||'Kein spezifisches Problem angegeben.'} — Letzte Wartung: <span style={{fontFamily:'JetBrains Mono,monospace',color:'#4ade80'}}>{lastService}</span>.
+                  </p>
+                  <div style={{display:'flex',alignItems:'center',gap:'6px',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.2)',borderRadius:'7px',padding:'5px 10px'}}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <span style={{color:'#86efac',fontSize:'11px',fontFamily:'JetBrains Mono,monospace'}}>Auftrag {cfg.orderId} · {new Date(cfg.sentAt).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</span>
+                  </div>
+                </>
+              ):(
+                <p style={{color:'#bbf7d0',fontSize:'13px',lineHeight:'1.65',margin:0}}>Muster erkannt: Häufigster Fehler bei diesem Modell <span style={{fontFamily:'JetBrains Mono,monospace',color:'#4ade80'}}>(1.200h)</span> ist der Hydraulik-Sensor. Letzte Wartung: <span style={{fontFamily:'JetBrains Mono,monospace',color:'#4ade80'}}>{lastService}</span>.</p>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Live Parts & Specs — dynamic from CID_LOGIC_CONFIG or defaults */}
+        {(()=>{
+          const cfg=CID_LOGIC_CONFIG[asset.id];
+          const parts=cfg?cfg.spareParts:SPARE_PARTS_DEFAULT.slice(0,1);
+          const techInstr=cfg?cfg.techInstructions:'120 Nm Anzugsdrehmoment am Drucksensor';
+          return(
+            <div className="tile-glass rounded-2xl overflow-hidden">
+              <div className="px-4 pt-4 pb-3 border-b border-slate-800 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                <span className="text-purple-400 text-xs font-semibold uppercase tracking-wider">Live Parts & Specs</span>
+                {cfg&&<span className="ml-auto text-[9px] font-semibold px-2 py-0.5 rounded-md text-green-400 border border-green-500/30" style={{background:'rgba(34,197,94,0.1)'}}>Admin-konfiguriert</span>}
+              </div>
+              <div className="p-4 space-y-3">
+                {/* Ersatzteil-Check */}
+                <div>
+                  <div className="text-gray-500 text-[10px] uppercase tracking-wider mb-2">Ersatzteil-Check</div>
+                  <div className="space-y-2">
+                    {parts.map(p=>(
+                      <div key={p.id} className="flex items-center justify-between p-3 rounded-xl border" style={{background:p.available?'rgba(34,197,94,0.05)':'rgba(239,68,68,0.05)',borderColor:p.available?'rgba(34,197,94,0.2)':'rgba(239,68,68,0.2)'}}>
+                        <div>
+                          <div className="text-white text-sm font-semibold">{p.name} <span className="text-gray-400 font-normal text-xs">(Art. {p.artNr})</span></div>
+                        </div>
+                        <div className="flex-shrink-0 ml-3">
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${p.available?'bg-green-500/15 border-green-500/30':'bg-red-500/15 border-red-500/30'}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${p.available?'bg-green-400':'bg-red-400'}`}/>
+                            <span className={`text-xs font-semibold whitespace-nowrap ${p.available?'text-green-400':'text-red-400'}`}>{p.available?'Verfügbar im Service-Wagen':'Nicht verfügbar'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Wartungs-Vorgabe */}
+                <div className="p-3 rounded-xl bg-black border border-slate-700">
+                  <div className="text-gray-500 text-[10px] uppercase tracking-wider mb-2">Wartungs-Vorgabe</div>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className="text-gray-300 text-sm" style={{fontFamily:'JetBrains Mono,monospace'}}>{techInstr}</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-red-500/10 border border-red-500/30">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span className="text-red-400 text-xs font-semibold">System drucklos machen!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Smart-Tags */}
+        <SmartTagsSection/>
+
         {/* Technische Daten */}
         <div className="tile-glass rounded-2xl p-4">
           <div className="text-gray-500 text-xs uppercase tracking-widest mb-3 font-semibold">Technische Daten</div>
@@ -1015,7 +1141,7 @@ function LoginScreen({onLogin}){
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0d] px-4 py-8">
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-8 w-full max-w-sm fade-in">
         <div className="flex flex-col items-center mb-8">
-          <LogoIcon/>
+          <img src="img/as_logo.png" style={{width:'52px',height:'52px',objectFit:'contain',borderRadius:'12px'}}/>
           <div className="mt-3 text-white font-bold tracking-widest text-lg">ASSETLOGIC</div>
           <div className="text-gray-500 text-xs mt-1">Asset Management Platform</div>
         </div>
@@ -1110,9 +1236,12 @@ function MobileHome({user,onScan,onNavigate,onSelectAsset}){
   return(
     <div className="page-enter">
       <div className="px-5 pt-8 pb-4 border-b border-mob-border flex items-center justify-between">
-        <div>
-          <div className="text-gray-400 text-sm">{greetingText()}</div>
-          <div className="text-white text-xl font-bold">{user.name.split(' ')[0]}</div>
+        <div className="flex items-center gap-3">
+          <img src="img/as_logo.png" style={{width:'34px',height:'34px',objectFit:'contain',borderRadius:'8px'}}/>
+          <div>
+            <div className="text-gray-400 text-sm">{greetingText()}</div>
+            <div className="text-white text-xl font-bold">{user.name.split(' ')[0]}</div>
+          </div>
         </div>
         <span className={`text-xs font-medium px-3 py-1 rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
       </div>
@@ -1630,27 +1759,56 @@ function AssetsPage({onSelect}){
   );
 }
 
-// ── DESKTOP PAGE: AUFTRÄGE (KANBAN) ──────────────────────────────────────────
+// ── DESKTOP PAGE: AUFTRÄGE (KANBAN + cid Logic New Order) ────────────────────
+const EMPTY_FORM={asset:'',tech:'',title:'',expectedIssue:'',techInstructions:'120 Nm Anzugsdrehmoment am Drucksensor',prio:'MITTEL',spareParts:SPARE_PARTS_DEFAULT.map(p=>({...p}))};
 function AuftraegePage({orders,setOrders,showNew,setShowNew}){
-  const [form,setForm]=React.useState({asset:'',tech:'',title:'',desc:'',prio:'MITTEL'});
+  const [form,setForm]=React.useState(EMPTY_FORM);
+  const [sent,setSent]=React.useState(false);
+
+  function togglePart(id){setForm(f=>({...f,spareParts:f.spareParts.map(p=>p.id===id?{...p,available:!p.available}:p)}));}
+
   function submitNew(){
     if(!form.title||!form.asset)return;
     const id='WO-'+Math.floor(Math.random()*9000+1000);
-    setOrders(p=>[{id,title:form.title,asset:form.asset,techId:form.tech||'mo-001',status:'OFFEN',priority:form.prio,desc:form.desc},...p]);
-    setShowNew(false);
-    setForm({asset:'',tech:'',title:'',desc:'',prio:'MITTEL'});
+    setOrders(p=>[{id,title:form.title,asset:form.asset,techId:form.tech||'mo-001',status:'OFFEN',priority:form.prio,desc:form.expectedIssue},...p]);
+    const assetObj=ASSETS_DB.find(a=>a.name===form.asset);
+    if(assetObj){
+      CID_LOGIC_CONFIG[assetObj.id]={
+        expectedIssue:form.expectedIssue,
+        techInstructions:form.techInstructions,
+        spareParts:form.spareParts,
+        orderId:id,
+        sentAt:new Date().toISOString(),
+      };
+    }
+    setSent(true);
+    setTimeout(()=>{setSent(false);setShowNew(false);setForm(EMPTY_FORM);},1800);
   }
+
   const cols=[
     ['OFFEN','Offen','border-blue-500/30 bg-blue-500/5'],
     ['IN_BEARBEITUNG','In Bearbeitung','border-amber-500/30 bg-amber-500/5'],
     ['ABGESCHLOSSEN','Abgeschlossen','border-green-500/30 bg-green-500/5'],
   ];
+
+  // Light-theme helpers (local vars, not CSS classes)
+  const LF={background:'#f8f9fb'};
+  const inputStyle={width:'100%',background:'#fff',border:'1.5px solid #e5e7eb',borderRadius:'10px',padding:'10px 14px',color:'#111827',fontSize:'14px',outline:'none',boxSizing:'border-box',fontFamily:'Inter,sans-serif'};
+  const labelStyle={color:'#6b7280',fontSize:'12px',display:'block',marginBottom:'5px',fontWeight:'500'};
+  const secHeadStyle={color:'#374151',fontWeight:'700',fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.09em',marginBottom:'12px'};
+
   return(
     <div>
+      {/* Kanban header */}
       <div className="flex items-center justify-between mb-5">
         <div className="text-white font-semibold text-lg">Auftragsmanagement</div>
-        <button onClick={()=>setShowNew(true)} className="bg-desk-accent hover:bg-desk-accent-dim text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">+ Neuer Auftrag</button>
+        <button onClick={()=>setShowNew(true)} className="bg-desk-accent hover:bg-desk-accent-dim text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Neuer Auftrag
+        </button>
       </div>
+
+      {/* Kanban board */}
       <div className="grid grid-cols-3 gap-4">
         {cols.map(([status,label,cls])=>(
           <div key={status} className={`border ${cls} rounded-xl p-4`}>
@@ -1667,48 +1825,189 @@ function AuftraegePage({orders,setOrders,showNew,setShowNew}){
                   </div>
                   <div className="text-white text-sm font-medium">{o.title}</div>
                   <div className="text-gray-500 text-xs mt-1">{o.asset}</div>
+                  {CID_LOGIC_CONFIG[ASSETS_DB.find(a=>a.name===o.asset)?.id]&&(
+                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 rounded-md px-2 py-1">
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      cid Logic aktiv
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         ))}
       </div>
+
+      {/* ── NEW WORK ORDER: light-themed side panel ── */}
       {showNew&&(
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-desk-surface border border-desk-border rounded-2xl p-6 w-full max-w-md fade-in">
-            <div className="flex items-center justify-between mb-5">
-              <div className="text-white font-semibold text-lg">Neuer Auftrag</div>
-              <button onClick={()=>setShowNew(false)} className="text-gray-600 hover:text-gray-400"><IconX size={20}/></button>
-            </div>
-            <div className="space-y-4">
-              <input value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Titel *"
-                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent"/>
-              <select value={form.asset} onChange={e=>setForm({...form,asset:e.target.value})}
-                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent">
-                <option value="">Asset wählen</option>
-                {ASSETS_DB.map(a=><option key={a.id} value={a.name}>{a.name}</option>)}
-              </select>
-              <select value={form.tech} onChange={e=>setForm({...form,tech:e.target.value})}
-                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent">
-                <option value="">Techniker wählen</option>
-                {TECHNIKER_DB.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
-              </select>
-              <textarea value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})} placeholder="Beschreibung" rows={3}
-                className="w-full bg-desk-base border border-desk-border rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-desk-accent resize-none"/>
-              <div>
-                <div className="text-gray-500 text-xs mb-2">Priorität</div>
-                <div className="flex gap-2">
-                  {['NIEDRIG','MITTEL','HOCH','KRITISCH'].map(p=>(
-                    <button key={p} onClick={()=>setForm({...form,prio:p})}
-                      className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${form.prio===p?getPrioBadge(p)+' border border-current/30':'bg-desk-base border border-desk-border text-gray-500 hover:text-gray-300'}`}>
-                      {p}
-                    </button>
-                  ))}
+        <div className="fixed inset-0 z-50 flex" style={{backdropFilter:'blur(6px)',background:'rgba(0,0,0,0.45)'}}>
+          <div className="flex-1" onClick={()=>!sent&&setShowNew(false)}/>
+          <div className="w-[540px] h-full overflow-y-auto flex flex-col" style={{background:'#f8f9fb',borderLeft:'1px solid #e5e7eb',boxShadow:'-8px 0 40px rgba(0,0,0,0.2)'}}>
+
+            {/* ── Panel Header ── */}
+            <div style={{background:'#ffffff',borderBottom:'1.5px solid #e5e7eb',padding:'18px 24px',flexShrink:0}} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img src="img/as_logo.png" style={{width:'38px',height:'38px',objectFit:'contain',borderRadius:'9px',border:'1px solid #e5e7eb'}}/>
+                <div>
+                  <div style={{color:'#111827',fontWeight:'700',fontSize:'16px',letterSpacing:'-0.01em'}}>Neuer Auftrag</div>
+                  <div style={{color:'#9ca3af',fontSize:'11px',fontWeight:'500'}}>AssetLogic — cid Logic Workflow</div>
                 </div>
               </div>
-              <button onClick={submitNew} className="btn-press w-full bg-desk-accent hover:bg-desk-accent-dim text-white font-semibold py-3 rounded-xl transition-colors">
-                Auftrag erstellen
+              <button onClick={()=>!sent&&setShowNew(false)} style={{color:'#9ca3af',padding:'7px',borderRadius:'8px',background:'#f3f4f6',border:'1px solid #e5e7eb',cursor:'pointer',display:'flex',alignItems:'center'}}>
+                <IconX size={16}/>
               </button>
+            </div>
+
+            <div style={{padding:'24px',flex:1,display:'flex',flexDirection:'column',gap:'22px'}}>
+
+              {/* ── Section 1: Auftrags-Details ── */}
+              <section>
+                <div style={secHeadStyle}>Auftrags-Details</div>
+                <div style={{display:'flex',flexDirection:'column',gap:'13px'}}>
+
+                  <div>
+                    <label style={labelStyle}>Titel *</label>
+                    <input value={form.title} onChange={e=>setForm({...form,title:e.target.value})}
+                      placeholder="z.B. Hydraulik-Inspektion CAT 320" style={inputStyle}
+                      onFocus={e=>{e.target.style.borderColor='#22c55e';e.target.style.boxShadow='0 0 0 3px rgba(34,197,94,0.1)'}}
+                      onBlur={e=>{e.target.style.borderColor='#e5e7eb';e.target.style.boxShadow='none'}}/>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Asset *</label>
+                    <div style={{position:'relative'}}>
+                      <select value={form.asset} onChange={e=>setForm({...form,asset:e.target.value})}
+                        style={{...inputStyle,appearance:'none',cursor:'pointer',paddingRight:'36px',color:form.asset?'#111827':'#9ca3af'}}>
+                        <option value="">Asset wählen…</option>
+                        {ASSETS_DB.map(a=><option key={a.id} value={a.name}>{a.name} — {a.status}</option>)}
+                      </select>
+                      <svg style={{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    {form.asset&&(()=>{const a=ASSETS_DB.find(x=>x.name===form.asset);return a?(
+                      <div style={{marginTop:'6px',display:'flex',alignItems:'center',gap:'8px',padding:'7px 10px',background:'#f9fafb',border:'1px solid #e5e7eb',borderRadius:'8px'}}>
+                        <span style={{width:'7px',height:'7px',borderRadius:'50%',flexShrink:0,background:a.status==='FEHLER'?'#ef4444':a.status==='WARTUNG'?'#f59e0b':'#22c55e'}}/>
+                        <span style={{color:'#374151',fontSize:'12px'}}>{a.location} · {a.betriebsstunden.toLocaleString('de-DE')} Std.</span>
+                      </div>
+                    ):null;})()}
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Erwartetes Problem</label>
+                    <input value={form.expectedIssue} onChange={e=>setForm({...form,expectedIssue:e.target.value})}
+                      placeholder="z.B. Hydraulikdruck Abfall, Sensor-Ausfall" style={inputStyle}
+                      onFocus={e=>{e.target.style.borderColor='#22c55e';e.target.style.boxShadow='0 0 0 3px rgba(34,197,94,0.1)'}}
+                      onBlur={e=>{e.target.style.borderColor='#e5e7eb';e.target.style.boxShadow='none'}}/>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Techniker zuweisen</label>
+                    <div style={{position:'relative'}}>
+                      <select value={form.tech} onChange={e=>setForm({...form,tech:e.target.value})}
+                        style={{...inputStyle,appearance:'none',cursor:'pointer',paddingRight:'36px',color:form.tech?'#111827':'#9ca3af'}}>
+                        <option value="">Techniker wählen…</option>
+                        {TECHNIKER_DB.map(t=><option key={t.id} value={t.id}>{t.name} — {t.role}</option>)}
+                      </select>
+                      <svg style={{position:'absolute',right:'12px',top:'50%',transform:'translateY(-50%)',pointerEvents:'none'}} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Priorität</label>
+                    <div style={{display:'flex',gap:'8px'}}>
+                      {[['NIEDRIG','#16a34a','#dcfce7','#86efac'],['MITTEL','#2563eb','#eff6ff','#93c5fd'],['HOCH','#d97706','#fef9c3','#fcd34d'],['KRITISCH','#dc2626','#fee2e2','#fca5a5']].map(([p,tc,bg,bc])=>(
+                        <button key={p} onClick={()=>setForm({...form,prio:p})}
+                          style={{flex:1,padding:'8px 4px',borderRadius:'9px',fontSize:'11px',fontWeight:'600',cursor:'pointer',transition:'all 0.15s',border:`1.5px solid ${form.prio===p?bc:'#e5e7eb'}`,background:form.prio===p?bg:'#fff',color:form.prio===p?tc:'#9ca3af'}}>
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                </div>
+              </section>
+
+              {/* Divider */}
+              <div style={{height:'1px',background:'#e5e7eb'}}/>
+
+              {/* ── Section 2: cid Logic Pre-Config ── */}
+              <section>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'14px'}}>
+                  <img src="img/as_logo.png" style={{width:'17px',height:'17px',objectFit:'contain',borderRadius:'4px'}}/>
+                  <div style={{color:'#15803d',fontWeight:'700',fontSize:'11px',textTransform:'uppercase',letterSpacing:'0.1em'}}>cid Logic Pre-Config</div>
+                  <div style={{marginLeft:'auto',background:'#dcfce7',border:'1px solid #86efac',borderRadius:'6px',padding:'2px 9px',color:'#16a34a',fontSize:'10px',fontWeight:'700'}}>KI-Voreinstellung</div>
+                </div>
+
+                {/* Spare parts toggles */}
+                <div style={{background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:'12px',padding:'16px',marginBottom:'14px'}}>
+                  <div style={{color:'#15803d',fontSize:'11px',fontWeight:'700',marginBottom:'11px',textTransform:'uppercase',letterSpacing:'0.07em',display:'flex',alignItems:'center',gap:'6px'}}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                    Ersatzteil-Check — Im Service-Wagen verfügbar
+                  </div>
+                  <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                    {form.spareParts.map(p=>(
+                      <div key={p.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'#ffffff',border:`1.5px solid ${p.available?'#86efac':'#e5e7eb'}`,borderRadius:'9px',padding:'10px 14px',transition:'border-color 0.2s'}}>
+                        <div>
+                          <div style={{color:'#111827',fontSize:'13px',fontWeight:'600'}}>{p.name}</div>
+                          <div style={{color:'#9ca3af',fontSize:'11px',fontFamily:'JetBrains Mono,monospace'}}>Art. {p.artNr}</div>
+                        </div>
+                        <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                          {p.available&&<span style={{color:'#16a34a',fontSize:'11px',fontWeight:'600',background:'#dcfce7',padding:'3px 9px',borderRadius:'6px',whiteSpace:'nowrap'}}>Im Service-Wagen</span>}
+                          <button onClick={()=>togglePart(p.id)}
+                            style={{width:'42px',height:'23px',borderRadius:'12px',position:'relative',cursor:'pointer',transition:'background 0.2s',background:p.available?'#22c55e':'#d1d5db',border:'none',flexShrink:0}}>
+                            <div style={{position:'absolute',top:'2.5px',width:'18px',height:'18px',borderRadius:'9px',background:'#ffffff',transition:'left 0.2s',left:p.available?'22px':'2px',boxShadow:'0 1px 4px rgba(0,0,0,0.18)'}}/>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Technical Instructions */}
+                <div>
+                  <label style={labelStyle}>Technische Anweisung (Sicherheitshinweis)</label>
+                  <input value={form.techInstructions} onChange={e=>setForm({...form,techInstructions:e.target.value})}
+                    placeholder="z.B. 120 Nm Anzugsdrehmoment am Drucksensor"
+                    style={{...inputStyle,fontFamily:'JetBrains Mono,monospace',fontSize:'13px'}}
+                    onFocus={e=>{e.target.style.borderColor='#22c55e';e.target.style.boxShadow='0 0 0 3px rgba(34,197,94,0.1)'}}
+                    onBlur={e=>{e.target.style.borderColor='#e5e7eb';e.target.style.boxShadow='none'}}/>
+                  <div style={{marginTop:'7px',display:'flex',alignItems:'center',gap:'7px',padding:'8px 12px',background:'#fff7ed',border:'1px solid #fed7aa',borderRadius:'8px'}}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ea580c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span style={{color:'#ea580c',fontSize:'11px',fontWeight:'600'}}>Wird als Sicherheitswarnung in der Techniker-App angezeigt</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* Divider */}
+              <div style={{height:'1px',background:'#e5e7eb'}}/>
+
+              {/* ── Submit ── */}
+              <div>
+                <button onClick={submitNew} disabled={!form.title||!form.asset||sent}
+                  style={{
+                    width:'100%',padding:'14px 20px',borderRadius:'12px',fontWeight:'700',fontSize:'14px',
+                    display:'flex',alignItems:'center',justifyContent:'center',gap:'10px',
+                    transition:'all 0.3s',border:'none',cursor:(!form.title||!form.asset||sent)?'not-allowed':'pointer',
+                    background:sent?'#22c55e':(!form.title||!form.asset)?'#e5e7eb':'#111827',
+                    color:sent?'#fff':(!form.title||!form.asset)?'#9ca3af':'#ffffff',
+                    boxShadow:sent||(!form.title||!form.asset)?'none':'0 4px 16px rgba(0,0,0,0.18)',
+                  }}>
+                  {sent?(
+                    <>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      An Techniker-App gesendet!
+                    </>
+                  ):(
+                    <>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      Auftrag erstellen & an Techniker-App senden
+                    </>
+                  )}
+                </button>
+                <div style={{textAlign:'center',color:'#9ca3af',fontSize:'11px',marginTop:'8px'}}>
+                  cid Logic Konfiguration wird live mit der Techniker-App synchronisiert
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1841,7 +2140,7 @@ function DesktopDashboard({user,onLogout}){
     <div className="bg-desk-base min-h-screen flex font-sans text-white">
       <div className="w-[220px] bg-desk-sidebar border-r border-desk-border fixed left-0 top-0 bottom-0 flex flex-col z-30">
         <button onClick={()=>setActivePage('dashboard')} className="p-5 flex items-center gap-3 border-b border-desk-border w-full hover:bg-white/[0.02] transition-colors">
-          <LogoIcon/>
+          <img src="img/as_logo.png" style={{width:'32px',height:'32px',objectFit:'contain',borderRadius:'6px'}}/>
           <span className="font-bold text-white tracking-widest text-sm">ASSETLOGIC</span>
         </button>
         <nav className="flex-1 p-3 space-y-1">
