@@ -91,6 +91,25 @@ const WORK_ORDERS_INITIAL = [
 ];
 // Global cid Logic config store — admin writes, technician app reads
 let CID_LOGIC_CONFIG = {};
+// Global shared orders store — keeps admin + technician in sync within same session
+let _globalOrders = [...WORK_ORDERS_INITIAL];
+const _ordersListeners = new Set();
+function useSharedOrders(){
+  const [orders,setLocal]=React.useState(_globalOrders);
+  React.useEffect(()=>{
+    // Sync with any changes made while this component was unmounted
+    setLocal(_globalOrders);
+    const listener=(o)=>setLocal(o);
+    _ordersListeners.add(listener);
+    return()=>_ordersListeners.delete(listener);
+  },[]);
+  function setOrders(updater){
+    const next=typeof updater==='function'?updater(_globalOrders):updater;
+    _globalOrders=next;
+    _ordersListeners.forEach(fn=>fn(next));
+  }
+  return [orders,setOrders];
+}
 const SPARE_PARTS_DEFAULT = [
   {id:'sp-1',name:'Hydraulik-Sensor',    artNr:'9920', available:true},
   {id:'sp-2',name:'Druckventil PV-220',  artNr:'7741', available:false},
@@ -1368,8 +1387,8 @@ function MobileAuftraege({user,orders,onSelectAsset}){
 function MobileProfil({user,onLogout,onNavigate}){
   const [notif,setNotif]=React.useState(true);
   const [dark,setDark]=React.useState(true);
-  const myDone=WORK_ORDERS_INITIAL.filter(o=>o.techId===user.techId&&o.status==='ABGESCHLOSSEN').length;
-  const myActive=WORK_ORDERS_INITIAL.filter(o=>o.techId===user.techId&&o.status!=='ABGESCHLOSSEN').length;
+  const myDone=_globalOrders.filter(o=>o.techId===user.techId&&o.status==='ABGESCHLOSSEN').length;
+  const myActive=_globalOrders.filter(o=>o.techId===user.techId&&o.status!=='ABGESCHLOSSEN').length;
   return(
     <div className="page-enter px-5 pt-8 pb-28 space-y-6">
       <div className="flex flex-col items-center gap-3">
@@ -1540,7 +1559,7 @@ function ScanFAB({onPress}){
 function MobileApp({user,onLogout}){
   const [screen,setScreen]=React.useState('home');
   const [showScan,setShowScan]=React.useState(false);
-  const [orders]=React.useState(WORK_ORDERS_INITIAL);
+  const [orders]=useSharedOrders();
   const [selectedAsset,setSelectedAsset]=React.useState(null);
   React.useEffect(()=>{_navigateToAsset=setSelectedAsset;return()=>{_navigateToAsset=null;};},[]);
   if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
@@ -1674,7 +1693,7 @@ function DashboardPage({onNavigate,onSelectAsset}){
             <button onClick={()=>onNavigate('auftraege')} className="text-desk-accent text-xs hover:underline">Alle →</button>
           </div>
           <div className="space-y-2">
-            {WORK_ORDERS_INITIAL.filter(o=>o.status==='OFFEN').map(o=>{
+            {_globalOrders.filter(o=>o.status==='OFFEN').map(o=>{
               const linkedAsset=ASSETS_DB.find(a=>a.name===o.asset);
               return(
                 <button key={o.id} onClick={()=>linkedAsset?onSelectAsset(linkedAsset):onNavigate('auftraege')}
@@ -2123,7 +2142,7 @@ function EinstellungenPage(){
 // ── DESKTOP DASHBOARD ─────────────────────────────────────────────────────────
 function DesktopDashboard({user,onLogout}){
   const [activePage,setActivePage]=React.useState('dashboard');
-  const [orders,setOrders]=React.useState(WORK_ORDERS_INITIAL);
+  const [orders,setOrders]=useSharedOrders();
   const [showNew,setShowNew]=React.useState(false);
   const [selectedAsset,setSelectedAsset]=React.useState(null);
   if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
