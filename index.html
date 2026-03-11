@@ -1518,7 +1518,7 @@ function AssetDetailView({asset,onBack}){
           return(
             <div style={{background:'rgba(0,16,8,0.85)',border:'1px solid rgba(34,197,94,0.3)',borderRadius:'16px',padding:'16px',boxShadow:'0 0 24px rgba(34,197,94,0.1),0 0 48px rgba(34,197,94,0.05)'}}>
               <div className="flex items-center gap-2 mb-2.5">
-                <img src="img/as_logo.png" style={{width:'18px',height:'18px',objectFit:'contain',borderRadius:'4px'}}/>
+                <img src="img/aslogo.png" style={{width:'18px',height:'18px',objectFit:'contain',borderRadius:'4px'}}/>
                 <span style={{color:'#4ade80',fontSize:'10px',fontWeight:'700',textTransform:'uppercase',letterSpacing:'0.12em'}}>cid Logic Insight</span>
                 {cfg&&<span style={{marginLeft:'4px',background:'rgba(34,197,94,0.2)',border:'1px solid rgba(34,197,94,0.4)',borderRadius:'5px',padding:'1px 7px',color:'#4ade80',fontSize:'9px',fontWeight:'700'}}>LIVE</span>}
                 <span className="ml-auto text-[9px] font-semibold px-2 py-0.5 rounded-md" style={{background:'rgba(34,197,94,0.15)',border:'1px solid rgba(34,197,94,0.3)',color:'#4ade80'}}>KI-Analyse</span>
@@ -1675,7 +1675,7 @@ function LoginScreen({onLogin}){
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0d0d0d] px-4 py-8">
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-8 w-full max-w-sm fade-in">
         <div className="flex flex-col items-center mb-8">
-          <img src="img/as_logo.png" style={{width:'52px',height:'52px',objectFit:'contain',borderRadius:'12px'}}/>
+          <img src="img/aslogo.png" style={{width:'52px',height:'52px',objectFit:'contain',borderRadius:'12px'}}/>
           <div className="mt-3 text-white font-bold tracking-widest text-lg">ASSETLOGIC</div>
           <div className="text-gray-500 text-xs mt-1">Asset Management Platform</div>
         </div>
@@ -1771,7 +1771,7 @@ function MobileHome({user,orders,onScan,onNavigate,onSelectAsset}){
     <div className="page-enter">
       <div className="px-5 pt-8 pb-4 border-b border-mob-border flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="img/as_logo.png" style={{width:'34px',height:'34px',objectFit:'contain',borderRadius:'8px'}}/>
+          <img src="img/aslogo.png" style={{width:'34px',height:'34px',objectFit:'contain',borderRadius:'8px'}}/>
           <div>
             <div className="text-gray-400 text-sm">{greetingText()}</div>
             <div className="text-white text-xl font-bold">{user.name.split(' ')[0]}</div>
@@ -2439,7 +2439,7 @@ function AuftraegePage({orders,setOrders,showNew,setShowNew}){
                 {cfg&&(
                   <div className="bg-desk-base border border-green-500/20 rounded-xl px-4 py-3">
                     <div className="flex items-center gap-2 mb-3">
-                      <img src="img/as_logo.png" style={{width:'14px',height:'14px',objectFit:'contain',borderRadius:'3px'}}/>
+                      <img src="img/aslogo.png" style={{width:'14px',height:'14px',objectFit:'contain',borderRadius:'3px'}}/>
                       <span className="text-green-400 text-xs font-semibold uppercase tracking-wider">AssetLogic Pre-Config</span>
                     </div>
                     {cfg.techInstructions&&(
@@ -2489,7 +2489,7 @@ function AuftraegePage({orders,setOrders,showNew,setShowNew}){
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-desk-border flex-shrink-0">
               <div className="flex items-center gap-3">
-                <img src="img/as_logo.png" className="w-8 h-8 rounded-lg" style={{objectFit:'contain'}}/>
+                <img src="img/aslogo.png" className="w-8 h-8 rounded-lg" style={{objectFit:'contain'}}/>
                 <div>
                   <div className="text-white font-semibold text-base">Neuer Auftrag</div>
                   <div className="text-gray-500 text-xs">AssetLogic Workflow</div>
@@ -2568,7 +2568,7 @@ function AuftraegePage({orders,setOrders,showNew,setShowNew}){
               {/* Section: AssetLogic Pre-Config */}
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <img src="img/as_logo.png" style={{width:'14px',height:'14px',objectFit:'contain',borderRadius:'3px'}}/>
+                  <img src="img/aslogo.png" style={{width:'14px',height:'14px',objectFit:'contain',borderRadius:'3px'}}/>
                   <span className="text-green-400 text-xs font-semibold uppercase tracking-wider">AssetLogic Pre-Config</span>
                   <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-md text-green-400 bg-green-500/10 border border-green-500/20">KI-Voreinstellung</span>
                 </div>
@@ -2885,7 +2885,7 @@ function DesktopDashboard({user,onLogout}){
     <div className="bg-desk-base min-h-screen flex font-sans text-white">
       <div className="w-[220px] bg-desk-sidebar border-r border-desk-border fixed left-0 top-0 bottom-0 flex flex-col z-30">
         <button onClick={()=>setActivePage('dashboard')} className="p-5 flex items-center gap-3 border-b border-desk-border w-full hover:bg-white/[0.02] transition-colors">
-          <img src="img/as_logo.png" style={{width:'32px',height:'32px',objectFit:'contain',borderRadius:'6px'}}/>
+          <img src="img/aslogo.png" style={{width:'32px',height:'32px',objectFit:'contain',borderRadius:'6px'}}/>
           <span className="font-bold text-white tracking-widest text-sm">ASSETLOGIC</span>
         </button>
         <nav className="flex-1 p-3 space-y-1">
