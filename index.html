@@ -1857,11 +1857,10 @@ function AuftraegePage({orders,setOrders,showNew,setShowNew}){
         ))}
       </div>
 
-      {/* ── NEW WORK ORDER: light-themed side panel ── */}
+      {/* ── NEW WORK ORDER: light-themed centered modal ── */}
       {showNew&&(
-        <div className="fixed inset-0 z-50 flex" style={{backdropFilter:'blur(6px)',background:'rgba(0,0,0,0.45)'}}>
-          <div className="flex-1" onClick={()=>!sent&&setShowNew(false)}/>
-          <div className="w-[540px] h-full overflow-y-auto flex flex-col" style={{background:'#f8f9fb',borderLeft:'1px solid #e5e7eb',boxShadow:'-8px 0 40px rgba(0,0,0,0.2)'}}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{backdropFilter:'blur(6px)',background:'rgba(0,0,0,0.45)'}} onClick={()=>!sent&&setShowNew(false)}>
+          <div className="w-full max-w-[560px] max-h-[90vh] overflow-y-auto flex flex-col rounded-2xl" style={{background:'#f8f9fb',boxShadow:'0 24px 64px rgba(0,0,0,0.25)'}} onClick={e=>e.stopPropagation()}>
 
             {/* ── Panel Header ── */}
             <div style={{background:'#ffffff',borderBottom:'1.5px solid #e5e7eb',padding:'18px 24px',flexShrink:0}} className="flex items-center justify-between">
