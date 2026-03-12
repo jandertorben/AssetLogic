@@ -1299,6 +1299,29 @@ function AbschlussModal({asset,dauer,onClose,onSubmit}){
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
+        {/* Smart Tags */}
+        <div className="rounded-2xl p-4" style={{background:'#1a1a1a',border:'1px solid #2a2a2a'}}>
+          <div className="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-3">Smart-Tags — Durchgeführte Maßnahmen</div>
+          <div className="space-y-2">
+            {tagRows.map((row,i)=>(
+              <div key={i} className="flex flex-wrap gap-2">
+                {row.map(tag=>(
+                  <button key={tag} onClick={()=>toggle(tag)}
+                    className="btn-press text-xs px-3 py-1.5 rounded-xl font-medium transition-all"
+                    style={selected.has(tag)
+                      ?{background:'rgba(99,102,241,0.25)',color:'#a5b4fc',border:'1px solid rgba(99,102,241,0.5)'}
+                      :{background:'#111',color:'#555',border:'1px solid #2a2a2a'}}>
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+          {selected.size>0&&(
+            <div className="mt-3 text-xs text-gray-600">{selected.size} Tag{selected.size!==1?'s':''} ausgewählt</div>
+          )}
+        </div>
+
         {/* Notiz */}
         <div className="rounded-2xl p-4" style={{background:'#1a1a1a',border:'1px solid #2a2a2a'}}>
           <div className="text-gray-500 text-xs uppercase tracking-widest font-semibold mb-2">Eigene Notiz (optional)</div>
