@@ -40,6 +40,8 @@ body{background:#0d0d0d;font-family:'Inter',sans-serif;margin:0;}
 .page-enter{animation:slideInRight 0.25s ease-out forwards;}
 @keyframes fadeIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
 .fade-in{animation:fadeIn 0.3s ease-out forwards;}
+@keyframes fadeInUp{from{opacity:0;transform:translateX(-50%) translateY(12px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+.animate-fade-in-up{animation:fadeInUp 0.25s ease-out forwards;}
 @keyframes checkPop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
 .check-pop{animation:checkPop 0.4s ease-out forwards;}
 .btn-press:active{transform:scale(0.97);}
@@ -89,6 +91,37 @@ const WORK_ORDERS_INITIAL = [
   {id:'WO-2021',title:'Bremsinspektion',     asset:'Toyota 8FBN25',   techId:'mo-002',status:'ABGESCHLOSSEN', priority:'HOCH',    desc:'Bremsbeläge kontrolliert und erneuert.'},
   {id:'WO-2020',title:'Reifenwechsel',       asset:'Komatsu WA 380',  techId:'mo-003',status:'ABGESCHLOSSEN', priority:'NIEDRIG', desc:'Alle 4 Reifen gewechselt.'},
 ];
+// Global ERP API configuration store
+let ERP_CONFIG = {
+  system: 'SAP S/4HANA',
+  apiUrl: 'https://erp.firma.de/api/v1',
+  apiKey: 'sk-demo-key-••••••••',
+  syncInterval: '15',
+  enabled: true,
+  status: 'online', // 'online' | 'offline' | 'error'
+  lastSync: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+};
+const _erpListeners = new Set();
+function useErpConfig(){
+  const [cfg,setCfg]=React.useState({...ERP_CONFIG});
+  React.useEffect(()=>{
+    setCfg({...ERP_CONFIG});
+    const l=(c)=>setCfg({...c});
+    _erpListeners.add(l);
+    return()=>_erpListeners.delete(l);
+  },[]);
+  const update=(patch)=>{ Object.assign(ERP_CONFIG,patch); _erpListeners.forEach(l=>l({...ERP_CONFIG})); };
+  return [cfg,update];
+}
+function triggerErpSync(status='online'){
+  ERP_CONFIG.lastSync=new Date().toISOString();
+  ERP_CONFIG.status=status;
+  _erpListeners.forEach(l=>l({...ERP_CONFIG}));
+}
+function fmtSyncTime(iso){
+  if(!iso) return '–';
+  try{ const d=new Date(iso); return d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); }catch{ return '–'; }
+}
 // Global cid Logic config store — admin writes, technician app reads
 let CID_LOGIC_CONFIG = {};
 // Track IDs of orders created this session so they get a "NEU" badge
@@ -487,6 +520,27 @@ function daysUntil(dateStr){
 // Module-level setter — allows any component to open the popup without prop drilling
 let _setDiagnostic=null;
 function openDiagnostic(data){if(_setDiagnostic)_setDiagnostic(data);}
+
+// Global toast notification
+let _setToast=null;
+function showToast(msg,type='ok'){if(_setToast)_setToast({msg,type,id:Date.now()});}
+function ToastContainer(){
+  const [toast,setToast]=React.useState(null);
+  _setToast=setToast;
+  React.useEffect(()=>{
+    if(!toast)return;
+    const t=setTimeout(()=>setToast(null),2800);
+    return()=>clearTimeout(t);
+  },[toast]);
+  if(!toast)return null;
+  const bg=toast.type==='ok'?'bg-green-600':toast.type==='err'?'bg-red-600':'bg-desk-accent';
+  return ReactDOM.createPortal(
+    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 ${bg} text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-xl z-[9999] animate-fade-in-up`}>
+      {toast.msg}
+    </div>,
+    document.body
+  );
+}
 
 // Global asset navigation + pending diagnosis code
 let _navigateToAsset=null;
@@ -2132,6 +2186,7 @@ function MobileApp({user,onLogout}){
 
 // ── DESKTOP PAGE: DASHBOARD ───────────────────────────────────────────────────
 function DashboardPage({onNavigate,onSelectAsset}){
+  const [erpCfg]=useErpConfig();
   const chartRef=React.useRef(null);
   React.useEffect(()=>{
     if(!chartRef.current)return;
@@ -2156,7 +2211,7 @@ function DashboardPage({onNavigate,onSelectAsset}){
     {l:'Wartungen fällig',v:'7',  tc:'text-amber-400',  bc:'bg-amber-500',  sub:'3 überfällig',   nav:'auftraege', pulseCls:'pulse-warning',
       diag:{title:'Wartungsintervalle überfällig',severity:'WARNUNG',code:'W-101',message:'7 Maschinen haben überfällige Wartungsintervalle. 3 davon sind mehr als 50 Betriebsstunden überschritten.',ursache:'Ressourcenengpass — planmäßige Wartungen wurden verschoben.',loesung:'Servicetermine für alle überfälligen Maschinen innerhalb 48h vergeben.'}},
     {l:'Gesamt Assets',  v:'142', tc:'text-indigo-400', bc:'bg-indigo-500', sub:'5 aktiv erfasst',nav:'assets',    pulseCls:'', diag:null},
-    {l:'ERP-Sync',       v:'98%', tc:'text-green-400',  bc:'bg-green-500',  sub:'Letzte: 14:22',  nav:'einstellungen',pulseCls:'',diag:null},
+    {l:'ERP-Sync', v:erpCfg.enabled?(erpCfg.status==='online'?'Online':'Fehler'):'Inaktiv', tc:erpCfg.enabled&&erpCfg.status==='online'?'text-green-400':erpCfg.enabled?'text-red-400':'text-gray-400', bc:erpCfg.enabled&&erpCfg.status==='online'?'bg-green-500':erpCfg.enabled?'bg-red-500':'bg-gray-500', sub:'Letzte Sync: '+fmtSyncTime(erpCfg.lastSync), nav:'einstellungen',pulseCls:'',diag:null},
   ];
 
   return(
@@ -2243,8 +2298,8 @@ function DashboardPage({onNavigate,onSelectAsset}){
           </div>
           <div className="space-y-2">
             {[
-              {k:'ERP-Verbindung',v:'Online',c:'text-green-400',nav:'einstellungen'},
-              {k:'Datenbank',v:'99,9% Uptime',c:'text-green-400',nav:'einstellungen'},
+              {k:'ERP-Verbindung', v:erpCfg.enabled?(erpCfg.status==='online'?'Online':'Fehler'):'Deaktiviert', c:erpCfg.enabled&&erpCfg.status==='online'?'text-green-400':erpCfg.enabled?'text-red-400':'text-gray-400', nav:'einstellungen'},
+              {k:'Letzte Sync', v:fmtSyncTime(erpCfg.lastSync), c:'text-gray-300', nav:'einstellungen'},
               {k:'API-Gateway',v:'12ms',c:'text-green-400',nav:'einstellungen'},
               {k:'IoT-Broker',v:'3 offline',c:'text-amber-400',nav:'einstellungen'},
             ].map(({k,v,c,nav})=>(
@@ -2830,13 +2885,55 @@ function EinstellungenPage(){
   const [n1,sN1]=React.useState(true);
   const [n2,sN2]=React.useState(false);
   const [n3,sN3]=React.useState(true);
+  const [erpCfg,updateErp]=useErpConfig();
+  const [erpKey,setErpKey]=React.useState(ERP_CONFIG.apiKey);
+  const [erpUrl,setErpUrl]=React.useState(ERP_CONFIG.apiUrl);
+  const [erpSystem,setErpSystem]=React.useState(ERP_CONFIG.system);
+  const [erpInterval,setErpInterval]=React.useState(ERP_CONFIG.syncInterval);
+  const [testState,setTestState]=React.useState(null); // null | 'testing' | 'ok' | 'fail'
+  const [syncing,setSyncing]=React.useState(false);
+
   const Toggle=({val,set})=>(
     <button onClick={()=>set(!val)} className={`w-11 h-6 rounded-full toggle-track relative flex-shrink-0 ${val?'bg-desk-accent':'bg-[#2a2a2a]'}`}>
       <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${val?'left-5':'left-0.5'}`}/>
     </button>
   );
+
+  const ERP_SYSTEMS=[
+    'SAP S/4HANA','SAP Business One','Microsoft Dynamics 365','Oracle NetSuite',
+    'Infor LN','proALPHA','Abas ERP','Sage 100','Custom REST API',
+  ];
+
+  function saveErpSettings(){
+    updateErp({system:erpSystem,apiUrl:erpUrl,apiKey:erpKey,syncInterval:erpInterval});
+    showToast('ERP-Einstellungen gespeichert');
+  }
+
+  function testConnection(){
+    setTestState('testing');
+    setTimeout(()=>{
+      const ok=erpUrl.startsWith('http')&&erpKey.length>4;
+      setTestState(ok?'ok':'fail');
+      updateErp({status:ok?'online':'error'});
+      setTimeout(()=>setTestState(null),3000);
+    },1500);
+  }
+
+  function syncNow(){
+    setSyncing(true);
+    setTimeout(()=>{
+      triggerErpSync('online');
+      setSyncing(false);
+      showToast('ERP-Synchronisation abgeschlossen');
+    },2000);
+  }
+
+  const inputCls="bg-desk-base border border-desk-border rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-desk-accent w-64";
+  const selectCls="bg-desk-base border border-desk-border rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-desk-accent w-64 cursor-pointer";
+
   return(
     <div className="space-y-5 max-w-2xl">
+      {/* Allgemein */}
       <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
         <div className="text-white font-semibold mb-4">Allgemein</div>
         <div className="space-y-4">
@@ -2848,6 +2945,69 @@ function EinstellungenPage(){
           ))}
         </div>
       </div>
+
+      {/* ERP-Schnittstelle */}
+      <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
+        <div className="flex items-center justify-between mb-1">
+          <div className="text-white font-semibold">ERP-Schnittstelle</div>
+          <Toggle val={erpCfg.enabled} set={(v)=>updateErp({enabled:v})}/>
+        </div>
+        <p className="text-gray-500 text-xs mb-5">Verbindet AssetLogic mit Ihrem ERP-System zum automatischen Datenaustausch.</p>
+
+        <div className="space-y-4">
+          {/* System */}
+          <div className="flex items-center justify-between">
+            <label className="text-gray-400 text-sm">ERP-System</label>
+            <select value={erpSystem} onChange={e=>setErpSystem(e.target.value)} className={selectCls}>
+              {ERP_SYSTEMS.map(s=><option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          {/* API URL */}
+          <div className="flex items-center justify-between">
+            <label className="text-gray-400 text-sm">API-Endpunkt</label>
+            <input value={erpUrl} onChange={e=>setErpUrl(e.target.value)} placeholder="https://erp.firma.de/api/v1" className={inputCls}/>
+          </div>
+          {/* API Key */}
+          <div className="flex items-center justify-between">
+            <label className="text-gray-400 text-sm">API-Schlüssel / Token</label>
+            <input type="password" value={erpKey} onChange={e=>setErpKey(e.target.value)} placeholder="sk-••••••••••••••••" className={inputCls}/>
+          </div>
+          {/* Sync interval */}
+          <div className="flex items-center justify-between">
+            <label className="text-gray-400 text-sm">Sync-Intervall</label>
+            <select value={erpInterval} onChange={e=>setErpInterval(e.target.value)} className={selectCls}>
+              {[['5','Alle 5 Minuten'],['15','Alle 15 Minuten'],['30','Alle 30 Minuten'],['60','Stündlich'],['1440','Täglich']].map(([v,l])=>(
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Status + Last Sync */}
+        <div className="mt-5 pt-4 border-t border-desk-border flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${erpCfg.enabled&&erpCfg.status==='online'?'bg-green-500 animate-pulse':erpCfg.enabled?'bg-red-500':'bg-gray-500'}`}/>
+              <span className={`text-sm font-medium ${erpCfg.enabled&&erpCfg.status==='online'?'text-green-400':erpCfg.enabled?'text-red-400':'text-gray-500'}`}>
+                {erpCfg.enabled?(erpCfg.status==='online'?'Verbunden':'Verbindungsfehler'):'Deaktiviert'}
+              </span>
+            </div>
+            <div className="text-gray-500 text-xs mt-1">Letzte Synchronisation: <span className="text-gray-300">{fmtSyncTime(erpCfg.lastSync)}</span></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={testConnection} disabled={testState==='testing'}
+              className="btn-press border border-desk-border text-gray-300 hover:text-white hover:border-desk-accent/50 px-3 py-1.5 rounded-lg text-xs transition-colors disabled:opacity-50">
+              {testState==='testing'?'Teste…':testState==='ok'?'✓ Verbunden':testState==='fail'?'✗ Fehlgeschlagen':'Verbindung testen'}
+            </button>
+            <button onClick={syncNow} disabled={syncing||!erpCfg.enabled}
+              className="btn-press bg-desk-accent/20 text-desk-accent border border-desk-accent/30 hover:bg-desk-accent/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-40">
+              {syncing?'Synchronisiere…':'Jetzt synchronisieren'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Benachrichtigungen */}
       <div className="bg-desk-surface border border-desk-border rounded-xl p-5">
         <div className="text-white font-semibold mb-4">Benachrichtigungen</div>
         <div className="space-y-4">
@@ -2859,7 +3019,8 @@ function EinstellungenPage(){
           ))}
         </div>
       </div>
-      <button className="btn-press bg-desk-accent hover:bg-desk-accent-dim text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors">Speichern</button>
+
+      <button onClick={saveErpSettings} className="btn-press bg-desk-accent hover:bg-desk-accent-dim text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors">Speichern</button>
     </div>
   );
 }
@@ -2964,6 +3125,7 @@ function App(){
   return(<>
     {user?<AppRouter user={user} onLogout={()=>setUser(null)}/>:<LoginScreen onLogin={setUser}/>}
     <DiagnosticPopup data={diagData} onClose={()=>setDiagData(null)}/>
+    <ToastContainer/>
   </>);
 }
 
