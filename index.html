@@ -240,6 +240,19 @@ select option{background:#1a1a1a;color:#fff;}
 /* Brand line */
 .inv-brand-line{text-align:center;font-size:9px;color:#c0c0c0;margin-top:22px;padding-top:14px;border-top:1px dashed #e8e8e8;letter-spacing:0.4px;}
 .inv-brand-line strong{color:#999;font-weight:600;}
+/* Manual correction badge (modal header) */
+.inv-manual-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:5px;padding:2px 8px;margin-left:8px;letter-spacing:0.1px;}
+/* Edit / Save buttons */
+.inv-foot-edit-btn{display:flex;align-items:center;gap:5px;padding:8px 16px;border-radius:9px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#cbd5e1;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;transition:all 0.15s;margin-right:auto;}
+.inv-foot-edit-btn:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.inv-foot-save-btn{display:flex;align-items:center;gap:5px;padding:8px 16px;border-radius:9px;border:none;background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(245,158,11,0.35);transition:all 0.15s;margin-right:auto;}
+.inv-foot-save-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(245,158,11,0.45);}
+/* Audit log */
+.inv-audit-log{border:1px solid #e8eaed;border-radius:6px;overflow:hidden;margin-bottom:28px;}
+.inv-audit-log-head{font-size:8.5px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.9px;padding:7px 14px;background:#f3f4f6;border-bottom:1px solid #e8eaed;}
+.inv-audit-log-row{display:flex;justify-content:space-between;font-size:10px;color:#555;padding:7px 14px;border-bottom:1px solid #f0f0f0;}
+.inv-audit-log-row:last-child{border-bottom:none;}
+.inv-audit-log-row strong{color:#333;}
 @media print{
   body>*{visibility:hidden!important;}
   .inv-a4{visibility:visible!important;position:fixed!important;inset:0!important;max-width:none!important;width:100%!important;padding:18mm 22mm!important;box-shadow:none!important;border-radius:0!important;animation:none!important;}
@@ -3758,41 +3771,54 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
   const isF=FREE.includes(billingType);
   const customer=CUSTOMER_MAP[m.asset]||DEFAULT_CUSTOMER;
 
-  // amounts (net)
-  const nLabor  = isF ? 0 : laborRaw;
-  const nTravel = isF ? 0 : travelRaw;
-  const nParts  = isF ? 0 : partsRaw;
-  const nNet    = nLabor+nTravel+nParts;
-  const nMwst   = nNet*0.19;
-  const nTotal  = nNet+nMwst;
-
   const fmtE=v=>v.toFixed(2).replace('.',',')+' €';
-  const fmtN=v=>v.toFixed(2).replace('.',',');
 
-  // invoice number & dates
   const invNr=`RE-2026-${m.id.replace('BM-','')}${String(Math.floor(Math.random()*900)+100).padStart(0,'')}`;
   const today='13.03.2026';
   const due  ='27.03.2026';
-
   const typeLabels={garantie:'Garantiefall',kulanz:'Kulanzregelung',wartung:'Wartungsvertrag',rechnung:'Dienstleistung'};
 
-  const positions=[
-    {pos:1, desc:`Arbeitsleistung – ${m.asset}`, detail:`${m.ki.hours} Std. à 70,00 € (Stundensatz Servicetechniker)`, qty:`${m.ki.hours} h`, ep:isF?0:70.00, total:nLabor},
-    {pos:2, desc:'Anfahrtspauschale', detail:`${m.ki.travel} min Fahrtzeit gemäß Servicevereinbarung`, qty:'1 Psch.', ep:isF?0:travelRaw, total:nTravel},
-    {pos:3, desc:`Material: ${m.ki.parts}`, detail:'Ersatzteil lt. Einsatzbericht, geprüfte Qualität', qty:'1 Stk.', ep:isF?0:partsRaw, total:nParts},
+  const nLabor =isF?0:laborRaw;
+  const nTravel=isF?0:travelRaw;
+  const nParts =isF?0:partsRaw;
+
+  const initRows=()=>[
+    {pos:1,desc:`Arbeitsleistung – ${m.asset}`,detail:`${m.ki.hours} Std. à 70,00 € (Stundensatz Servicetechniker)`,qty:`${m.ki.hours} h`,ep:isF?0:70.00,total:nLabor},
+    {pos:2,desc:'Anfahrtspauschale',detail:`${m.ki.travel} min Fahrtzeit gemäß Servicevereinbarung`,qty:'1 Psch.',ep:isF?0:travelRaw,total:nTravel},
+    {pos:3,desc:`Material: ${m.ki.parts}`,detail:'Ersatzteil lt. Einsatzbericht, geprüfte Qualität',qty:'1 Stk.',ep:isF?0:partsRaw,total:nParts},
   ].filter(p=>p.ep>0||isF);
 
+  const [editMode,setEditMode]=React.useState(false);
+  const [rows,setRows]=React.useState(initRows);
+  const [origRows]=React.useState(initRows);
+  const [isEdited,setIsEdited]=React.useState(false);
+  const [auditLog,setAuditLog]=React.useState([]);
   const [erpState,setErpState]=React.useState('idle');
 
+  // Live totals — always derived from rows state
+  const eNet=rows.reduce((s,r)=>s+(parseFloat(r.qty)||0)*r.ep,0);
+  const eMwst=eNet*0.19;
+  const eTotal=eNet+eMwst;
+  const dNet=isF?0:eNet;
+  const dMwst=isF?0:eMwst;
+  const dTotal=isF?0:eTotal;
+
+  function updRow(i,f,v){setRows(p=>p.map((r,j)=>j===i?{...r,[f]:f==='ep'?parseFloat(v)||0:v}:r));}
+  function changed(i,f){return editMode&&!!origRows[i]&&String(rows[i][f])!==String(origRows[i][f]);}
+  function iStyle(c){return{border:'1px solid '+(c?'#f59e0b':'#d1d5db'),background:c?'#fffbeb':'#fff',borderRadius:'4px',padding:'3px 6px',fontSize:'11px',fontFamily:'Inter,sans-serif',color:'#111',width:'100%',outline:'none',boxSizing:'border-box'};}
+
+  function handleSave(){
+    setEditMode(false);
+    setIsEdited(true);
+    const n=new Date();
+    const ts=`${n.toLocaleDateString('de-DE')} ${n.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} Uhr`;
+    setAuditLog(p=>[...p,{admin:'Admin-Zentrale',ts}]);
+  }
   function handlePrint(){window.print();}
   function handleTransfer(){
     if(erpState!=='idle')return;
     setErpState('loading');
-    setTimeout(()=>{
-      setErpState('success');
-      triggerErpSync('online');
-      setTimeout(()=>onClose(),1600);
-    },1800);
+    setTimeout(()=>{setErpState('success');triggerErpSync('online');setTimeout(()=>onClose(),1600);},1800);
   }
 
   return ReactDOM.createPortal(
@@ -3805,10 +3831,9 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             Rechnungs-Vorschau
             <span className="inv-modal-head-nr">— {invNr}</span>
+            {isEdited&&<span className="inv-manual-badge">✎ Manuell korrigiert</span>}
           </div>
-          <button className="inv-modal-close-btn" onClick={onClose} title="Schließen">
-            <IconX size={14}/>
-          </button>
+          <button className="inv-modal-close-btn" onClick={onClose} title="Schließen"><IconX size={14}/></button>
         </div>
 
         {/* ── Scrollable Document Area ── */}
@@ -3894,8 +3919,8 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
             <tr>
               <th style={{width:'36px'}}>Pos.</th>
               <th>Beschreibung</th>
-              <th className="c" style={{width:'72px'}}>Menge</th>
-              <th className="r" style={{width:'100px'}}>Einzelpreis</th>
+              <th className="c" style={{width:'80px'}}>Menge</th>
+              <th className="r" style={{width:'110px'}}>Einzelpreis</th>
               <th className="r" style={{width:'100px'}}>Gesamt</th>
             </tr>
           </thead>
@@ -3913,15 +3938,33 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
                 <td className="r">0,00 €</td>
               </tr>
             ):(
-              positions.map(p=>(
-                <tr key={p.pos}>
-                  <td className="pos">{p.pos}</td>
-                  <td>{p.desc}<small>{p.detail}</small>{p.pos===2&&<span className="inv-geo-line">Einsatzzeit und Entfernung via Geofencing verifiziert (ID: GL-9928).</span>}</td>
-                  <td className="c">{p.qty}</td>
-                  <td className="r">{fmtE(p.ep)}</td>
-                  <td className="r">{fmtE(p.total)}</td>
-                </tr>
-              ))
+              rows.map((r,i)=>{
+                const rowTotal=(parseFloat(r.qty)||0)*r.ep;
+                return(
+                  <tr key={r.pos}>
+                    <td className="pos">{r.pos}</td>
+                    <td>
+                      {editMode
+                        ?<input style={iStyle(changed(i,'desc'))} value={r.desc} onChange={e=>updRow(i,'desc',e.target.value)}/>
+                        :<>{r.desc}<small>{r.detail}</small>{r.pos===2&&<span className="inv-geo-line">Einsatzzeit und Entfernung via Geofencing verifiziert (ID: GL-9928).</span>}</>
+                      }
+                    </td>
+                    <td className="c">
+                      {editMode
+                        ?<input style={iStyle(changed(i,'qty'))} value={r.qty} onChange={e=>updRow(i,'qty',e.target.value)}/>
+                        :r.qty
+                      }
+                    </td>
+                    <td className="r">
+                      {editMode
+                        ?<input type="number" step="0.01" min="0" style={{...iStyle(changed(i,'ep')),textAlign:'right'}} value={r.ep} onChange={e=>updRow(i,'ep',e.target.value)}/>
+                        :fmtE(r.ep)
+                      }
+                    </td>
+                    <td className="r">{fmtE(rowTotal)}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -3938,9 +3981,9 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
               </>
             ):(
               <>
-                <div className="inv-sum-row"><span>Nettobetrag</span><span>{fmtE(nNet)}</span></div>
-                <div className="inv-sum-row divider mwst"><span>zzgl. 19% MwSt.</span><span>{fmtE(nMwst)}</span></div>
-                <div className="inv-sum-row total"><span>Gesamtbetrag (brutto)</span><span>{fmtE(nTotal)}</span></div>
+                <div className="inv-sum-row"><span>Nettobetrag</span><span>{fmtE(dNet)}</span></div>
+                <div className="inv-sum-row divider mwst"><span>zzgl. 19% MwSt.</span><span>{fmtE(dMwst)}</span></div>
+                <div className="inv-sum-row total"><span>Gesamtbetrag (brutto)</span><span>{fmtE(dTotal)}</span></div>
               </>
             )}
           </div>
@@ -3966,8 +4009,22 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
           </div>
           <div className="inv-ai-audit-text">
             <strong>KI-Audit bestätigt:</strong> Positionen automatisch validiert und vorkontiert durch AssetLogic AI-Audit. Prüf-ID: AI-{m.id.replace('BM-','')}-2026 · Konfidenz: {m.ki.confidence}%
+            {isEdited&&<><br/><span style={{color:'#b45309',fontWeight:600}}>⚠ KI-Vorschlag manuell angepasst.</span></>}
           </div>
         </div>
+
+        {/* Audit Log */}
+        {auditLog.length>0&&(
+          <div className="inv-audit-log">
+            <div className="inv-audit-log-head">Bearbeitungshistorie</div>
+            {auditLog.map((e,i)=>(
+              <div key={i} className="inv-audit-log-row">
+                <span>Bearbeitet von: <strong>{e.admin}</strong></span>
+                <span>Zeit: {e.ts}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="inv-footer">
@@ -4008,6 +4065,10 @@ function InvoicePreviewModal({mission:m, billingType, laborRaw, travelRaw, parts
 
         {/* ── Fixed Footer ── */}
         <div className="inv-modal-foot">
+          {!isF&&(editMode
+            ?<button className="inv-foot-save-btn" onClick={handleSave}>✓ Speichern</button>
+            :<button className="inv-foot-edit-btn" onClick={()=>setEditMode(true)}>✏ Korrigieren</button>
+          )}
           <button className="inv-foot-pdf-btn" onClick={handlePrint}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             PDF Download
