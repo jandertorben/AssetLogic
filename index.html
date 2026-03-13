@@ -122,6 +122,44 @@ select option{background:#1a1a1a;color:#fff;}
 .erp-billing-kulanz .erp-select{border-color:rgba(245,158,11,0.4);color:#fbbf24;}
 .erp-billing-wartung .erp-select{border-color:rgba(59,130,246,0.4);color:#60a5fa;}
 .erp-billing-rechnung .erp-select{border-color:rgba(34,197,94,0.4);color:#4ade80;}
+/* ── Billing Center Slide-over & Table ────────────────────── */
+@keyframes bcSlideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes bcBackdropIn{from{opacity:0;}to{opacity:1;}}
+.bc-backdrop{animation:bcBackdropIn 0.2s ease forwards;position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:40;}
+.bc-slideover{animation:bcSlideIn 0.3s cubic-bezier(0.32,0.72,0,1) forwards;position:fixed;top:0;right:0;bottom:0;width:520px;max-width:95vw;background:#0f1115;border-left:1px solid #1f2128;z-index:50;display:flex;flex-direction:column;overflow:hidden;}
+.bc-slideover-header{padding:20px 24px 16px;border-bottom:1px solid #1f2128;flex-shrink:0;background:linear-gradient(180deg,#0a0b0f 0%,#0f1115 100%);}
+.bc-slideover-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px;}
+.bc-report-box{background:#0a0b0f;border:1px solid #2a2a2a;border-radius:12px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8;line-height:1.75;}
+.bc-report-box .rbl{font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:#475569;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px;}
+.bc-ki-card{background:linear-gradient(135deg,rgba(99,102,241,0.07) 0%,rgba(41,121,255,0.04) 100%);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:16px;}
+.bc-ki-label{font-size:10px;font-weight:600;color:#6366f1;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.bc-ki-tag{background:rgba(99,102,241,0.2);border-radius:4px;padding:2px 7px;font-size:11px;color:#818cf8;}
+.bc-ki-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.bc-ki-field{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;}
+.bc-ki-field .fk{font-size:10px;color:#475569;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:3px;}
+.bc-ki-field .fv{font-size:14px;color:#e2e8f0;font-weight:600;}
+.bc-ki-field .fv.col-garantie{color:#818cf8;}.bc-ki-field .fv.col-kulanz{color:#fbbf24;}
+.bc-confidence{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.bc-confidence-bar{flex:1;height:5px;background:#1a1a2e;border-radius:3px;overflow:hidden;}
+.bc-confidence-fill{height:100%;border-radius:3px;transition:width 0.6s cubic-bezier(0.4,0,0.2,1);}
+.bc-reasoning{margin-top:10px;font-size:11px;color:#64748b;font-style:italic;line-height:1.55;padding:8px 10px;background:rgba(0,0,0,0.25);border-radius:8px;border-left:2px solid rgba(99,102,241,0.3);}
+.bc-transfer-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border:none;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.3px;background:linear-gradient(135deg,#4f46e5,#2979FF);color:#fff;box-shadow:0 4px 24px rgba(41,121,255,0.25),0 0 0 1px rgba(41,121,255,0.15);transition:all 0.15s;flex-shrink:0;}
+.bc-transfer-btn:hover{box-shadow:0 4px 32px rgba(41,121,255,0.45),0 0 0 1px rgba(41,121,255,0.3);transform:translateY(-1px);}
+.bc-transfer-btn:active{transform:scale(0.98);}
+.bc-transfer-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.bc-transfer-btn.success{background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 4px 24px rgba(16,185,129,0.25);}
+.bc-table{width:100%;border-collapse:collapse;}
+.bc-table th{font-size:10px;font-weight:600;color:#475569;letter-spacing:0.8px;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid #1f2128;white-space:nowrap;}
+.bc-table td{padding:11px 14px;border-bottom:1px solid rgba(31,33,40,0.7);vertical-align:middle;}
+.bc-table tbody tr{cursor:pointer;transition:background 0.12s;}
+.bc-table tbody tr:hover td{background:rgba(99,102,241,0.05);}
+.bc-badge-ki{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:rgba(41,121,255,0.1);color:#60a5fa;border:1px solid rgba(41,121,255,0.18);}
+.bc-badge-review{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:rgba(245,158,11,0.1);color:#fbbf24;border:1px solid rgba(245,158,11,0.22);}
+.bc-type-chip{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;}
+.bc-type-garantie{background:rgba(99,102,241,0.15);color:#818cf8;}
+.bc-type-kulanz{background:rgba(245,158,11,0.14);color:#fbbf24;}
+.bc-type-wartung{background:rgba(59,130,246,0.14);color:#60a5fa;}
+.bc-type-rechnung{background:rgba(34,197,94,0.13);color:#4ade80;}
 </style>
 </head>
 <body>
@@ -297,6 +335,12 @@ const IconChevLeft = ({size=20,cls=''}) => <svg width={size} height={size} viewB
 const IconHome = ({size=22,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 const IconThermometer = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>;
 const IconCalendar = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+
+const IconShield = ({size=16,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cls}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+const IconChevDown = ({size=12,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cls}><polyline points="6 9 12 15 18 9"/></svg>;
+const IconChevRight2 = ({size=12,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cls}><polyline points="9 18 15 12 9 6"/></svg>;
+const IconChevronsLeft = ({size=14,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cls}><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>;
+const IconChevronsRight = ({size=14,cls=''}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cls}><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>;
 
 // ── ASSET MACHINE ILLUSTRATION ────────────────────────────────────────────────
 function MachineIllustration({type}){
@@ -3584,50 +3628,381 @@ function EinstellungenPage(){
   );
 }
 
+// ── BILLING CENTER DATA ───────────────────────────────────────────────────────
+const BILLING_MISSIONS = [
+  {id:'BM-001',techName:'Marco Köhler',techInitials:'MK',asset:'CAT 320 Bagger',date:'12.03.2026',duration:3.5,
+   note:'Lüftermotor ausgefallen. Seriennummer FK-220-2024 liegt innerhalb der 24-Monat-Garantie. Ersatzteil getauscht, Funktionstest abgeschlossen.',
+   status:'ki-ready',
+   ki:{type:'garantie',hours:3.5,travel:45,parts:'Lüftermotor FK-220',partsCost:0,laborCost:0,confidence:94,
+       reasoning:'Seriennummer im Garantiezeitraum erkannt. Kein Kundenverschulden festgestellt. Vollständige Kostenübernahme empfohlen.'}},
+  {id:'BM-002',techName:'Lars Fischer',techInitials:'LF',asset:'STILL RX 20-20',date:'12.03.2026',duration:2.0,
+   note:'Bremsbeläge stark abgenutzt nach 1.200 Betriebsstunden. Normaler Verschleiß. Austausch mit Original-Ersatzteilen durchgeführt.',
+   status:'ki-ready',
+   ki:{type:'wartung',hours:2.0,travel:30,parts:'Bremsbeläge Set RX20',partsCost:189.00,laborCost:140.00,confidence:88,
+       reasoning:'Regulärer Verschleiß außerhalb Garantie. Wartungsvertrag aktiv – Abrechnung gemäß Vertragstarif.'}},
+  {id:'BM-003',techName:'Jana Müller',techInitials:'JM',asset:'Toyota 8FBN25',date:'11.03.2026',duration:4.5,
+   note:'Steuerungsfehler E-45. Ursache unklar — möglicherweise Softwareproblem oder defektes Steuergerät. Zusätzliches Diagnosewerkzeug benötigt.',
+   status:'review',
+   ki:{type:'rechnung',hours:4.5,travel:90,parts:'Steuergerät (Verdacht)',partsCost:420.00,laborCost:315.00,confidence:52,
+       reasoning:'Fehlercode E-45 nicht eindeutig klassifizierbar. Manuell prüfen: Garantie oder Kundenverschulden?'}},
+  {id:'BM-004',techName:'Marco Köhler',techInitials:'MK',asset:'Komatsu WA 380',date:'11.03.2026',duration:1.5,
+   note:'Reifendruck-Sensor defekt. Tausch in 20 Min erledigt. Sensor erst 3 Monate alt – Kulanzantrag gestellt.',
+   status:'ki-ready',
+   ki:{type:'kulanz',hours:1.5,travel:30,parts:'TPMS Sensor WA380',partsCost:0,laborCost:0,confidence:79,
+       reasoning:'Sensor unter 6 Monate alt, Kulanzregelung empfohlen. Kein offizieller Garantiefall nach Herstellerkriterien.'}},
+  {id:'BM-005',techName:'Lars Fischer',techInitials:'LF',asset:'Liebherr R 920',date:'10.03.2026',duration:6.0,
+   note:'Hydraulikpumpe defekt. Außerhalb Garantie. Stundensatz 70 €/h. Pumpe bestellt, Einbau folgende Woche.',
+   status:'review',
+   ki:{type:'rechnung',hours:6.0,travel:180,parts:'Hydraulikpumpe HP-920',partsCost:1240.00,laborCost:420.00,confidence:41,
+       reasoning:'Garantie abgelaufen (32 Monate). Prüfen ob Kulanz möglich – Premiumkunde seit 5 Jahren. Manuelle Freigabe empfohlen.'}},
+];
+
+// ── BILLING SLIDE-OVER ────────────────────────────────────────────────────────
+function BillingSlideOver({mission:m, onClose}){
+  const [billingType,setBillingType]=React.useState(m.ki.type);
+  const [btnState,setBtnState]=React.useState('idle');
+  const FREE=['garantie','kulanz'];
+  const isF=FREE.includes(billingType);
+  const fmt=v=>v.toFixed(2).replace('.',',')+' €';
+  const laborAmt=isF?'0,00 €':fmt(m.ki.hours*70);
+  const travelAmt=isF?'0,00 €':fmt(m.ki.travel*0.5);
+  const partsAmt=isF?'0,00 €':fmt(m.ki.partsCost);
+  const confColor=m.ki.confidence>=80?'#4ade80':m.ki.confidence>=60?'#fbbf24':'#f87171';
+
+  function onTransfer(){
+    if(btnState!=='idle')return;
+    setBtnState('loading');
+    setTimeout(()=>{
+      setBtnState('success');
+      triggerErpSync('online');
+      setTimeout(()=>{setBtnState('idle');onClose();},1800);
+    },1800);
+  }
+
+  return(
+    <div className="bc-slideover">
+      {/* Header */}
+      <div className="bc-slideover-header">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className="font-mono text-xs text-gray-600">{m.id}</span>
+              {m.status==='ki-ready'
+                ?<span className="bc-badge-ki">⚡ KI-Vorschlag bereit</span>
+                :<span className="bc-badge-review">⚠ Prüfung nötig</span>}
+            </div>
+            <div className="text-white font-bold text-lg leading-tight">{m.asset}</div>
+            <div className="text-gray-500 text-sm mt-0.5">{m.techName} · {m.date} · {m.duration}h</div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all flex-shrink-0 ml-4">
+            <IconX size={16}/>
+          </button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="bc-slideover-body">
+        {/* Techniker-Bericht */}
+        <div className="bc-report-box">
+          <div className="rbl">Techniker-Bericht (Original)</div>
+          "{m.note}"
+        </div>
+
+        {/* KI-Analyse */}
+        <div className="bc-ki-card">
+          <div className="bc-ki-label">
+            <span className="bc-ki-tag">KI</span>
+            Extrahierte Abrechnungsfelder
+          </div>
+          <div className="bc-ki-grid">
+            <div className="bc-ki-field" style={{gridColumn:'1/-1'}}>
+              <div className="fk">Abrechnungs-Typ</div>
+              <select className="erp-select" style={{marginTop:'6px'}} value={billingType} onChange={e=>setBillingType(e.target.value)}>
+                <option value="rechnung">💶  Rechnung (Standard)</option>
+                <option value="garantie">🛡️  Garantie</option>
+                <option value="kulanz">🤝  Kulanz</option>
+                <option value="wartung">🔧  Wartung (Vertrag)</option>
+              </select>
+            </div>
+            <div className="bc-ki-field">
+              <div className="fk">Arbeitsstunden</div>
+              <div className="fv">{m.ki.hours} h</div>
+            </div>
+            <div className="bc-ki-field">
+              <div className="fk">Betrag Arbeit</div>
+              <div className={`fv ${isF?'col-garantie':''}`}>{laborAmt}</div>
+            </div>
+            <div className="bc-ki-field">
+              <div className="fk">Anfahrt</div>
+              <div className="fv">{m.ki.travel} min</div>
+            </div>
+            <div className="bc-ki-field">
+              <div className="fk">Anfahrtskosten</div>
+              <div className={`fv ${isF?'col-garantie':''}`}>{travelAmt}</div>
+            </div>
+            <div className="bc-ki-field" style={{gridColumn:'1/-1'}}>
+              <div className="fk">Material / Ersatzteile</div>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'3px'}}>
+                <div style={{fontSize:'12px',color:'#94a3b8'}}>{m.ki.parts}</div>
+                <div className={`fv ${isF?'col-garantie':''}`}>{partsAmt}</div>
+              </div>
+            </div>
+          </div>
+          {/* Confidence */}
+          <div className="bc-confidence">
+            <span style={{fontSize:'10px',color:'#475569',fontWeight:600,minWidth:'76px',letterSpacing:'0.5px'}}>KI-KONFIDENZ</span>
+            <div className="bc-confidence-bar">
+              <div className="bc-confidence-fill" style={{width:`${m.ki.confidence}%`,background:confColor}}/>
+            </div>
+            <span style={{fontSize:'12px',fontWeight:700,color:confColor,minWidth:'36px',textAlign:'right'}}>{m.ki.confidence}%</span>
+          </div>
+          <div className="bc-reasoning">💬 {m.ki.reasoning}</div>
+        </div>
+
+        {/* Transfer button */}
+        <button className={`bc-transfer-btn${btnState==='success'?' success':''}`} onClick={onTransfer} disabled={btnState==='loading'}>
+          {btnState==='idle'&&<>⚡ An ERP übertragen</>}
+          {btnState==='loading'&&<><span className="erp-btn-spinner"/>Überträgt an ERP…</>}
+          {btnState==='success'&&<>✓ Erfolgreich übertragen</>}
+        </button>
+        <div style={{height:'4px'}}/>
+      </div>
+    </div>
+  );
+}
+
+// ── ABRECHNUNGS-BRIDGE PAGE ───────────────────────────────────────────────────
+function AbrechnungsBridgePage({onOpenSlideOver}){
+  const kiReady=BILLING_MISSIONS.filter(m=>m.status==='ki-ready').length;
+  const review=BILLING_MISSIONS.filter(m=>m.status==='review').length;
+  const typeLabel={garantie:'Garantie',kulanz:'Kulanz',wartung:'Wartung',rechnung:'Rechnung'};
+  return(
+    <div className="space-y-5 max-w-5xl">
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-4">
+        {[{l:'Gesamt Einsätze',v:BILLING_MISSIONS.length,c:'text-white'},{l:'KI-Vorschlag bereit',v:kiReady,c:'text-[#60a5fa]'},{l:'Prüfung nötig',v:review,c:'text-[#fbbf24]'}].map(({l,v,c})=>(
+          <div key={l} className="bg-desk-surface border border-desk-border rounded-xl p-4">
+            <div className={`text-2xl font-bold ${c} mb-1 font-mono`}>{v}</div>
+            <div className="text-gray-500 text-xs">{l}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-desk-border flex items-center justify-between">
+          <div>
+            <div className="text-white font-semibold">Eingehende Techniker-Einsätze</div>
+            <div className="text-gray-500 text-xs mt-0.5">Klick auf Zeile → KI-ERP Bridge öffnen</div>
+          </div>
+          <div className="text-xs text-gray-600 font-mono">13.03.2026 · Live</div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="bc-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Techniker</th><th>Asset</th><th>Datum</th><th>Dauer</th><th>KI-Typ</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {BILLING_MISSIONS.map(m=>(
+                <tr key={m.id} onClick={()=>onOpenSlideOver(m)}>
+                  <td><span className="font-mono text-xs text-gray-500">{m.id}</span></td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-desk-accent/20 text-desk-accent text-[9px] font-bold flex items-center justify-center flex-shrink-0">{m.techInitials}</div>
+                      <span className="text-sm text-gray-300">{m.techName}</span>
+                    </div>
+                  </td>
+                  <td><span className="text-sm text-white font-medium">{m.asset}</span></td>
+                  <td><span className="text-xs text-gray-400">{m.date}</span></td>
+                  <td><span className="text-xs text-gray-300 font-mono">{m.duration}h</span></td>
+                  <td><span className={`bc-type-chip bc-type-${m.ki.type}`}>{typeLabel[m.ki.type]}</span></td>
+                  <td>
+                    {m.status==='ki-ready'
+                      ?<span className="bc-badge-ki">⚡ KI-Vorschlag</span>
+                      :<span className="bc-badge-review">⚠ Prüfen</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── GARANTIE-CHECK PAGE ───────────────────────────────────────────────────────
+function GarantieCheckPage({onOpenSlideOver}){
+  const items=BILLING_MISSIONS.filter(m=>m.ki.type==='garantie'||m.ki.type==='kulanz');
+  const garantieFaelle=items.filter(m=>m.ki.type==='garantie').length;
+  const kulanzFaelle=items.filter(m=>m.ki.type==='kulanz').length;
+  return(
+    <div className="space-y-5 max-w-3xl">
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          {l:'Garantie-Fälle',v:garantieFaelle,c:'text-[#818cf8]'},
+          {l:'Kulanz-Fälle',v:kulanzFaelle,c:'text-[#fbbf24]'},
+          {l:'Kosten erstattet',v:'0,00 €',c:'text-[#4ade80]'},
+        ].map(({l,v,c})=>(
+          <div key={l} className="bg-desk-surface border border-desk-border rounded-xl p-4">
+            <div className={`text-2xl font-bold ${c} mb-1`}>{v}</div>
+            <div className="text-gray-500 text-xs">{l}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-desk-border">
+          <div className="text-white font-semibold">Garantie & Kulanz Fälle</div>
+          <div className="text-gray-500 text-xs mt-0.5">Einsätze mit Kostenerlass – klicken zum Öffnen</div>
+        </div>
+        <div className="divide-y divide-desk-border">
+          {items.map(m=>(
+            <div key={m.id} onClick={()=>onOpenSlideOver(m)}
+              className="px-5 py-4 flex items-start gap-4 cursor-pointer hover:bg-white/[0.025] transition-colors">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base ${m.ki.type==='garantie'?'bg-[rgba(99,102,241,0.15)]':'bg-[rgba(245,158,11,0.12)]'}`}>
+                {m.ki.type==='garantie'?'🛡':'🤝'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-white font-medium text-sm">{m.asset}</span>
+                  <span className={`bc-type-chip bc-type-${m.ki.type}`}>{m.ki.type==='garantie'?'Garantie':'Kulanz'}</span>
+                </div>
+                <div className="text-gray-500 text-xs">{m.techName} · {m.date}</div>
+                <div className="text-gray-500 text-xs mt-1 truncate italic">{m.ki.reasoning}</div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <div className="text-[#818cf8] font-bold text-sm">0,00 €</div>
+                <div className="text-gray-600 text-xs mt-0.5">{m.ki.confidence}% KI</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── DESKTOP DASHBOARD ─────────────────────────────────────────────────────────
 function DesktopDashboard({user,onLogout}){
   const [activePage,setActivePage]=React.useState('dashboard');
   const [orders,setOrders]=useSharedOrders();
   const [showNew,setShowNew]=React.useState(false);
   const [selectedAsset,setSelectedAsset]=React.useState(null);
+  const [collapsed,setCollapsed]=React.useState(false);
+  const [billingOpen,setBillingOpen]=React.useState(false);
+  const [slideOver,setSlideOver]=React.useState(null);
+
   if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
+
   const navItems=[
-    ['dashboard','Dashboard',<IconGrid size={18}/>],
-    ['assets','Assets',<IconCube size={18}/>],
-    ['auftraege','Aufträge',<IconClipboard size={18}/>],
-    ['techniker','Techniker',<IconUsers size={18}/>],
-    ['news','News',<IconBell size={18}/>],
-    ['einstellungen','Einstellungen',<IconGear size={18}/>],
+    ['dashboard','Dashboard',<IconGrid size={17}/>],
+    ['assets','Assets',<IconCube size={17}/>],
+    ['auftraege','Aufträge',<IconClipboard size={17}/>],
+    ['techniker','Techniker',<IconUsers size={17}/>],
+    ['news','News',<IconBell size={17}/>],
+    ['einstellungen','Einstellungen',<IconGear size={17}/>],
   ];
-  const pageTitle={dashboard:'Dashboard',assets:'Asset-Verwaltung',auftraege:'Auftragsmanagement',techniker:'Techniker',news:'News & Updates',einstellungen:'Einstellungen'}[activePage]||'';
+  const billingItems=[
+    ['abrechnungsbridge','Abrechnungs-Bridge',<IconFileText size={15}/>],
+    ['garantiecheck','Garantie-Check',<IconShield size={15}/>],
+  ];
+  const isBillingPage=['abrechnungsbridge','garantiecheck'].includes(activePage);
+  const pageTitle={
+    dashboard:'Dashboard',assets:'Asset-Verwaltung',auftraege:'Auftragsmanagement',
+    techniker:'Techniker',news:'News & Updates',einstellungen:'Einstellungen',
+    abrechnungsbridge:'Abrechnungs-Bridge',garantiecheck:'Garantie-Check',
+  }[activePage]||'';
+
+  const sw=collapsed?64:224;
+  const navBtnCls=(active)=>`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all ${active?'bg-desk-accent/10 text-desk-accent':'text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]'}`;
+
+  function goPage(id){
+    setActivePage(id);
+    if(['abrechnungsbridge','garantiecheck'].includes(id)) setBillingOpen(true);
+  }
+
   return(
     <div className="bg-desk-base min-h-screen flex font-sans text-white">
-      <div className="w-[220px] bg-desk-sidebar border-r border-desk-border fixed left-0 top-0 bottom-0 flex flex-col z-30">
-        <button onClick={()=>setActivePage('dashboard')} className="p-5 flex items-center gap-3 border-b border-desk-border w-full hover:bg-white/[0.02] transition-colors">
-          <img src="img/aslogo.png" style={{width:'32px',height:'32px',objectFit:'contain',borderRadius:'6px'}}/>
-          <span className="font-bold text-white tracking-widest text-sm">ASSETLOGIC</span>
-        </button>
-        <nav className="flex-1 p-3 space-y-1">
+
+      {/* ── Sidebar ── */}
+      <div style={{width:`${sw}px`,transition:'width 0.22s cubic-bezier(0.4,0,0.2,1)'}}
+        className="bg-desk-sidebar border-r border-desk-border fixed left-0 top-0 bottom-0 flex flex-col z-30 overflow-hidden">
+
+        {/* Logo row */}
+        <div className="flex items-center border-b border-desk-border flex-shrink-0" style={{height:'56px',padding:'0 10px 0 14px'}}>
+          <button onClick={()=>goPage('dashboard')} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity flex-1 min-w-0 overflow-hidden">
+            <img src="img/aslogo.png" style={{width:'26px',height:'26px',objectFit:'contain',borderRadius:'5px',flexShrink:0}}/>
+            {!collapsed&&<span className="font-bold text-white tracking-widest text-xs whitespace-nowrap overflow-hidden">ASSETLOGIC</span>}
+          </button>
+          <button onClick={()=>setCollapsed(v=>!v)}
+            className="w-7 h-7 rounded-md flex items-center justify-center text-gray-600 hover:text-gray-300 hover:bg-white/5 transition-all flex-shrink-0"
+            title={collapsed?'Sidebar ausklappen':'Sidebar einklappen'}>
+            {collapsed?<IconChevronsRight size={13}/>:<IconChevronsLeft size={13}/>}
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto py-3 px-2 flex flex-col gap-0.5">
           {navItems.map(([id,label,icon])=>(
-            <button key={id} onClick={()=>setActivePage(id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activePage===id?'bg-desk-accent/10 text-desk-accent border-l-2 border-desk-accent pl-[10px]':'text-gray-500 hover:text-gray-300'}`}>
-              {icon}{label}
+            <button key={id} onClick={()=>goPage(id)} title={collapsed?label:undefined}
+              className={navBtnCls(activePage===id&&!isBillingPage?activePage===id:activePage===id)}
+              style={{justifyContent:collapsed?'center':'flex-start'}}>
+              <span className="flex-shrink-0">{icon}</span>
+              {!collapsed&&<span className="truncate">{label}</span>}
             </button>
           ))}
+
+          {/* Billing Center section */}
+          <div className="mt-3">
+            {!collapsed?(
+              <button onClick={()=>setBillingOpen(v=>!v)}
+                className="w-full flex items-center justify-between px-2.5 pb-1.5 group">
+                <span className="text-[10px] font-semibold text-gray-600 tracking-widest uppercase group-hover:text-gray-500 transition-colors">Billing Center</span>
+                <span className="text-gray-600 group-hover:text-gray-400 transition-colors">
+                  {billingOpen?<IconChevDown size={11}/>:<IconChevRight2 size={11}/>}
+                </span>
+              </button>
+            ):(
+              <div className="h-px bg-desk-border mx-2 mb-2"/>
+            )}
+            {(billingOpen||collapsed)&&billingItems.map(([id,label,icon])=>(
+              <button key={id} onClick={()=>goPage(id)} title={collapsed?label:undefined}
+                className={`${navBtnCls(activePage===id)} ${collapsed?'':'pl-4'}`}
+                style={{justifyContent:collapsed?'center':'flex-start'}}>
+                <span className="flex-shrink-0" style={{color:activePage===id?'#60a5fa':'inherit'}}>{icon}</span>
+                {!collapsed&&<span className="truncate text-xs">{label}</span>}
+              </button>
+            ))}
+          </div>
         </nav>
-        <div className="p-4 border-t border-desk-border">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-desk-accent/20 flex items-center justify-center text-desk-accent text-xs font-bold flex-shrink-0">{user.initials}</div>
-            <div className="min-w-0 flex-1">
-              <div className="text-white text-xs font-medium truncate">{user.name}</div>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
-            </div>
+
+        {/* User */}
+        <div className="p-3 border-t border-desk-border flex-shrink-0">
+          <div className="flex items-center gap-2.5" style={{justifyContent:collapsed?'center':'flex-start'}}>
+            <div className="w-7 h-7 rounded-full bg-desk-accent/20 flex items-center justify-center text-desk-accent text-[10px] font-bold flex-shrink-0">{user.initials}</div>
+            {!collapsed&&(
+              <div className="min-w-0 flex-1">
+                <div className="text-white text-xs font-medium truncate">{user.name}</div>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getRoleColor(user.role)}`}>{getRoleLabel(user.role)}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div className="ml-[220px] flex-1 flex flex-col min-h-screen">
+
+      {/* ── Main content ── */}
+      <div style={{marginLeft:`${sw}px`,transition:'margin-left 0.22s cubic-bezier(0.4,0,0.2,1)'}}
+        className="flex-1 flex flex-col min-h-screen">
         <div className="h-14 border-b border-desk-border flex items-center px-6 justify-between bg-desk-base/80 backdrop-blur sticky top-0 z-20">
-          <div className="text-white font-semibold">{pageTitle}</div>
+          <div className="flex items-center gap-2">
+            {isBillingPage&&(
+              <span className="text-xs px-2 py-0.5 rounded-md bg-[rgba(41,121,255,0.1)] text-[#60a5fa] border border-[rgba(41,121,255,0.15)] font-medium mr-1">Billing</span>
+            )}
+            <div className="text-white font-semibold">{pageTitle}</div>
+          </div>
           <div className="flex items-center gap-3">
             <div className="relative">
               <IconSearch size={14} cls="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"/>
@@ -3645,8 +4020,16 @@ function DesktopDashboard({user,onLogout}){
           {activePage==='techniker'&&<TechnikerPage/>}
           {activePage==='news'&&<NewsPage/>}
           {activePage==='einstellungen'&&<EinstellungenPage/>}
+          {activePage==='abrechnungsbridge'&&<AbrechnungsBridgePage onOpenSlideOver={setSlideOver}/>}
+          {activePage==='garantiecheck'&&<GarantieCheckPage onOpenSlideOver={setSlideOver}/>}
         </div>
       </div>
+
+      {/* ── Slide-over overlay ── */}
+      {slideOver&&(<>
+        <div className="bc-backdrop" onClick={()=>setSlideOver(null)}/>
+        <BillingSlideOver mission={slideOver} onClose={()=>setSlideOver(null)}/>
+      </>)}
     </div>
   );
 }
