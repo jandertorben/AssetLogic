@@ -186,6 +186,33 @@ select option{background:#1a1a1a;color:#fff;}
 .rp-role-chip.admin{background:rgba(99,102,241,0.12);color:#818cf8;}
 @keyframes confetti-fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(80px) rotate(720deg);opacity:0;}}
 .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti-fall 0.9s ease-in forwards;}
+/* ── Calendar ──────────────────────────────────────────────── */
+.rp-view-toggle{display:inline-flex;background:#0a0b0f;border:1px solid #1f2128;border-radius:10px;padding:3px;gap:2px;}
+.rp-view-toggle-btn{padding:6px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;transition:all 0.15s;background:transparent;color:#475569;}
+.rp-view-toggle-btn.active{background:#141519;color:#e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.4);}
+.rp-cal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px;border-bottom:1px solid #1f2128;}
+.rp-cal-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid #1f2128;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.rp-cal-nav-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.rp-cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #1f2128;}
+.rp-cal-dow{padding:9px 0;text-align:center;font-size:11px;font-weight:600;color:#475569;letter-spacing:0.5px;text-transform:uppercase;}
+.rp-cal-dow:last-child{color:#6366f1;}
+.rp-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.rp-cal-cell{min-height:100px;padding:8px 9px;border-right:1px solid rgba(31,33,40,0.5);border-bottom:1px solid rgba(31,33,40,0.5);cursor:pointer;transition:background 0.12s;position:relative;display:flex;flex-direction:column;gap:3px;}
+.rp-cal-cell:nth-child(7n){border-right:none;}
+.rp-cal-cell:hover{background:rgba(99,102,241,0.05);}
+.rp-cal-cell.today{background:rgba(99,102,241,0.08);}
+.rp-cal-cell.today .rp-cal-day-num{background:#6366f1;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.rp-cal-cell.other-month .rp-cal-day-num{color:#2a2a35;}
+.rp-cal-cell.other-month{background:rgba(0,0,0,0.15);}
+.rp-cal-cell.has-events{background:rgba(15,16,22,0.5);}
+.rp-cal-day-num{font-size:13px;font-weight:600;color:#94a3b8;line-height:1;margin-bottom:2px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.rp-cal-pill{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:block;}
+.rp-cal-pill.urlaub{background:rgba(34,197,94,0.15);color:#4ade80;border-left:2px solid #4ade80;}
+.rp-cal-pill.urlaub.pending{background:rgba(245,158,11,0.13);color:#fbbf24;border-left:2px solid #fbbf24;}
+.rp-cal-pill.einsatz{background:rgba(41,121,255,0.13);color:#60a5fa;border-left:2px solid #60a5fa;}
+.rp-cal-more{font-size:10px;color:#475569;padding:1px 4px;}
+.rp-day-slide-item{background:#0d0e12;border:1px solid #1f2128;border-radius:10px;padding:12px 14px;}
+.rp-day-slide-item-label{font-size:10px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:4px;}
 /* ── Archiv & Historie ─────────────────────────────────────── */
 .arch-filter-bar{display:flex;align-items:center;gap:10px;padding:14px 20px;background:#0a0b0f;border-bottom:1px solid #1f2128;flex-wrap:wrap;}
 .arch-filter-group{display:flex;align-items:center;gap:7px;flex:1;min-width:180px;}
@@ -360,6 +387,15 @@ const VACATION_REQUESTS = [
   {id:'VA-004',name:'Anna Richter',  initials:'AR',role:'ADMIN',    from:'2026-04-14',to:'2026-04-18',days:5,status:'approved',asset:'–', conflictChecked:true},
   {id:'VA-005',name:'Lars Berger',   initials:'LB',role:'MCU',      from:'2026-04-22',to:'2026-04-25',days:4,status:'review',  asset:'HP 500', conflictChecked:true},
   {id:'VA-006',name:'Sophie Klein',  initials:'SK',role:'TECHNIKER',from:'2026-05-04',to:'2026-05-15',days:10,status:'pending',asset:'Liebherr R 920', conflictChecked:true},
+];
+const DEPLOYMENT_EVENTS = [
+  {id:'DE-001',name:'Marco Köhler', initials:'MK',asset:'CAT 320 Bagger',  from:'2026-03-14',to:'2026-03-16'},
+  {id:'DE-002',name:'Jana Müller',  initials:'JM',asset:'Liebherr R 920',  from:'2026-03-17',to:'2026-03-19'},
+  {id:'DE-003',name:'Lars Berger',  initials:'LB',asset:'HP 500',           from:'2026-03-23',to:'2026-03-25'},
+  {id:'DE-004',name:'Dirk Müller',  initials:'DM',asset:'STILL RX 20-20',  from:'2026-04-01',to:'2026-04-03'},
+  {id:'DE-005',name:'Marco Köhler', initials:'MK',asset:'Komatsu WA 380',  from:'2026-04-14',to:'2026-04-16'},
+  {id:'DE-006',name:'Jana Müller',  initials:'JM',asset:'Toyota 8FBN25',   from:'2026-04-22',to:'2026-04-24'},
+  {id:'DE-007',name:'Lars Berger',  initials:'LB',asset:'CAT 320 Bagger',  from:'2026-03-30',to:'2026-04-01'},
 ];
 // Global ERP API configuration store
 let ERP_CONFIG = {
@@ -4456,17 +4492,31 @@ function GarantieCheckPage({onOpenSlideOver}){
 // ── Resource Planning: Urlaubs-Dashboard ─────────────────────────────────────
 function UrlaubsDashboardPage(){
   const [requests,setRequests]=React.useState(VACATION_REQUESTS.map(r=>({...r})));
-  const [selected,setSelected]=React.useState(null);
-  const [approveState,setApproveState]=React.useState('idle'); // idle | loading | success
+  const [viewMode,setViewMode]=React.useState('list'); // 'list' | 'calendar'
+  const [calYear,setCalYear]=React.useState(2026);
+  const [calMonth,setCalMonth]=React.useState(2); // 0-indexed; 2=März
+  const [selected,setSelected]=React.useState(null);       // single request (list click)
+  const [daySlide,setDaySlide]=React.useState(null);        // {date, label, vacations, deployments}
+  const [approveState,setApproveState]=React.useState('idle');
   const [confettiPieces,setConfettiPieces]=React.useState([]);
 
+  const MONTH_NAMES=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const DOW=['Mo','Di','Mi','Do','Fr','Sa','So'];
+
   const pendingCount=requests.filter(r=>r.status==='pending').length;
-  const activeToday=3; // mock
+  const activeToday=DEPLOYMENT_EVENTS.filter(e=>{
+    const t=new Date(2026,2,14).getTime();
+    return t>=new Date(e.from).getTime()&&t<=new Date(e.to).getTime();
+  }).length;
   const availPct=Math.round((requests.filter(r=>r.status!=='approved').length/requests.length)*100);
 
   const fmtDate=s=>{
-    const d=new Date(s);
+    const d=new Date(s+'T00:00:00');
     return d.toLocaleDateString('de-DE',{day:'2-digit',month:'short',year:'numeric'});
+  };
+  const fmtDateShort=s=>{
+    const d=new Date(s+'T00:00:00');
+    return d.toLocaleDateString('de-DE',{day:'2-digit',month:'short'});
   };
 
   const roleLabelMap={TECHNIKER:'Techniker',MCU:'MCU',ADMIN:'Admin'};
@@ -4474,53 +4524,182 @@ function UrlaubsDashboardPage(){
   const statusLabel={pending:'Offen',approved:'Genehmigt',review:'Rücksprache'};
   const statusChipCls={pending:'pending',approved:'approved',review:'review'};
 
-  function launchConfetti(containerRef){
+  function launchConfetti(){
     const colors=['#6366f1','#10b981','#fbbf24','#f472b6','#60a5fa','#34d399'];
     const pieces=Array.from({length:22},(_,i)=>({
-      id:i,
-      color:colors[i%colors.length],
-      left:Math.random()*90+5,
-      delay:Math.random()*0.4,
-      rotate:Math.random()*360,
+      id:i,color:colors[i%colors.length],
+      left:Math.random()*90+5,delay:Math.random()*0.4,rotate:Math.random()*360,
     }));
     setConfettiPieces(pieces);
     setTimeout(()=>setConfettiPieces([]),1200);
   }
 
-  function handleApprove(){
+  function handleApprove(req,setter){
     if(approveState!=='idle')return;
     setApproveState('loading');
     setTimeout(()=>{
       setApproveState('success');
       launchConfetti();
-      setRequests(prev=>prev.map(r=>r.id===selected.id?{...r,status:'approved'}:r));
-      setSelected(s=>({...s,status:'approved'}));
-      setTimeout(()=>{setApproveState('idle');setSelected(null);},2000);
+      setRequests(prev=>prev.map(r=>r.id===req.id?{...r,status:'approved'}:r));
+      setter(s=>({...s,status:'approved'}));
+      setTimeout(()=>{setApproveState('idle');setter(null);},2000);
     },1200);
   }
 
-  function handleChat(){
-    setRequests(prev=>prev.map(r=>r.id===selected.id?{...r,status:'review'}:r));
-    setSelected(null);
+  function handleChat(req,setter){
+    setRequests(prev=>prev.map(r=>r.id===req.id?{...r,status:'review'}:r));
+    setter(null);
   }
 
-  const IconUserClock=()=>(
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" style={{display:'none'}}/>
-      <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h3"/>
-      <circle cx="18" cy="16" r="4"/><polyline points="18 14 18 16 19.5 17"/>
-    </svg>
-  );
+  // ── Calendar helpers ──────────────────────────────────────
+  function buildCalendar(year,month){
+    const firstDay=new Date(year,month,1);
+    const lastDay=new Date(year,month+1,0);
+    let startDow=firstDay.getDay(); // 0=Sun
+    startDow=startDow===0?6:startDow-1; // Mon=0
+    const days=[];
+    for(let i=0;i<startDow;i++){
+      days.push({date:new Date(year,month,1-(startDow-i)),inMonth:false});
+    }
+    for(let i=1;i<=lastDay.getDate();i++){
+      days.push({date:new Date(year,month,i),inMonth:true});
+    }
+    const rem=7-(days.length%7);
+    if(rem<7){for(let i=1;i<=rem;i++) days.push({date:new Date(year,month+1,i),inMonth:false});}
+    return days;
+  }
+
+  function dateInRange(d,from,to){
+    const dt=new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();
+    const f=new Date(from+'T00:00:00').getTime();
+    const t=new Date(to+'T00:00:00').getTime();
+    return dt>=f&&dt<=t;
+  }
+
+  function getDayItems(date){
+    const vacations=requests.filter(r=>dateInRange(date,r.from,r.to));
+    const deployments=DEPLOYMENT_EVENTS.filter(e=>dateInRange(date,e.from,e.to));
+    return {vacations,deployments};
+  }
+
+  function isToday(date){
+    return date.getFullYear()===2026&&date.getMonth()===2&&date.getDate()===14;
+  }
+
+  function prevMonth(){
+    if(calMonth===0){setCalMonth(11);setCalYear(y=>y-1);}
+    else setCalMonth(m=>m-1);
+  }
+  function nextMonth(){
+    if(calMonth===11){setCalMonth(0);setCalYear(y=>y+1);}
+    else setCalMonth(m=>m+1);
+  }
+
+  function openDaySlide(day){
+    const {vacations,deployments}=getDayItems(day.date);
+    if(!vacations.length&&!deployments.length)return;
+    const label=day.date.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    setDaySlide({date:day.date,label,vacations,deployments});
+    setApproveState('idle');
+  }
+
+  const calDays=buildCalendar(calYear,calMonth);
+
+  // ── Shared slide-over body renderer ──────────────────────
+  function SlideOverSingleRequest({req,onClose}){
+    return(<>
+      {/* Confetti */}
+      {confettiPieces.length>0&&(
+        <div style={{position:'absolute',inset:0,pointerEvents:'none',overflow:'hidden',zIndex:10}}>
+          {confettiPieces.map(p=>(
+            <div key={p.id} className="confetti-piece" style={{left:`${p.left}%`,top:0,background:p.color,animationDelay:`${p.delay}s`,transform:`rotate(${p.rotate}deg)`}}/>
+          ))}
+        </div>
+      )}
+      <div className="rp-slideover-header">
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+          <div>
+            <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
+              <span style={{fontSize:'11px',fontFamily:"'JetBrains Mono',monospace",color:'#475569'}}>{req.id}</span>
+              <span className={`rp-status-chip ${statusChipCls[req.status]}`}>{statusLabel[req.status]}</span>
+            </div>
+            <div style={{fontSize:'16px',fontWeight:700,color:'#fff'}}>{req.name}</div>
+            <div style={{fontSize:'12px',color:'#64748b',marginTop:'2px'}}>
+              {fmtDate(req.from)} – {fmtDate(req.to)} · {req.days} Tage · <span className={`rp-role-chip ${roleChipMap[req.role]}`}>{roleLabelMap[req.role]}</span>
+            </div>
+          </div>
+          <button onClick={onClose} style={{width:'32px',height:'32px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center',color:'#94a3b8',cursor:'pointer',flexShrink:0,marginLeft:'12px'}}>
+            <IconX size={15}/>
+          </button>
+        </div>
+      </div>
+      <div className="rp-slideover-body">
+        <div style={{background:'#0a0b0f',border:'1px solid #1f2128',borderRadius:'10px',padding:'14px 16px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+          <div><div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Von</div><div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{fmtDate(req.from)}</div></div>
+          <div><div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Bis</div><div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{fmtDate(req.to)}</div></div>
+          <div><div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Urlaubstage</div><div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{req.days} Tage</div></div>
+          <div><div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Zugeordnetes Asset</div><div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{req.asset}</div></div>
+        </div>
+        <div className="rp-ki-box">
+          <div className="rp-ki-header">
+            <span className="rp-ki-tag">KI</span>
+            <span className="rp-ki-title">Konfliktprüfung</span>
+            <span style={{marginLeft:'auto',fontSize:'11px',color:'#4ade80',fontWeight:600}}>✓ Abgeschlossen</span>
+          </div>
+          <div className="rp-ki-text">Prüfung gegen Wartungskalender abgeschlossen. Keine Überschneidungen mit geplanten Asset-Checks im Zeitraum {fmtDate(req.from)} – {fmtDate(req.to)} gefunden. Alle kritischen Wartungen sind durch verfügbare Techniker abgedeckt.</div>
+          <div style={{marginTop:'12px',display:'flex',alignItems:'center',gap:'8px'}}>
+            <div style={{flex:1,height:'4px',background:'#1a1a2e',borderRadius:'3px',overflow:'hidden'}}>
+              <div style={{width:'94%',height:'100%',background:'linear-gradient(90deg,#6366f1,#4ade80)',borderRadius:'3px'}}/>
+            </div>
+            <span style={{fontSize:'11px',fontWeight:700,color:'#4ade80',whiteSpace:'nowrap'}}>94% Konfidenz</span>
+          </div>
+        </div>
+        {approveState==='success'&&(
+          <div style={{background:'rgba(16,185,129,0.1)',border:'1px solid rgba(16,185,129,0.25)',borderRadius:'12px',padding:'16px',textAlign:'center'}}>
+            <div style={{fontSize:'28px',marginBottom:'6px'}}>🎉</div>
+            <div style={{fontSize:'15px',fontWeight:700,color:'#4ade80'}}>Antrag genehmigt!</div>
+            <div style={{fontSize:'12px',color:'#64748b',marginTop:'3px'}}>{req.name} wurde benachrichtigt.</div>
+          </div>
+        )}
+        {req.status!=='approved'&&approveState!=='success'&&(
+          <div style={{display:'flex',flexDirection:'column',gap:'10px',marginTop:'auto'}}>
+            <button className={`rp-approve-btn${approveState==='loading'?' opacity-60':''}`}
+              onClick={()=>handleApprove(req,setSelected)} disabled={approveState!=='idle'}>
+              {approveState==='loading'
+                ?<><span style={{width:'16px',height:'16px',border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',borderRadius:'50%',display:'inline-block',animation:'erpSpinner 0.7s linear infinite'}}/> Wird genehmigt…</>
+                :<>✓ Genehmigen</>}
+            </button>
+            <button className="rp-chat-btn" onClick={()=>handleChat(req,setSelected)}>💬 Rücksprache halten</button>
+          </div>
+        )}
+        {req.status==='approved'&&approveState==='idle'&&(
+          <div style={{background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.2)',borderRadius:'12px',padding:'14px',textAlign:'center',color:'#4ade80',fontSize:'13px',fontWeight:600}}>✓ Bereits genehmigt</div>
+        )}
+      </div>
+    </>);
+  }
 
   return(
-    <div className="max-w-5xl">
+    <div style={{maxWidth:'100%'}}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-white font-bold text-lg">Urlaubs-Dashboard</div>
           <div className="text-gray-500 text-xs mt-0.5">Antragsübersicht · KI-gestützte Konfliktprüfung</div>
         </div>
-        <div className="text-xs font-mono text-gray-600">Stand: 14.03.2026</div>
+        <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+          <div className="text-xs font-mono text-gray-600">Stand: 14.03.2026</div>
+          <div className="rp-view-toggle">
+            <button className={`rp-view-toggle-btn${viewMode==='list'?' active':''}`} onClick={()=>setViewMode('list')}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{display:'inline',marginRight:'5px',verticalAlign:'middle'}}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Listen-Ansicht
+            </button>
+            <button className={`rp-view-toggle-btn${viewMode==='calendar'?' active':''}`} onClick={()=>setViewMode('calendar')}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{display:'inline',marginRight:'5px',verticalAlign:'middle'}}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Kalender-Ansicht
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Metric cards */}
@@ -4542,152 +4721,230 @@ function UrlaubsDashboardPage(){
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
-        <div style={{padding:'14px 20px 12px',borderBottom:'1px solid #1f2128',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-          <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>Urlaubsanträge</div>
-          <div style={{fontSize:'11px',color:'#475569'}}>{requests.length} Einträge</div>
-        </div>
-        <table className="bc-table">
-          <thead>
-            <tr>
-              <th>Mitarbeiter</th>
-              <th>Rolle</th>
-              <th>Zeitraum</th>
-              <th>Tage</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map(r=>(
-              <tr key={r.id} onClick={()=>{setSelected(r);setApproveState('idle');}}
-                style={{cursor:'pointer'}}>
-                <td>
-                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
-                    <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'rgba(99,102,241,0.15)',border:'1px solid rgba(99,102,241,0.25)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'11px',fontWeight:700,color:'#818cf8',flexShrink:0}}>{r.initials}</div>
-                    <div>
-                      <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{r.name}</div>
-                      <div style={{fontSize:'10px',color:'#475569',fontFamily:"'JetBrains Mono',monospace"}}>{r.id}</div>
+      {/* ── LIST VIEW ── */}
+      {viewMode==='list'&&(
+        <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
+          <div style={{padding:'14px 20px 12px',borderBottom:'1px solid #1f2128',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>Urlaubsanträge</div>
+            <div style={{fontSize:'11px',color:'#475569'}}>{requests.length} Einträge</div>
+          </div>
+          <table className="bc-table">
+            <thead><tr>
+              <th>Mitarbeiter</th><th>Rolle</th><th>Zeitraum</th><th>Tage</th><th>Status</th>
+            </tr></thead>
+            <tbody>
+              {requests.map(r=>(
+                <tr key={r.id} onClick={()=>{setSelected(r);setApproveState('idle');}} style={{cursor:'pointer'}}>
+                  <td>
+                    <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                      <div style={{width:'30px',height:'30px',borderRadius:'50%',background:'rgba(99,102,241,0.15)',border:'1px solid rgba(99,102,241,0.25)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'11px',fontWeight:700,color:'#818cf8',flexShrink:0}}>{r.initials}</div>
+                      <div>
+                        <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{r.name}</div>
+                        <div style={{fontSize:'10px',color:'#475569',fontFamily:"'JetBrains Mono',monospace"}}>{r.id}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td><span className={`rp-role-chip ${roleChipMap[r.role]}`}>{roleLabelMap[r.role]}</span></td>
-                <td style={{fontSize:'12px',color:'#94a3b8'}}>{fmtDate(r.from)} – {fmtDate(r.to)}</td>
-                <td style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{r.days}</td>
-                <td><span className={`rp-status-chip ${statusChipCls[r.status]}`}>{statusLabel[r.status]}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  </td>
+                  <td><span className={`rp-role-chip ${roleChipMap[r.role]}`}>{roleLabelMap[r.role]}</span></td>
+                  <td style={{fontSize:'12px',color:'#94a3b8'}}>{fmtDate(r.from)} – {fmtDate(r.to)}</td>
+                  <td style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{r.days}</td>
+                  <td><span className={`rp-status-chip ${statusChipCls[r.status]}`}>{statusLabel[r.status]}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Slide-over */}
+      {/* ── CALENDAR VIEW ── */}
+      {viewMode==='calendar'&&(
+        <div className="bg-desk-surface border border-desk-border rounded-xl overflow-hidden">
+          {/* Calendar header */}
+          <div className="rp-cal-header">
+            <button className="rp-cal-nav-btn" onClick={prevMonth}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style={{textAlign:'center'}}>
+              <div style={{fontSize:'16px',fontWeight:700,color:'#fff'}}>{MONTH_NAMES[calMonth]} {calYear}</div>
+              <div style={{fontSize:'11px',color:'#475569',marginTop:'1px'}}>
+                {requests.filter(r=>{
+                  const f=new Date(r.from+'T00:00:00'),t=new Date(r.to+'T00:00:00');
+                  const ms=new Date(calYear,calMonth,1),me=new Date(calYear,calMonth+1,0);
+                  return f<=me&&t>=ms;
+                }).length} Urlaubsanträge · {DEPLOYMENT_EVENTS.filter(e=>{
+                  const f=new Date(e.from+'T00:00:00'),t=new Date(e.to+'T00:00:00');
+                  const ms=new Date(calYear,calMonth,1),me=new Date(calYear,calMonth+1,0);
+                  return f<=me&&t>=ms;
+                }).length} Einsätze diesen Monat
+              </div>
+            </div>
+            <button className="rp-cal-nav-btn" onClick={nextMonth}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          {/* Legend */}
+          <div style={{display:'flex',alignItems:'center',gap:'16px',padding:'10px 20px',borderBottom:'1px solid #1f2128',background:'#0a0b0f'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+              <div style={{width:'10px',height:'10px',borderRadius:'2px',background:'#4ade80'}}/>
+              <span style={{fontSize:'11px',color:'#64748b',fontWeight:500}}>Urlaub (genehmigt)</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+              <div style={{width:'10px',height:'10px',borderRadius:'2px',background:'#fbbf24'}}/>
+              <span style={{fontSize:'11px',color:'#64748b',fontWeight:500}}>Urlaub (offen)</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+              <div style={{width:'10px',height:'10px',borderRadius:'2px',background:'#60a5fa'}}/>
+              <span style={{fontSize:'11px',color:'#64748b',fontWeight:500}}>Einsatz</span>
+            </div>
+            <div style={{marginLeft:'auto',fontSize:'11px',color:'#475569'}}>Klick auf Tag öffnet Details</div>
+          </div>
+
+          {/* Day-of-week header */}
+          <div className="rp-cal-dow-row">
+            {DOW.map(d=><div key={d} className="rp-cal-dow">{d}</div>)}
+          </div>
+
+          {/* Grid */}
+          <div className="rp-cal-grid">
+            {calDays.map((day,i)=>{
+              const {vacations,deployments}=getDayItems(day.date);
+              const hasEvents=vacations.length>0||deployments.length>0;
+              const today=isToday(day.date);
+              const allItems=[
+                ...vacations.map(v=>({...v,_type:'urlaub'})),
+                ...deployments.map(e=>({...e,_type:'einsatz'})),
+              ];
+              const visible=allItems.slice(0,2);
+              const extra=allItems.length-visible.length;
+              return(
+                <div key={i}
+                  className={`rp-cal-cell${today?' today':''}${!day.inMonth?' other-month':''}${hasEvents?' has-events':''}`}
+                  onClick={()=>day.inMonth&&openDaySlide(day)}>
+                  <div className="rp-cal-day-num">{day.date.getDate()}</div>
+                  {visible.map((item,j)=>(
+                    <span key={j} className={`rp-cal-pill ${item._type==='einsatz'?'einsatz':`urlaub${item.status==='pending'?' pending':''}`}`}>
+                      {item.name.split(' ')[0]}
+                    </span>
+                  ))}
+                  {extra>0&&<span className="rp-cal-more">+{extra} weitere</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── SLIDE-OVER: single request from list ── */}
       {selected&&(<>
         <div className="bc-backdrop" onClick={()=>setSelected(null)}/>
         <div className="rp-slideover">
-          {/* Confetti layer */}
+          <SlideOverSingleRequest req={selected} onClose={()=>setSelected(null)}/>
+        </div>
+      </>)}
+
+      {/* ── SLIDE-OVER: day details from calendar ── */}
+      {daySlide&&(<>
+        <div className="bc-backdrop" onClick={()=>setDaySlide(null)}/>
+        <div className="rp-slideover">
+          {/* Confetti */}
           {confettiPieces.length>0&&(
             <div style={{position:'absolute',inset:0,pointerEvents:'none',overflow:'hidden',zIndex:10}}>
               {confettiPieces.map(p=>(
-                <div key={p.id} className="confetti-piece" style={{
-                  left:`${p.left}%`,top:0,
-                  background:p.color,
-                  animationDelay:`${p.delay}s`,
-                  transform:`rotate(${p.rotate}deg)`
-                }}/>
+                <div key={p.id} className="confetti-piece" style={{left:`${p.left}%`,top:0,background:p.color,animationDelay:`${p.delay}s`,transform:`rotate(${p.rotate}deg)`}}/>
               ))}
             </div>
           )}
-
-          {/* Header */}
           <div className="rp-slideover-header">
             <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
               <div>
-                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}}>
-                  <span style={{fontSize:'11px',fontFamily:"'JetBrains Mono',monospace",color:'#475569'}}>{selected.id}</span>
-                  <span className={`rp-status-chip ${statusChipCls[selected.status]}`}>{statusLabel[selected.status]}</span>
-                </div>
-                <div style={{fontSize:'16px',fontWeight:700,color:'#fff'}}>{selected.name}</div>
-                <div style={{fontSize:'12px',color:'#64748b',marginTop:'2px'}}>
-                  {fmtDate(selected.from)} – {fmtDate(selected.to)} · {selected.days} Tage · <span className={`rp-role-chip ${roleChipMap[selected.role]}`}>{roleLabelMap[selected.role]}</span>
+                <div style={{fontSize:'11px',color:'#475569',fontWeight:600,letterSpacing:'0.5px',textTransform:'uppercase',marginBottom:'6px'}}>Tagesübersicht</div>
+                <div style={{fontSize:'16px',fontWeight:700,color:'#fff'}}>{daySlide.label}</div>
+                <div style={{fontSize:'12px',color:'#64748b',marginTop:'3px'}}>
+                  {daySlide.vacations.length} Urlaubsanträge · {daySlide.deployments.length} Einsätze
                 </div>
               </div>
-              <button onClick={()=>setSelected(null)} style={{width:'32px',height:'32px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center',color:'#94a3b8',cursor:'pointer',flexShrink:0,marginLeft:'12px'}}
-                className="hover:text-white hover:bg-white/10 transition-all">
+              <button onClick={()=>setDaySlide(null)} style={{width:'32px',height:'32px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center',color:'#94a3b8',cursor:'pointer',flexShrink:0,marginLeft:'12px'}}>
                 <IconX size={15}/>
               </button>
             </div>
           </div>
-
-          {/* Body */}
           <div className="rp-slideover-body">
+            {/* Vacations */}
+            {daySlide.vacations.length>0&&(
+              <div>
+                <div style={{fontSize:'10px',fontWeight:600,color:'#4ade80',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'8px'}}>🏖 Urlaub</div>
+                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {daySlide.vacations.map(v=>(
+                    <div key={v.id} className="rp-day-slide-item">
+                      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'6px'}}>
+                        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'rgba(99,102,241,0.15)',border:'1px solid rgba(99,102,241,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:700,color:'#818cf8'}}>{v.initials}</div>
+                          <div>
+                            <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{v.name}</div>
+                            <div style={{fontSize:'10px',color:'#475569'}}>{roleLabelMap[v.role]}</div>
+                          </div>
+                        </div>
+                        <span className={`rp-status-chip ${statusChipCls[v.status]}`}>{statusLabel[v.status]}</span>
+                      </div>
+                      <div style={{fontSize:'11px',color:'#64748b'}}>
+                        {fmtDateShort(v.from)} – {fmtDateShort(v.to)} · {v.days} Tage
+                      </div>
+                      {v.status==='pending'&&approveState==='idle'&&(
+                        <div style={{display:'flex',gap:'6px',marginTop:'10px'}}>
+                          <button className="rp-approve-btn" style={{flex:1,padding:'9px',fontSize:'12px'}}
+                            onClick={()=>{setSelected(v);setDaySlide(null);setApproveState('idle');}}>
+                            ✓ Prüfen
+                          </button>
+                          <button className="rp-chat-btn" style={{flex:1,padding:'9px',fontSize:'12px'}}
+                            onClick={()=>{handleChat(v,()=>setDaySlide(null));}}>
+                            💬 Rücksprache
+                          </button>
+                        </div>
+                      )}
+                      {v.status==='approved'&&(
+                        <div style={{marginTop:'8px',fontSize:'12px',color:'#4ade80',fontWeight:600}}>✓ Genehmigt</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            {/* Zeitraum info */}
-            <div style={{background:'#0a0b0f',border:'1px solid #1f2128',borderRadius:'10px',padding:'14px 16px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+            {/* Deployments */}
+            {daySlide.deployments.length>0&&(
               <div>
-                <div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Von</div>
-                <div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{fmtDate(selected.from)}</div>
+                <div style={{fontSize:'10px',fontWeight:600,color:'#60a5fa',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'8px'}}>🔧 Einsätze</div>
+                <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+                  {daySlide.deployments.map(e=>(
+                    <div key={e.id} className="rp-day-slide-item">
+                      <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}}>
+                        <div style={{width:'28px',height:'28px',borderRadius:'50%',background:'rgba(41,121,255,0.12)',border:'1px solid rgba(41,121,255,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:700,color:'#60a5fa'}}>{e.initials}</div>
+                        <div>
+                          <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{e.name}</div>
+                          <div style={{fontSize:'10px',color:'#475569'}}>{e.asset}</div>
+                        </div>
+                        <span style={{marginLeft:'auto',fontSize:'10px',fontWeight:600,padding:'2px 8px',borderRadius:'5px',background:'rgba(41,121,255,0.12)',color:'#60a5fa'}}>{e.id}</span>
+                      </div>
+                      <div style={{fontSize:'11px',color:'#64748b'}}>
+                        {fmtDateShort(e.from)} – {fmtDateShort(e.to)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div>
-                <div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Bis</div>
-                <div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{fmtDate(selected.to)}</div>
-              </div>
-              <div>
-                <div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Urlaubstage</div>
-                <div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{selected.days} Tage</div>
-              </div>
-              <div>
-                <div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.7px',textTransform:'uppercase',marginBottom:'4px'}}>Zugeordnetes Asset</div>
-                <div style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0'}}>{selected.asset}</div>
-              </div>
-            </div>
+            )}
 
-            {/* KI-Konfliktprüfung */}
+            {/* KI summary */}
             <div className="rp-ki-box">
               <div className="rp-ki-header">
                 <span className="rp-ki-tag">KI</span>
-                <span className="rp-ki-title">Konfliktprüfung</span>
-                <span style={{marginLeft:'auto',fontSize:'11px',color:'#4ade80',fontWeight:600}}>✓ Abgeschlossen</span>
+                <span className="rp-ki-title">Tages-Analyse</span>
+                <span style={{marginLeft:'auto',fontSize:'11px',color:'#4ade80',fontWeight:600}}>✓ Kein Konflikt</span>
               </div>
               <div className="rp-ki-text">
-                Prüfung gegen Wartungskalender abgeschlossen. Keine Überschneidungen mit geplanten Asset-Checks im Zeitraum {fmtDate(selected.from)} – {fmtDate(selected.to)} gefunden. Alle kritischen Wartungen sind durch verfügbare Techniker abgedeckt.
-              </div>
-              <div style={{marginTop:'12px',display:'flex',alignItems:'center',gap:'8px'}}>
-                <div style={{flex:1,height:'4px',background:'#1a1a2e',borderRadius:'3px',overflow:'hidden'}}>
-                  <div style={{width:'94%',height:'100%',background:'linear-gradient(90deg,#6366f1,#4ade80)',borderRadius:'3px',transition:'width 0.6s'}}/>
-                </div>
-                <span style={{fontSize:'11px',fontWeight:700,color:'#4ade80',whiteSpace:'nowrap'}}>94% Konfidenz</span>
+                Keine kritischen Überschneidungen an diesem Tag. Alle Wartungsaufgaben bleiben durch verfügbares Personal abgedeckt.
               </div>
             </div>
-
-            {/* Approve success badge */}
-            {approveState==='success'&&(
-              <div style={{background:'rgba(16,185,129,0.1)',border:'1px solid rgba(16,185,129,0.25)',borderRadius:'12px',padding:'16px',textAlign:'center'}}>
-                <div style={{fontSize:'28px',marginBottom:'6px'}}>🎉</div>
-                <div style={{fontSize:'15px',fontWeight:700,color:'#4ade80'}}>Antrag genehmigt!</div>
-                <div style={{fontSize:'12px',color:'#64748b',marginTop:'3px'}}>{selected.name} wurde benachrichtigt.</div>
-              </div>
-            )}
-
-            {/* Action buttons */}
-            {selected.status!=='approved'&&approveState!=='success'&&(
-              <div style={{display:'flex',flexDirection:'column',gap:'10px',marginTop:'auto'}}>
-                <button className={`rp-approve-btn${approveState==='loading'?' opacity-60':''}`}
-                  onClick={handleApprove} disabled={approveState!=='idle'}>
-                  {approveState==='loading'
-                    ?<><span style={{width:'16px',height:'16px',border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',borderRadius:'50%',display:'inline-block',animation:'erpSpinner 0.7s linear infinite'}}/> Wird genehmigt…</>
-                    :<>✓ Genehmigen</>}
-                </button>
-                <button className="rp-chat-btn" onClick={handleChat}>
-                  💬 Rücksprache halten
-                </button>
-              </div>
-            )}
-            {selected.status==='approved'&&approveState==='idle'&&(
-              <div style={{background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.2)',borderRadius:'12px',padding:'14px',textAlign:'center',color:'#4ade80',fontSize:'13px',fontWeight:600}}>
-                ✓ Bereits genehmigt
-              </div>
-            )}
           </div>
         </div>
       </>)}
