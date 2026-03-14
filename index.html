@@ -5233,11 +5233,248 @@ function UrlaubsDashboardPage(){
 /* ─────────────────────────────────────────────────────────
    Executive Insights — CEO-Level KPI & AI Strategy View
 ───────────────────────────────────────────────────────── */
+/* ── Exec Insights Detail Slide-Over ── */
+function ExecDetailPanel({panel,onClose}){
+  if(!panel)return null;
+
+  const panels={
+    umsatz:{
+      accent:'#EAB308',glow:'rgba(234,179,8,',border:'rgba(234,179,8,0.2)',
+      title:'Umsatz-Potenzial',subtitle:'KI-Analyse · Q1/Q2 2026',
+      hero:'€ 47.200',heroSub:'KI-identifiziertes Gesamtpotenzial',
+      content:(
+        <>
+          {/* Aufschlüsselung */}
+          <div style={{marginBottom:'24px'}}>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Potenzial nach Kategorie</div>
+            {[
+              {label:'Auslaufende Wartungsverträge',value:'€ 18.400',pct:39,color:'#EAB308'},
+              {label:'Ungenutztes Ersatzteil-Upsell',value:'€ 14.700',pct:31,color:'#F59E0B'},
+              {label:'Offene Serviceeinsätze',value:'€ 9.200',pct:20,color:'#FCD34D'},
+              {label:'Schulungs-Pakete',value:'€ 4.900',pct:10,color:'#FDE68A'},
+            ].map(r=>(
+              <div key={r.label} style={{marginBottom:'12px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:'5px'}}>
+                  <span style={{fontSize:'13px',color:'#94a3b8'}}>{r.label}</span>
+                  <span style={{fontSize:'13px',fontWeight:700,color:r.color}}>{r.value}</span>
+                </div>
+                <div style={{height:'5px',borderRadius:'3px',background:'rgba(255,255,255,0.05)',overflow:'hidden'}}>
+                  <div style={{width:`${r.pct}%`,height:'100%',background:r.color,borderRadius:'3px',opacity:0.85}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Top Chancen */}
+          <div style={{marginBottom:'24px'}}>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Top 3 KI-Empfehlungen</div>
+            {[
+              {nr:'01',text:'Wartungsvertrag Kunde Müller GmbH läuft am 28.03. aus. Verlängerungsangebot vorbereiten: +€ 6.200/Jahr.',prio:'Hoch'},
+              {nr:'02',text:'CAT-320 zeigt erhöhten Verschleiß an Hydraulikpumpe. Präventive Inspektion + Ersatzteil-Bundle anbieten.',prio:'Mittel'},
+              {nr:'03',text:'HP-500 in Region Nord hat 3 ungeplante Ausfälle. Premium-Servicevertrag als Upgrade vorschlagen.',prio:'Mittel'},
+            ].map(r=>(
+              <div key={r.nr} style={{display:'flex',gap:'12px',marginBottom:'12px',background:'rgba(234,179,8,0.04)',border:'1px solid rgba(234,179,8,0.1)',borderRadius:'10px',padding:'12px 14px'}}>
+                <span style={{fontSize:'18px',fontWeight:800,color:'rgba(234,179,8,0.25)',fontFamily:"'JetBrains Mono',monospace",flexShrink:0}}>{r.nr}</span>
+                <div>
+                  <div style={{fontSize:'13px',color:'#cbd5e1',lineHeight:1.55,marginBottom:'6px'}}>{r.text}</div>
+                  <span style={{fontSize:'10px',fontWeight:700,color:'#EAB308',background:'rgba(234,179,8,0.1)',borderRadius:'4px',padding:'2px 7px'}}>Priorität: {r.prio}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Monatsprognose */}
+          <div>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Monatliche Prognose</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px'}}>
+              {[['März 2026','€ 12.400','abgeschlossen'],['April 2026','€ 18.600','prognostiziert'],['Mai 2026','€ 16.200','prognostiziert']].map(([m,v,s])=>(
+                <div key={m} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'10px',padding:'12px 14px'}}>
+                  <div style={{fontSize:'11px',color:'#475569',marginBottom:'4px'}}>{m}</div>
+                  <div style={{fontSize:'17px',fontWeight:700,color:'#EAB308',marginBottom:'4px'}}>{v}</div>
+                  <div style={{fontSize:'10px',color:s==='abgeschlossen'?'#4ade80':'#64748b'}}>{s}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      ),
+    },
+    effizienz:{
+      accent:'#06B6D4',glow:'rgba(6,182,212,',border:'rgba(6,182,212,0.2)',
+      title:'Bearbeitungszeit',subtitle:'Effizienz-Analyse · Vorher vs. Nachher',
+      hero:'↓ 41%',heroSub:'Reduktion durch Auto-Dokumentation',
+      content:(
+        <>
+          {/* Vorher/Nachher */}
+          <div style={{marginBottom:'24px'}}>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Vergleich nach Service-Typ</div>
+            {[
+              {label:'Wartungseinsatz',vorher:'2,8h',nachher:'1,6h',delta:'-43%'},
+              {label:'Störungsbehebung',vorher:'4,1h',nachher:'2,4h',delta:'-41%'},
+              {label:'Garantiefall',vorher:'3,5h',nachher:'2,1h',delta:'-40%'},
+              {label:'Inspektion',vorher:'2,4h',nachher:'1,5h',delta:'-38%'},
+            ].map(r=>(
+              <div key={r.label} style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'10px',background:'rgba(6,182,212,0.04)',border:'1px solid rgba(6,182,212,0.09)',borderRadius:'10px',padding:'11px 14px'}}>
+                <span style={{fontSize:'13px',color:'#94a3b8',flex:1}}>{r.label}</span>
+                <span style={{fontSize:'13px',color:'#ef4444',textDecoration:'line-through',opacity:0.6,fontFamily:"'JetBrains Mono',monospace"}}>{r.vorher}</span>
+                <span style={{color:'#475569',fontSize:'12px'}}>→</span>
+                <span style={{fontSize:'13px',fontWeight:700,color:'#06B6D4',fontFamily:"'JetBrains Mono',monospace"}}>{r.nachher}</span>
+                <span style={{fontSize:'11px',fontWeight:700,color:'#4ade80',background:'rgba(74,222,128,0.08)',borderRadius:'4px',padding:'2px 7px'}}>{r.delta}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Zeitersparnis */}
+          <div style={{marginBottom:'24px'}}>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Zeitersparnis pro Techniker / Monat</div>
+            {[
+              {name:'M. Köhler',std:'14,2h',kosten:'€ 994'},
+              {name:'T. Braun',std:'12,8h',kosten:'€ 896'},
+              {name:'S. Fischer',std:'11,5h',kosten:'€ 805'},
+              {name:'A. Weber',std:'10,9h',kosten:'€ 763'},
+            ].map((r,i)=>(
+              <div key={r.name} style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'8px'}}>
+                <div style={{width:'26px',height:'26px',borderRadius:'50%',background:'rgba(6,182,212,0.1)',border:'1px solid rgba(6,182,212,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'11px',fontWeight:700,color:'#06B6D4',flexShrink:0}}>{i+1}</div>
+                <span style={{fontSize:'13px',color:'#e2e8f0',flex:1}}>{r.name}</span>
+                <span style={{fontSize:'13px',fontWeight:600,color:'#06B6D4',fontFamily:"'JetBrains Mono',monospace"}}>{r.std}</span>
+                <span style={{fontSize:'12px',color:'#4ade80',fontWeight:600}}>≙ {r.kosten}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Haupttreiber */}
+          <div>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Haupttreiber der Reduktion</div>
+            {[
+              ['Auto-Dokumentation','Berichte automatisch aus Sensordaten generiert','52%'],
+              ['Vorausgefüllte Formulare','KI befüllt Einsatzberichte aus Verlauf','28%'],
+              ['Spracherfassung','Diktier-Funktion statt manueller Eingabe','20%'],
+            ].map(([t,d,p])=>(
+              <div key={t} style={{marginBottom:'10px',background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.05)',borderRadius:'10px',padding:'12px 14px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:'4px'}}>
+                  <span style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>{t}</span>
+                  <span style={{fontSize:'12px',fontWeight:700,color:'#06B6D4'}}>{p}</span>
+                </div>
+                <div style={{fontSize:'12px',color:'#475569'}}>{d}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      ),
+    },
+    produktivitaet:{
+      accent:'#a78bfa',glow:'rgba(139,92,246,',border:'rgba(139,92,246,0.2)',
+      title:'Techniker-Produktivität',subtitle:'Teamübersicht · März 2026',
+      hero:'+15%',heroSub:'Produktivitätssteigerung durch Auto-Doku',
+      content:(
+        <>
+          {/* Ranking */}
+          <div style={{marginBottom:'24px'}}>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Techniker-Ranking</div>
+            {[
+              {name:'M. Köhler',auftraege:18,erstlösung:'94%',bewertung:'4,9',trend:'+8%'},
+              {name:'T. Braun',auftraege:15,erstlösung:'88%',bewertung:'4,7',trend:'+12%'},
+              {name:'S. Fischer',auftraege:14,erstlösung:'85%',bewertung:'4,6',trend:'+19%'},
+              {name:'A. Weber',auftraege:12,erstlösung:'82%',bewertung:'4,5',trend:'+21%'},
+            ].map((r,i)=>(
+              <div key={r.name} style={{background:i===0?'rgba(139,92,246,0.07)':'rgba(255,255,255,0.02)',border:`1px solid ${i===0?'rgba(139,92,246,0.18)':'rgba(255,255,255,0.05)'}`,borderRadius:'12px',padding:'14px 16px',marginBottom:'8px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
+                  <span style={{fontSize:'16px',fontWeight:800,color:i===0?'#a78bfa':'#334155',fontFamily:"'JetBrains Mono',monospace",width:'20px'}}>#{i+1}</span>
+                  <span style={{fontSize:'14px',fontWeight:600,color:'#e2e8f0',flex:1}}>{r.name}</span>
+                  <span style={{fontSize:'12px',fontWeight:700,color:'#4ade80'}}>{r.trend}</span>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'8px'}}>
+                  {[['Aufträge',r.auftraege],['Erstlösung',r.erstlösung],['Bewertung','★ '+r.bewertung]].map(([l,v])=>(
+                    <div key={l} style={{background:'rgba(255,255,255,0.03)',borderRadius:'7px',padding:'7px 9px'}}>
+                      <div style={{fontSize:'10px',color:'#475569',marginBottom:'2px'}}>{l}</div>
+                      <div style={{fontSize:'13px',fontWeight:700,color:'#c4b5fd'}}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Wochenauslastung */}
+          <div style={{marginBottom:'24px'}}>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>Auslastung diese Woche</div>
+            {[
+              {name:'M. Köhler',pct:92},
+              {name:'T. Braun',pct:78},
+              {name:'S. Fischer',pct:85},
+              {name:'A. Weber',pct:63},
+            ].map(r=>(
+              <div key={r.name} style={{marginBottom:'10px'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:'5px'}}>
+                  <span style={{fontSize:'12px',color:'#94a3b8'}}>{r.name}</span>
+                  <span style={{fontSize:'12px',fontWeight:700,color:r.pct>=90?'#f87171':r.pct>=75?'#a78bfa':'#4ade80'}}>{r.pct}%</span>
+                </div>
+                <div style={{height:'5px',borderRadius:'3px',background:'rgba(255,255,255,0.05)',overflow:'hidden'}}>
+                  <div style={{width:`${r.pct}%`,height:'100%',borderRadius:'3px',background:r.pct>=90?'#f87171':r.pct>=75?'#a78bfa':'#4ade80'}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* KI-Empfehlungen */}
+          <div>
+            <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'12px'}}>KI-Empfehlungen</div>
+            {[
+              'M. Köhler hat das tiefste Know-how bei Hydrauliksystemen. Wissen in Wissensdatenbank erfassen.',
+              'A. Weber zeigt den stärksten Produktivitäts-Trend (+21%). Mentoring-Programm für andere Techniker.',
+              'M. Köhler ist nahe am Kapazitätslimit (92%). Auftragslast auf T. Braun verteilen.',
+            ].map((t,i)=>(
+              <div key={i} style={{display:'flex',gap:'10px',marginBottom:'8px',background:'rgba(139,92,246,0.05)',border:'1px solid rgba(139,92,246,0.1)',borderRadius:'10px',padding:'11px 13px'}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" style={{flexShrink:0,marginTop:'1px'}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span style={{fontSize:'13px',color:'#cbd5e1',lineHeight:1.55}}>{t}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      ),
+    },
+  };
+
+  const p=panels[panel];
+  if(!p)return null;
+
+  return(
+    <>
+      <div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.6)',backdropFilter:'blur(4px)',WebkitBackdropFilter:'blur(4px)',zIndex:200}}/>
+      <div style={{position:'fixed',top:0,right:0,bottom:0,width:'460px',background:'#0d0e12',borderLeft:`1px solid ${p.border}`,zIndex:201,display:'flex',flexDirection:'column',animation:'slideInRight 0.28s cubic-bezier(0.34,1.1,0.64,1)'}}>
+        {/* Header */}
+        <div style={{padding:'20px 24px',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'flex-start',gap:'14px',flexShrink:0}}>
+          <div style={{flex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}}>
+              <div style={{width:'8px',height:'8px',borderRadius:'50%',background:p.accent,boxShadow:`0 0 8px ${p.accent}`}}/>
+              <span style={{fontSize:'16px',fontWeight:700,color:'#fff'}}>{p.title}</span>
+            </div>
+            <div style={{fontSize:'12px',color:'#475569'}}>{p.subtitle}</div>
+          </div>
+          <button onClick={onClose} style={{width:'30px',height:'30px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',color:'#64748b',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:'16px'}}>✕</button>
+        </div>
+
+        {/* Hero metric */}
+        <div style={{padding:'20px 24px',borderBottom:'1px solid rgba(255,255,255,0.06)',background:`linear-gradient(135deg,${p.glow}0.07),transparent)`,flexShrink:0}}>
+          <div style={{fontSize:'42px',fontWeight:800,color:p.accent,letterSpacing:'-1.5px',lineHeight:1,textShadow:`0 0 30px ${p.glow}0.5)`,marginBottom:'6px'}}>{p.hero}</div>
+          <div style={{fontSize:'13px',color:'#64748b'}}>{p.heroSub}</div>
+        </div>
+
+        {/* Scrollable content */}
+        <div style={{flex:1,overflowY:'auto',padding:'20px 24px'}}>
+          {p.content}
+        </div>
+      </div>
+    </>
+  );
+}
+
 function ExecInsightsPage(){
   const chartRef=React.useRef(null);
   const chartInst=React.useRef(null);
   const [tickerIdx,setTickerIdx]=React.useState(0);
   const [tickerAnim,setTickerAnim]=React.useState(true);
+  const [detailPanel,setDetailPanel]=React.useState(null);
 
   const aiTips=[
     {tag:'Anomalie Region',msg:'In Region Süd steigt die Fehlerquote bei Modell HP-500 um +31%. Empfehlung: Gezielte Schulung für 2 Techniker vor Ort einplanen.'},
@@ -5282,6 +5519,7 @@ function ExecInsightsPage(){
 
   const kpiCards=[
     {
+      id:'umsatz',
       accent:'#EAB308',glow:'rgba(234,179,8,',border:'rgba(234,179,8,0.22)',
       tag:'KI-Empfehlung',tagIcon:<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>,
       label:'Umsatz-Potenzial',
@@ -5298,6 +5536,7 @@ function ExecInsightsPage(){
       </div>,
     },
     {
+      id:'effizienz',
       accent:'#06B6D4',glow:'rgba(6,182,212,',border:'rgba(6,182,212,0.22)',
       tag:'Effizienz',tagIcon:<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
       label:'Bearbeitungszeit pro Fall',
@@ -5310,6 +5549,7 @@ function ExecInsightsPage(){
       extra:<div style={{marginTop:'14px',display:'flex',alignItems:'center',gap:'6px'}}><span style={{fontSize:'13px',fontWeight:700,color:'#4ade80'}}>↓ 41%</span><span style={{fontSize:'12px',color:'#64748b'}}>Reduktion durch Auto-Dokumentation</span></div>,
     },
     {
+      id:'produktivitaet',
       accent:'#a78bfa',glow:'rgba(139,92,246,',border:'rgba(139,92,246,0.22)',
       tag:'Produktivität',tagIcon:<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
       label:'Techniker-Produktivität',
@@ -5348,8 +5588,16 @@ function ExecInsightsPage(){
       {/* 3 KPI tiles */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px',marginBottom:'20px'}}>
         {kpiCards.map((c,i)=>(
-          <div key={i} style={{background:'rgba(13,14,18,0.85)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',border:`1px solid ${c.border}`,borderRadius:'16px',padding:'24px',position:'relative',overflow:'hidden'}}>
+          <div key={i} onClick={()=>setDetailPanel(c.id)}
+            style={{background:'rgba(13,14,18,0.85)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',border:`1px solid ${c.border}`,borderRadius:'16px',padding:'24px',position:'relative',overflow:'hidden',cursor:'pointer',transition:'transform 0.15s,box-shadow 0.15s'}}
+            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow=`0 8px 32px ${c.glow}0.15)`;}}
+            onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none';}}>
             <div style={{position:'absolute',top:0,right:0,width:'140px',height:'140px',background:`radial-gradient(circle at 80% 15%,${c.glow}0.1),transparent 65%)`,pointerEvents:'none'}}/>
+            {/* "Details" hint */}
+            <div style={{position:'absolute',top:'14px',right:'14px',fontSize:'10px',fontWeight:600,color:c.accent,opacity:0.5,display:'flex',alignItems:'center',gap:'3px'}}>
+              Details
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
             <div style={{fontSize:'10px',fontWeight:700,color:c.accent,letterSpacing:'1px',textTransform:'uppercase',marginBottom:'12px',display:'flex',alignItems:'center',gap:'5px'}}>
               {c.tagIcon}{c.tag}
             </div>
@@ -5408,6 +5656,8 @@ function ExecInsightsPage(){
         </div>
 
       </div>
+
+      <ExecDetailPanel panel={detailPanel} onClose={()=>setDetailPanel(null)}/>
     </div>
   );
 }
