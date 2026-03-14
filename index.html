@@ -71,6 +71,25 @@ select option{background:#1a1a1a;color:#fff;}
 .diag-border-warn{animation:borderPulseAmber 2s ease-in-out infinite;}
 .clickable-tile{cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;}
 .clickable-tile:active{transform:scale(0.97);}
+/* ── Expert-Vault / Magic Scan ───────────────────── */
+@keyframes vaultScanLine{0%{top:8%;}100%{top:88%;}}
+.vault-scan-line{position:absolute;left:6%;right:6%;height:2px;background:linear-gradient(90deg,transparent,#00E5FF,#00FF87,#00E5FF,transparent);animation:vaultScanLine 1.8s ease-in-out infinite alternate;box-shadow:0 0 12px #00E5FF,0 0 24px rgba(0,229,255,0.4);}
+@keyframes cornerPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.vault-corner{position:absolute;width:22px;height:22px;animation:cornerPulse 1.2s ease-in-out infinite;}
+.vault-corner.tl{top:8%;left:6%;border-top:2px solid #00E5FF;border-left:2px solid #00E5FF;}
+.vault-corner.tr{top:8%;right:6%;border-top:2px solid #00E5FF;border-right:2px solid #00E5FF;}
+.vault-corner.bl{bottom:12%;left:6%;border-bottom:2px solid #00E5FF;border-left:2px solid #00E5FF;}
+.vault-corner.br{bottom:12%;right:6%;border-bottom:2px solid #00E5FF;border-right:2px solid #00E5FF;}
+@keyframes glitchH{0%,95%,100%{transform:translateX(0);}96%{transform:translateX(-3px);}97%{transform:translateX(3px);}98%{transform:translateX(-2px);}}
+.glitch-text{animation:glitchH 4s ease-in-out infinite;}
+@keyframes xpFill{from{width:0%;}to{width:var(--xp-w);}}
+.xp-fill{animation:xpFill 1.2s cubic-bezier(0.34,1.2,0.64,1) forwards;}
+@keyframes resultSlideUp{from{opacity:0;transform:translateY(60px);}to{opacity:1;transform:translateY(0);}}
+.result-slide-up{animation:resultSlideUp 0.4s cubic-bezier(0.34,1.1,0.64,1) forwards;}
+@keyframes neonBorder{0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,0.08);}50%{box-shadow:0 0 20px #00E5FF,0 0 40px rgba(0,229,255,0.3),inset 0 0 14px rgba(0,229,255,0.12);}}
+.neon-border-anim{animation:neonBorder 2s ease-in-out infinite;}
+@keyframes scanReady{0%{opacity:0;transform:scale(0.9);}100%{opacity:1;transform:scale(1);}}
+.scan-ready{animation:scanReady 0.35s ease-out forwards;}
 /* ── ERP Bridge Card ─────────────────────────────── */
 @keyframes erpSpinner{to{transform:rotate(360deg);}}
 @keyframes erpSuccessPop{0%{transform:scale(0.5);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
@@ -2268,7 +2287,185 @@ function ScanModal({onClose,onFound}){
 }
 
 // ── MOBILE HOME ───────────────────────────────────────────────────────────────
-function MobileHome({user,orders,onScan,onNavigate,onSelectAsset}){
+/* ─────────────────────────────────────────────────────────
+   Magic Scan Modal — Cyberpunk Camera Interface
+───────────────────────────────────────────────────────── */
+const MAGIC_SCAN_DB=[
+  {name:'Hydraulikpumpe A6VM',serial:'HYD-2024-00441',hersteller:'Bosch Rexroth',baujahr:'2021',druck:'350 bar',leistung:'75 kW',status:'OK',wartung:'850h / 1000h',tutorial:'Hydraulikpumpe – Demontage & Inspektion',tutorialDauer:'12 Min',match:'98.4%'},
+  {name:'Drehantrieb CAT R12',serial:'CAT-R12-00882',hersteller:'Caterpillar Inc.',baujahr:'2022',druck:'280 bar',leistung:'45 kW',status:'WARTUNG',wartung:'1120h / 1000h',tutorial:'Drehkranz – Schmierung & Einstellung',tutorialDauer:'8 Min',match:'96.1%'},
+  {name:'Steuerventil NG16',serial:'VAL-NG16-00213',hersteller:'Parker Hannifin',baujahr:'2020',druck:'420 bar',leistung:'—',status:'OK',wartung:'200h / 500h',tutorial:'Steuerventil – Fehlerdiagnose & Reset',tutorialDauer:'6 Min',match:'99.2%'},
+  {name:'Schwenkmotor SM-400',serial:'SM-400-00719',hersteller:'Danfoss',baujahr:'2023',druck:'310 bar',leistung:'55 kW',status:'OK',wartung:'300h / 750h',tutorial:'Schwenkmotor – Drucktest & Einstellung',tutorialDauer:'10 Min',match:'97.8%'},
+];
+
+function MagicScanModal({onClose}){
+  const [phase,setPhase]=React.useState('scanning'); // scanning | result
+  const [result,setResult]=React.useState(null);
+  const [dots,setDots]=React.useState('');
+
+  React.useEffect(()=>{
+    const iv=setInterval(()=>setDots(d=>d.length>=3?'':d+'.'),400);
+    return()=>clearInterval(iv);
+  },[]);
+
+  React.useEffect(()=>{
+    const t=setTimeout(()=>{
+      const r=MAGIC_SCAN_DB[Math.floor(Math.random()*MAGIC_SCAN_DB.length)];
+      setResult(r);
+      setPhase('result');
+    },2600);
+    return()=>clearTimeout(t);
+  },[]);
+
+  const statusColor=result?.status==='WARTUNG'?'#FFB800':'#00FF87';
+
+  return(
+    <div style={{position:'fixed',inset:0,zIndex:300,background:'#050508',display:'flex',flexDirection:'column',fontFamily:"'Inter',sans-serif"}}>
+
+      {/* Top bar */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px',borderBottom:'1px solid rgba(0,229,255,0.15)',background:'rgba(0,0,0,0.8)',backdropFilter:'blur(10px)',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+          <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#00E5FF',boxShadow:'0 0 8px #00E5FF',animation:'statusGlow 1s ease-in-out infinite'}}/>
+          <span style={{fontSize:'11px',fontWeight:700,color:'#00E5FF',letterSpacing:'2px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>MAGIC SCAN</span>
+        </div>
+        <button onClick={onClose} style={{width:'32px',height:'32px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.1)',color:'#64748b',fontSize:'16px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+      </div>
+
+      {phase==='scanning'&&(
+        <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px',position:'relative'}}>
+
+          {/* Fake camera grid bg */}
+          <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px)',backgroundSize:'40px 40px',pointerEvents:'none'}}/>
+
+          {/* Viewfinder */}
+          <div style={{position:'relative',width:'100%',maxWidth:'300px',aspectRatio:'1',background:'rgba(0,229,255,0.02)',border:'1px solid rgba(0,229,255,0.15)',borderRadius:'8px',overflow:'hidden'}} className="neon-border-anim">
+
+            {/* Simulated blurry "component" bg */}
+            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <div style={{width:'60%',height:'45%',background:'linear-gradient(135deg,rgba(0,229,255,0.06),rgba(0,255,135,0.04))',border:'1px solid rgba(0,229,255,0.1)',borderRadius:'6px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <div style={{fontSize:'10px',color:'rgba(0,229,255,0.25)',fontFamily:"'JetBrains Mono',monospace",textAlign:'center',lineHeight:1.8}}>
+                  <div>███████</div><div>█ ··· █</div><div>███████</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Scan line */}
+            <div className="vault-scan-line"/>
+
+            {/* Corners */}
+            <div className="vault-corner tl"/><div className="vault-corner tr"/>
+            <div className="vault-corner bl"/><div className="vault-corner br"/>
+
+            {/* Center crosshair */}
+            <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:'14px',height:'14px'}}>
+              <div style={{position:'absolute',top:'50%',left:0,right:0,height:'1px',background:'rgba(0,229,255,0.6)'}}/>
+              <div style={{position:'absolute',left:'50%',top:0,bottom:0,width:'1px',background:'rgba(0,229,255,0.6)'}}/>
+            </div>
+          </div>
+
+          {/* Status text */}
+          <div style={{marginTop:'28px',textAlign:'center'}}>
+            <div style={{fontSize:'13px',fontWeight:700,color:'#00E5FF',letterSpacing:'2px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace",marginBottom:'8px'}} className="glitch-text">
+              BAUTEIL ANALYSIEREN{dots}
+            </div>
+            <div style={{fontSize:'11px',color:'rgba(0,229,255,0.4)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'1px'}}>KI-MODELL WIRD GELADEN</div>
+          </div>
+
+          {/* Data stream lines */}
+          <div style={{marginTop:'24px',fontFamily:"'JetBrains Mono',monospace",fontSize:'10px',color:'rgba(0,229,255,0.25)',lineHeight:1.8,textAlign:'center'}}>
+            {['SYS > scan.init(camera_feed)','> loading model: CV-3.7.1','> matching database: 4.820 parts','> neural_match running...'].map((l,i)=>(
+              <div key={i} style={{opacity:1-i*0.2}}>{l}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {phase==='result'&&result&&(
+        <div style={{flex:1,overflowY:'auto',padding:'20px'}}>
+
+          {/* Match badge */}
+          <div className="scan-ready" style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'20px'}}>
+            <div style={{flex:1,height:'1px',background:'rgba(0,255,135,0.2)'}}/>
+            <span style={{fontSize:'10px',fontWeight:700,color:'#00FF87',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>BAUTEIL IDENTIFIZIERT · {result.match}</span>
+            <div style={{flex:1,height:'1px',background:'rgba(0,255,135,0.2)'}}/>
+          </div>
+
+          {/* Main result card */}
+          <div className="result-slide-up" style={{background:'rgba(0,229,255,0.04)',border:'1px solid rgba(0,229,255,0.18)',borderRadius:'16px',padding:'20px',marginBottom:'16px',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,right:0,width:'100px',height:'100px',background:'radial-gradient(circle at 90% 10%,rgba(0,229,255,0.1),transparent 70%)',pointerEvents:'none'}}/>
+
+            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:'16px'}}>
+              <div>
+                <div style={{fontSize:'17px',fontWeight:800,color:'#fff',letterSpacing:'-0.3px',marginBottom:'4px'}}>{result.name}</div>
+                <div style={{fontSize:'11px',color:'rgba(0,229,255,0.6)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.5px'}}>{result.serial}</div>
+              </div>
+              <span style={{fontSize:'11px',fontWeight:700,background:result.status==='WARTUNG'?'rgba(255,184,0,0.12)':'rgba(0,255,135,0.1)',color:statusColor,border:`1px solid ${result.status==='WARTUNG'?'rgba(255,184,0,0.3)':'rgba(0,255,135,0.3)'}`,borderRadius:'8px',padding:'4px 10px',flexShrink:0}}>{result.status}</span>
+            </div>
+
+            {/* Tech specs grid */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+              {[
+                ['Hersteller',result.hersteller],
+                ['Baujahr',result.baujahr],
+                ['Max. Druck',result.druck],
+                ['Leistung',result.leistung],
+                ['Wartung',result.wartung,'full'],
+              ].map(([l,v,full])=>(
+                <div key={l} style={{gridColumn:full?'1/-1':'',background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'8px',padding:'9px 11px'}}>
+                  <div style={{fontSize:'9px',fontWeight:700,color:'#475569',letterSpacing:'0.8px',textTransform:'uppercase',marginBottom:'3px'}}>{l}</div>
+                  <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0',fontFamily:"'JetBrains Mono',monospace"}}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Wartungswarnung */}
+          {result.status==='WARTUNG'&&(
+            <div className="result-slide-up" style={{background:'rgba(255,184,0,0.06)',border:'1px solid rgba(255,184,0,0.25)',borderRadius:'12px',padding:'14px 16px',marginBottom:'16px',display:'flex',gap:'10px',animationDelay:'0.1s'}}>
+              <span style={{fontSize:'18px',flexShrink:0}}>⚠</span>
+              <div>
+                <div style={{fontSize:'13px',fontWeight:700,color:'#FFB800',marginBottom:'3px'}}>Wartung überfällig</div>
+                <div style={{fontSize:'12px',color:'rgba(255,184,0,0.7)',lineHeight:1.5}}>Wartungsintervall um 120h überschritten. Serviceauftrag empfohlen.</div>
+              </div>
+            </div>
+          )}
+
+          {/* Video Tutorial */}
+          <div className="result-slide-up" style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.2)',borderRadius:'14px',padding:'16px',marginBottom:'20px',animationDelay:'0.15s'}}>
+            <div style={{fontSize:'10px',fontWeight:700,color:'#a78bfa',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'10px',display:'flex',alignItems:'center',gap:'5px'}}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Video-Tutorial
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+              <div style={{width:'52px',height:'52px',borderRadius:'10px',background:'rgba(139,92,246,0.15)',border:'1px solid rgba(139,92,246,0.25)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#a78bfa" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0',marginBottom:'4px',lineHeight:1.3}}>{result.tutorial}</div>
+                <div style={{fontSize:'11px',color:'#64748b'}}>{result.tutorialDauer} · HD · Deutsch</div>
+              </div>
+            </div>
+            <button style={{marginTop:'12px',width:'100%',background:'linear-gradient(135deg,rgba(139,92,246,0.2),rgba(99,102,241,0.2))',border:'1px solid rgba(139,92,246,0.3)',borderRadius:'10px',padding:'11px',color:'#c4b5fd',fontSize:'13px',fontWeight:700,cursor:'pointer',letterSpacing:'0.5px',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Tutorial starten
+            </button>
+          </div>
+
+          {/* Action buttons */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginBottom:'8px'}}>
+            <button style={{background:'rgba(0,229,255,0.08)',border:'1px solid rgba(0,229,255,0.2)',borderRadius:'12px',padding:'13px',color:'#00E5FF',fontSize:'12px',fontWeight:700,cursor:'pointer',letterSpacing:'0.5px'}}>
+              Auftrag anlegen
+            </button>
+            <button onClick={()=>{setPhase('scanning');setResult(null);}} style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'12px',padding:'13px',color:'#64748b',fontSize:'12px',fontWeight:700,cursor:'pointer',letterSpacing:'0.5px'}}>
+              Erneut scannen
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileHome({user,orders,onScan,onNavigate,onSelectAsset,onMagicScan}){
   const elevated=['SERVICELEITER','ADMIN','CEO'].includes(user.role);
   const kpiTiles=[
     {label:'Aktive Fehler',value:'3',color:'text-red-400',border:'border-red-500/20',nav:'auftraege',sub:'2 kritisch',
@@ -2312,6 +2509,97 @@ function MobileHome({user,orders,onScan,onNavigate,onSelectAsset}){
           <IconQR size={24}/>
           MASCHINE SCANNEN
         </button>
+
+        {/* ── EXPERT VAULT ───────────────────────── */}
+        <div style={{background:'linear-gradient(135deg,#0a0a12,#0d0f18)',border:'1px solid rgba(0,229,255,0.18)',borderRadius:'20px',padding:'18px',position:'relative',overflow:'hidden'}}>
+
+          {/* BG grid */}
+          <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px)',backgroundSize:'28px 28px',pointerEvents:'none',borderRadius:'20px'}}/>
+
+          {/* Corner accents */}
+          <div style={{position:'absolute',top:'10px',left:'10px',width:'14px',height:'14px',borderTop:'1.5px solid rgba(0,229,255,0.5)',borderLeft:'1.5px solid rgba(0,229,255,0.5)'}}/>
+          <div style={{position:'absolute',top:'10px',right:'10px',width:'14px',height:'14px',borderTop:'1.5px solid rgba(0,229,255,0.5)',borderRight:'1.5px solid rgba(0,229,255,0.5)'}}/>
+
+          {/* Header */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px',position:'relative'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+              <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#00E5FF',boxShadow:'0 0 8px #00E5FF',animation:'statusGlow 1.5s ease-in-out infinite'}}/>
+              <span style={{fontSize:'11px',fontWeight:800,color:'#00E5FF',letterSpacing:'2.5px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>EXPERT VAULT</span>
+            </div>
+            <span style={{fontSize:'10px',fontWeight:700,background:'rgba(0,229,255,0.08)',color:'rgba(0,229,255,0.6)',border:'1px solid rgba(0,229,255,0.15)',borderRadius:'20px',padding:'2px 8px',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.5px'}}>v2.4.1</span>
+          </div>
+
+          {/* IMPACT HEUTE */}
+          <div style={{marginBottom:'16px',position:'relative'}}>
+            <div style={{fontSize:'10px',fontWeight:700,color:'#475569',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'10px'}}>Dein Impact heute</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+              {/* Gelöste Fälle */}
+              <div style={{background:'rgba(0,255,135,0.05)',border:'1px solid rgba(0,255,135,0.15)',borderRadius:'12px',padding:'12px 14px'}}>
+                <div style={{fontSize:'26px',fontWeight:800,color:'#00FF87',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 16px rgba(0,255,135,0.5)',marginBottom:'4px'}}>3</div>
+                <div style={{fontSize:'10px',color:'rgba(0,255,135,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>gelöste Fälle</div>
+                <div style={{fontSize:'9px',color:'#334155',marginTop:'3px',fontFamily:"'JetBrains Mono',monospace"}}>+2 vs. gestern</div>
+              </div>
+              {/* Zeitersparnis */}
+              <div style={{background:'rgba(0,229,255,0.05)',border:'1px solid rgba(0,229,255,0.15)',borderRadius:'12px',padding:'12px 14px'}}>
+                <div style={{fontSize:'26px',fontWeight:800,color:'#00E5FF',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 16px rgba(0,229,255,0.5)',marginBottom:'4px'}}>120</div>
+                <div style={{fontSize:'10px',color:'rgba(0,229,255,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>Min. gespart</div>
+                <div style={{fontSize:'9px',color:'#334155',marginTop:'3px',fontFamily:"'JetBrains Mono',monospace"}}>durch KI-Doku</div>
+              </div>
+            </div>
+          </div>
+
+          {/* LEVEL UP SYSTEM */}
+          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'12px',padding:'12px 14px',marginBottom:'16px',position:'relative'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                <div style={{width:'28px',height:'28px',borderRadius:'8px',background:'linear-gradient(135deg,rgba(234,179,8,0.2),rgba(250,204,21,0.1))',border:'1px solid rgba(234,179,8,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px'}}>⚡</div>
+                <div>
+                  <div style={{fontSize:'13px',fontWeight:800,color:'#EAB308',letterSpacing:'-0.3px',textShadow:'0 0 12px rgba(234,179,8,0.4)'}}>Level 5</div>
+                  <div style={{fontSize:'10px',color:'rgba(234,179,8,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>SERVICE-PRO</div>
+                </div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',fontFamily:"'JetBrains Mono',monospace"}}>2480 / 3000</div>
+                <div style={{fontSize:'9px',color:'#334155'}}>XP bis Level 6</div>
+              </div>
+            </div>
+            {/* XP Bar */}
+            <div style={{height:'6px',borderRadius:'3px',background:'rgba(255,255,255,0.05)',overflow:'hidden',position:'relative'}}>
+              <div className="xp-fill" style={{'--xp-w':'82.7%',height:'100%',borderRadius:'3px',background:'linear-gradient(90deg,#EAB308,#F59E0B,#FBBF24)',boxShadow:'0 0 10px rgba(234,179,8,0.6)'}}/>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',marginTop:'5px'}}>
+              <span style={{fontSize:'9px',color:'#334155',fontFamily:"'JetBrains Mono',monospace"}}>Level 5</span>
+              <span style={{fontSize:'9px',color:'rgba(234,179,8,0.4)',fontFamily:"'JetBrains Mono',monospace"}}>82% → Level 6</span>
+            </div>
+            {/* Badges */}
+            <div style={{display:'flex',gap:'6px',marginTop:'10px'}}>
+              {[['🏆','Top Technik'],['⚡','Speed Pro'],['🎯','Erstlösung']].map(([e,l])=>(
+                <div key={l} style={{flex:1,background:'rgba(234,179,8,0.05)',border:'1px solid rgba(234,179,8,0.12)',borderRadius:'8px',padding:'5px 4px',textAlign:'center'}}>
+                  <div style={{fontSize:'14px',marginBottom:'2px'}}>{e}</div>
+                  <div style={{fontSize:'8px',color:'rgba(234,179,8,0.5)',fontWeight:600,letterSpacing:'0.3px'}}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* MAGIC SCAN Button */}
+          <button onClick={onMagicScan}
+            style={{width:'100%',background:'linear-gradient(135deg,rgba(0,229,255,0.12),rgba(0,255,135,0.06))',border:'1px solid rgba(0,229,255,0.3)',borderRadius:'14px',padding:'16px',cursor:'pointer',position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'}}
+            className="neon-border-anim btn-press">
+            <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,transparent 40%,rgba(0,229,255,0.05))',pointerEvents:'none'}}/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" style={{filter:'drop-shadow(0 0 6px #00E5FF)',flexShrink:0}}>
+              <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+              <circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/>
+            </svg>
+            <div>
+              <div style={{fontSize:'14px',fontWeight:800,color:'#00E5FF',letterSpacing:'2px',textTransform:'uppercase',textShadow:'0 0 12px rgba(0,229,255,0.6)'}}>MAGIC SCAN</div>
+              <div style={{fontSize:'9px',color:'rgba(0,229,255,0.5)',letterSpacing:'1px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>KI-Bauteilerkennung</div>
+            </div>
+          </button>
+
+        </div>
+        {/* ── END EXPERT VAULT ──────────────────── */}
+
         <div>
           <div className="flex items-center justify-between mb-3">
             <div className="text-gray-400 text-xs uppercase tracking-wider">Letzte Aktivität</div>
@@ -2865,6 +3153,7 @@ function ScanFAB({onPress}){
 function MobileApp({user,onLogout}){
   const [screen,setScreen]=React.useState('home');
   const [showScan,setShowScan]=React.useState(false);
+  const [showMagicScan,setShowMagicScan]=React.useState(false);
   const [orders]=useSharedOrders();
   const [selectedAsset,setSelectedAsset]=React.useState(null);
   React.useEffect(()=>{_navigateToAsset=setSelectedAsset;return()=>{_navigateToAsset=null;};},[]);
@@ -2875,7 +3164,7 @@ function MobileApp({user,onLogout}){
   return(
     <div className="bg-mob-bg min-h-screen text-white font-sans" style={{maxWidth:'448px',margin:'0 auto',position:'relative'}}>
       <div className="overflow-y-auto" style={{paddingBottom:'90px'}}>
-        {screen==='home'&&<MobileHome user={user} orders={orders} onScan={()=>setShowScan(true)} onNavigate={setScreen} onSelectAsset={setSelectedAsset}/>}
+        {screen==='home'&&<MobileHome user={user} orders={orders} onScan={()=>setShowScan(true)} onMagicScan={()=>setShowMagicScan(true)} onNavigate={setScreen} onSelectAsset={setSelectedAsset}/>}
         {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders} onSelectAsset={setSelectedAsset}/>}
         {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout} onNavigate={setScreen}/>}
       </div>
@@ -2915,6 +3204,7 @@ function MobileApp({user,onLogout}){
         </button>
       </div>
       {showScan&&<ScanModal onClose={()=>setShowScan(false)} onFound={name=>{setShowScan(false);const a=ASSETS_DB.find(x=>x.name===name);if(a)setSelectedAsset(a);}}/>}
+      {showMagicScan&&<MagicScanModal onClose={()=>setShowMagicScan(false)}/>}
     </div>
   );
 }
