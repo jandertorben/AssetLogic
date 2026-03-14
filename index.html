@@ -2415,10 +2415,85 @@ function MobileAuftraege({user,orders,onSelectAsset}){
 function MobileProfil({user,onLogout,onNavigate}){
   const [notif,setNotif]=React.useState(true);
   const [dark,setDark]=React.useState(true);
+  const [showUrlaub,setShowUrlaub]=React.useState(false);
+  const [showOvertime,setShowOvertime]=React.useState(false);
+  // vacation modal state
+  const [pickerYear,setPickerYear]=React.useState(2026);
+  const [pickerMonth,setPickerMonth]=React.useState(2);
+  const [fromDate,setFromDate]=React.useState(null);
+  const [toDate,setToDate]=React.useState(null);
+  const [submitState,setSubmitState]=React.useState('idle'); // idle|loading|success
+
   const myDone=_globalOrders.filter(o=>o.techId===user.techId&&o.status==='ABGESCHLOSSEN').length;
   const myActive=_globalOrders.filter(o=>o.techId===user.techId&&o.status!=='ABGESCHLOSSEN').length;
+
+  const MONTH_NAMES=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const DOW=['Mo','Di','Mi','Do','Fr','Sa','So'];
+
+  function buildCal(y,m){
+    const first=new Date(y,m,1),last=new Date(y,m+1,0);
+    let dow=first.getDay();dow=dow===0?6:dow-1;
+    const days=[];
+    for(let i=0;i<dow;i++) days.push(null);
+    for(let i=1;i<=last.getDate();i++) days.push(new Date(y,m,i));
+    while(days.length%7!==0) days.push(null);
+    return days;
+  }
+
+  function toISO(d){
+    if(!d)return null;
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function fmtShort(iso){
+    if(!iso)return'–';
+    const d=new Date(iso+'T00:00:00');
+    return d.toLocaleDateString('de-DE',{day:'2-digit',month:'short'});
+  }
+
+  function countDays(f,t){
+    if(!f||!t)return 0;
+    const diff=(new Date(t+'T00:00:00')-new Date(f+'T00:00:00'))/(1000*60*60*24);
+    return Math.round(diff)+1;
+  }
+
+  function handleDayTap(d){
+    if(!d)return;
+    const iso=toISO(d);
+    if(!fromDate||(fromDate&&toDate)){setFromDate(iso);setToDate(null);}
+    else if(iso<fromDate){setFromDate(iso);setToDate(fromDate);}
+    else if(iso===fromDate){setFromDate(null);}
+    else{setToDate(iso);}
+  }
+
+  function inRange(d){
+    if(!d||!fromDate||!toDate)return false;
+    const iso=toISO(d);return iso>fromDate&&iso<toDate;
+  }
+  function isFrom(d){return d&&toISO(d)===fromDate;}
+  function isTo(d){return d&&toISO(d)===toDate;}
+
+  function openUrlaub(){setShowUrlaub(true);setFromDate(null);setToDate(null);setSubmitState('idle');setPickerYear(2026);setPickerMonth(2);}
+
+  function handleSubmit(){
+    if(submitState!=='idle'||!fromDate||!toDate)return;
+    setSubmitState('loading');
+    setTimeout(()=>setSubmitState('success'),1900);
+  }
+
+  function isPast(d){
+    if(!d)return false;
+    const today=new Date(2026,2,14);
+    return d<today;
+  }
+
+  const calDays=buildCal(pickerYear,pickerMonth);
+  const dayCount=countDays(fromDate,toDate);
+
   return(
     <div className="page-enter px-5 pt-8 pb-28 space-y-6">
+
+      {/* Avatar + name */}
       <div className="flex flex-col items-center gap-3">
         <div className="w-20 h-20 rounded-full bg-[#2979FF]/20 flex items-center justify-center text-[#2979FF] font-bold text-2xl">{user.initials}</div>
         <div className="text-center">
@@ -2427,6 +2502,8 @@ function MobileProfil({user,onLogout,onNavigate}){
           <div className="text-gray-500 text-sm mt-1">{user.email}</div>
         </div>
       </div>
+
+      {/* Stats */}
       <div className="bg-mob-card border border-mob-border rounded-2xl p-4">
         <div className="text-gray-400 text-xs uppercase tracking-wider mb-3">Meine Statistiken</div>
         <div className="grid grid-cols-2 gap-3">
@@ -2444,6 +2521,63 @@ function MobileProfil({user,onLogout,onNavigate}){
           </button>
         </div>
       </div>
+
+      {/* ── Meine Zeit ── */}
+      <div className="bg-mob-card border border-mob-border rounded-2xl p-4">
+        <div className="text-gray-400 text-xs uppercase tracking-wider mb-3">Meine Zeit</div>
+        <div className="grid grid-cols-2 gap-3">
+
+          {/* Urlaub planen */}
+          <button onClick={openUrlaub}
+            className="btn-press text-left rounded-2xl p-4 transition-all active:scale-95"
+            style={{background:'rgba(34,197,94,0.06)',border:'1px solid rgba(34,197,94,0.2)'}}>
+            <div style={{fontSize:'22px',marginBottom:'6px'}}>🏖️</div>
+            <div style={{fontSize:'13px',fontWeight:700,color:'#fff',lineHeight:1.2}}>Urlaub planen</div>
+            <div style={{fontSize:'11px',color:'#4ade80',marginTop:'4px',fontWeight:600}}>18 Tage frei</div>
+            <div style={{fontSize:'10px',color:'#475569',marginTop:'2px'}}>Verfügbar 2026</div>
+          </button>
+
+          {/* Überstunden-Konto */}
+          <button onClick={()=>setShowOvertime(v=>!v)}
+            className="btn-press text-left rounded-2xl p-4 transition-all active:scale-95"
+            style={{background:'rgba(245,158,11,0.06)',border:'1px solid rgba(245,158,11,0.2)'}}>
+            <div style={{fontSize:'22px',marginBottom:'6px'}}>⏱️</div>
+            <div style={{fontSize:'13px',fontWeight:700,color:'#fff',lineHeight:1.2}}>Überstunden</div>
+            <div style={{fontSize:'16px',fontWeight:800,color:'#fbbf24',fontFamily:"'JetBrains Mono',monospace",marginTop:'4px'}}>+12.5h</div>
+            <div style={{fontSize:'10px',color:'#475569',marginTop:'2px'}}>Konto-Stand</div>
+          </button>
+        </div>
+
+        {/* Überstunden inline expand */}
+        {showOvertime&&(
+          <div className="mt-3 rounded-xl overflow-hidden" style={{border:'1px solid rgba(245,158,11,0.18)',background:'rgba(245,158,11,0.04)'}}>
+            <div style={{padding:'12px 14px',borderBottom:'1px solid rgba(245,158,11,0.12)'}}>
+              <div style={{fontSize:'11px',fontWeight:600,color:'#fbbf24',letterSpacing:'0.6px',textTransform:'uppercase',marginBottom:'10px'}}>Überstunden-Konto · März 2026</div>
+              {[
+                {label:'Aufgebaute Überstunden',val:'+12.5h',c:'#fbbf24'},
+                {label:'Genehmigt zur Auszahlung',val:'0h',c:'#475569'},
+                {label:'Abbau-Ziel bis 31.03.',val:'–8.0h',c:'#60a5fa'},
+                {label:'Verbleibend (Prognose)',val:'+4.5h',c:'#4ade80'},
+              ].map(({label,val,c})=>(
+                <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'7px'}}>
+                  <span style={{fontSize:'12px',color:'#94a3b8'}}>{label}</span>
+                  <span style={{fontSize:'13px',fontWeight:700,color:c,fontFamily:"'JetBrains Mono',monospace"}}>{val}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{padding:'10px 14px',display:'flex',gap:'8px'}}>
+              <button style={{flex:1,padding:'9px',borderRadius:'10px',border:'1px solid rgba(245,158,11,0.25)',background:'rgba(245,158,11,0.08)',color:'#fbbf24',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'Inter,sans-serif'}}>
+                Auszahlung beantragen
+              </button>
+              <button onClick={()=>setShowOvertime(false)} style={{padding:'9px 12px',borderRadius:'10px',border:'1px solid rgba(255,255,255,0.06)',background:'transparent',color:'#475569',fontSize:'12px',cursor:'pointer',fontFamily:'Inter,sans-serif'}}>
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Settings */}
       <div className="bg-mob-card border border-mob-border rounded-2xl p-4 space-y-4">
         <div className="text-gray-400 text-xs uppercase tracking-wider">Einstellungen</div>
         {[['Benachrichtigungen',notif,setNotif],['Dark Mode',dark,setDark]].map(([label,val,setter])=>(
@@ -2455,9 +2589,153 @@ function MobileProfil({user,onLogout,onNavigate}){
           </div>
         ))}
       </div>
+
       <button onClick={onLogout} className="btn-press w-full py-3 rounded-2xl border border-red-500/30 text-red-400 font-semibold text-sm bg-red-500/10 hover:bg-red-500/20 transition-colors">
         Abmelden
       </button>
+
+      {/* ── Urlaub-Modal ── */}
+      {showUrlaub&&(<>
+        <div className="fixed inset-0 z-[88]"
+          style={{background:'rgba(0,0,0,0.75)',backdropFilter:'blur(10px)',WebkitBackdropFilter:'blur(10px)'}}
+          onClick={()=>{if(submitState!=='loading')setShowUrlaub(false);}}/>
+        <div className="fixed inset-x-0 bottom-0 z-[89] diag-slide-in"
+          style={{background:'rgba(8,11,20,0.97)',backdropFilter:'blur(28px)',WebkitBackdropFilter:'blur(28px)',
+            borderTop:'1px solid rgba(34,197,94,0.2)',borderLeft:'1px solid rgba(34,197,94,0.1)',borderRight:'1px solid rgba(34,197,94,0.1)',
+            borderRadius:'24px 24px 0 0',maxHeight:'90vh',overflowY:'auto',boxShadow:'0 -16px 60px rgba(0,0,0,0.7),0 0 0 1px rgba(34,197,94,0.06)'}}>
+
+          {/* Handle */}
+          <div style={{display:'flex',justifyContent:'center',padding:'12px 0 4px'}}>
+            <div style={{width:'36px',height:'4px',borderRadius:'2px',background:'rgba(255,255,255,0.1)'}}/>
+          </div>
+
+          {/* Header */}
+          <div style={{padding:'8px 20px 14px',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <div>
+                <div style={{fontSize:'17px',fontWeight:700,color:'#fff'}}>Urlaub planen</div>
+                <div style={{fontSize:'12px',color:'#475569',marginTop:'2px'}}>Zeitraum wählen · 18 Tage verfügbar</div>
+              </div>
+              <button onClick={()=>setShowUrlaub(false)}
+                style={{width:'32px',height:'32px',borderRadius:'8px',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',display:'flex',alignItems:'center',justifyContent:'center',color:'#64748b',cursor:'pointer',fontSize:'16px'}}>
+                ✕
+              </button>
+            </div>
+
+            {/* Selected range display */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:'8px',alignItems:'center',marginTop:'14px'}}>
+              <div style={{background:fromDate?'rgba(34,197,94,0.1)':'rgba(255,255,255,0.03)',border:`1px solid ${fromDate?'rgba(34,197,94,0.3)':'rgba(255,255,255,0.06)'}`,borderRadius:'10px',padding:'10px 12px'}}>
+                <div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.6px',textTransform:'uppercase',marginBottom:'3px'}}>Von</div>
+                <div style={{fontSize:'14px',fontWeight:700,color:fromDate?'#4ade80':'#334155'}}>{fmtShort(fromDate)}</div>
+              </div>
+              <div style={{color:'#334155',fontSize:'14px',fontWeight:600}}>→</div>
+              <div style={{background:toDate?'rgba(34,197,94,0.1)':'rgba(255,255,255,0.03)',border:`1px solid ${toDate?'rgba(34,197,94,0.3)':'rgba(255,255,255,0.06)'}`,borderRadius:'10px',padding:'10px 12px'}}>
+                <div style={{fontSize:'10px',color:'#475569',fontWeight:600,letterSpacing:'0.6px',textTransform:'uppercase',marginBottom:'3px'}}>Bis</div>
+                <div style={{fontSize:'14px',fontWeight:700,color:toDate?'#4ade80':'#334155'}}>{fmtShort(toDate)}</div>
+              </div>
+            </div>
+            {dayCount>0&&(
+              <div style={{textAlign:'center',marginTop:'8px',fontSize:'12px',color:'#4ade80',fontWeight:600}}>
+                {dayCount} Tage · noch {18-dayCount} verbleibend
+              </div>
+            )}
+          </div>
+
+          {/* Calendar */}
+          <div style={{padding:'16px 16px 8px'}}>
+            {/* Month nav */}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'14px',padding:'0 4px'}}>
+              <button onClick={()=>{if(pickerMonth===0){setPickerMonth(11);setPickerYear(y=>y-1);}else setPickerMonth(m=>m-1);}}
+                style={{width:'34px',height:'34px',borderRadius:'9px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)',color:'#64748b',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>‹</button>
+              <span style={{fontSize:'15px',fontWeight:700,color:'#fff'}}>{MONTH_NAMES[pickerMonth]} {pickerYear}</span>
+              <button onClick={()=>{if(pickerMonth===11){setPickerMonth(0);setPickerYear(y=>y+1);}else setPickerMonth(m=>m+1);}}
+                style={{width:'34px',height:'34px',borderRadius:'9px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)',color:'#64748b',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>›</button>
+            </div>
+
+            {/* DOW headers */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',marginBottom:'6px'}}>
+              {DOW.map(d=>(
+                <div key={d} style={{textAlign:'center',fontSize:'10px',fontWeight:600,color:'#334155',padding:'4px 0',letterSpacing:'0.5px'}}>{d}</div>
+              ))}
+            </div>
+
+            {/* Day grid */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:'2px'}}>
+              {calDays.map((d,i)=>{
+                if(!d) return <div key={i}/>;
+                const past=isPast(d);
+                const from=isFrom(d);
+                const to=isTo(d);
+                const mid=inRange(d);
+                const sel=from||to;
+                return(
+                  <button key={i} onClick={()=>!past&&handleDayTap(d)}
+                    style={{
+                      padding:'0',height:'42px',borderRadius:'10px',border:'none',cursor:past?'default':'pointer',
+                      background:sel?'#16a34a':mid?'rgba(34,197,94,0.15)':'transparent',
+                      color:sel?'#fff':past?'#1e2a1e':mid?'#4ade80':'#94a3b8',
+                      fontSize:'13px',fontWeight:sel?700:mid?600:400,
+                      boxShadow:sel?'0 0 12px rgba(34,197,94,0.4)':'none',
+                      transition:'all 0.1s',
+                      position:'relative',
+                      fontFamily:'Inter,sans-serif',
+                    }}>
+                    {d.getDate()}
+                    {/* today dot */}
+                    {d.getFullYear()===2026&&d.getMonth()===2&&d.getDate()===14&&!sel&&(
+                      <div style={{position:'absolute',bottom:'5px',left:'50%',transform:'translateX(-50%)',width:'4px',height:'4px',borderRadius:'50%',background:'#2979FF'}}/>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Hint */}
+          <div style={{padding:'0 20px 12px',textAlign:'center',fontSize:'11px',color:'#334155'}}>
+            {!fromDate?'Ersten Tag antippen':(fromDate&&!toDate)?'Letzten Tag antippen':'Zeitraum gewählt ✓'}
+          </div>
+
+          {/* Submit area */}
+          <div style={{padding:'8px 20px 36px'}}>
+            {submitState==='idle'&&(
+              <button onClick={handleSubmit} disabled={!fromDate||!toDate}
+                style={{width:'100%',padding:'15px',borderRadius:'14px',border:'none',cursor:fromDate&&toDate?'pointer':'not-allowed',
+                  background:fromDate&&toDate?'linear-gradient(135deg,#15803d,#16a34a,#22c55e)':'rgba(255,255,255,0.04)',
+                  color:fromDate&&toDate?'#fff':'#334155',fontSize:'15px',fontWeight:700,
+                  fontFamily:'Inter,sans-serif',letterSpacing:'0.3px',
+                  boxShadow:fromDate&&toDate?'0 4px 28px rgba(34,197,94,0.3),0 0 0 1px rgba(34,197,94,0.15)':'none',
+                  transition:'all 0.2s'}}>
+                Antrag absenden
+              </button>
+            )}
+
+            {submitState==='loading'&&(
+              <div style={{width:'100%',padding:'15px',borderRadius:'14px',background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.2)',display:'flex',alignItems:'center',justifyContent:'center',gap:'12px'}}>
+                <span style={{width:'18px',height:'18px',border:'2px solid rgba(34,197,94,0.3)',borderTopColor:'#4ade80',borderRadius:'50%',display:'inline-block',animation:'erpSpinner 0.75s linear infinite',flexShrink:0}}/>
+                <span style={{fontSize:'14px',fontWeight:600,color:'#4ade80'}}>KI prüft Kapazitäten…</span>
+              </div>
+            )}
+
+            {submitState==='success'&&(
+              <div style={{width:'100%',padding:'18px 16px',borderRadius:'14px',background:'rgba(34,197,94,0.1)',border:'1px solid rgba(34,197,94,0.25)',textAlign:'center',animation:'fadeIn 0.35s ease-out'}}>
+                <div style={{fontSize:'32px',marginBottom:'6px',filter:'drop-shadow(0 0 12px rgba(34,197,94,0.6))'}}>✅</div>
+                <div style={{fontSize:'16px',fontWeight:700,color:'#4ade80',marginBottom:'3px'}}>Antrag eingereicht!</div>
+                <div style={{fontSize:'12px',color:'#64748b',marginBottom:'14px'}}>
+                  {fmtShort(fromDate)} – {fmtShort(toDate)} · {dayCount} Tage
+                </div>
+                <div style={{background:'rgba(0,0,0,0.3)',borderRadius:'8px',padding:'9px 12px',fontSize:'11px',color:'#64748b',lineHeight:1.6,textAlign:'left',borderLeft:'2px solid rgba(34,197,94,0.4)',marginBottom:'14px'}}>
+                  <span style={{fontWeight:600,color:'#818cf8'}}>KI: </span>Keine Überschneidungen mit geplanten Einsätzen. Teamverfügbarkeit sichergestellt. Antrag wurde weitergeleitet.
+                </div>
+                <button onClick={()=>setShowUrlaub(false)}
+                  style={{width:'100%',padding:'12px',borderRadius:'11px',border:'1px solid rgba(34,197,94,0.25)',background:'rgba(34,197,94,0.08)',color:'#4ade80',fontSize:'13px',fontWeight:600,cursor:'pointer',fontFamily:'Inter,sans-serif'}}>
+                  Schließen
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </>)}
     </div>
   );
 }
