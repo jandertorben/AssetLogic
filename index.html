@@ -90,6 +90,8 @@ select option{background:#1a1a1a;color:#fff;}
 .neon-border-anim{animation:neonBorder 2s ease-in-out infinite;}
 @keyframes scanReady{0%{opacity:0;transform:scale(0.9);}100%{opacity:1;transform:scale(1);}}
 .scan-ready{animation:scanReady 0.35s ease-out forwards;}
+@keyframes vaultExpand{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.vault-expand{animation:vaultExpand 0.32s cubic-bezier(0.34,1.1,0.64,1) forwards;}
 /* ── ERP Bridge Card ─────────────────────────────── */
 @keyframes erpSpinner{to{transform:rotate(360deg);}}
 @keyframes erpSuccessPop{0%{transform:scale(0.5);opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
@@ -2510,130 +2512,46 @@ function MobileHome({user,orders,onScan,onNavigate,onSelectAsset,onMagicScan}){
           MASCHINE SCANNEN
         </button>
 
-        {/* ── EXPERT VAULT ───────────────────────── */}
-        <div style={{background:'linear-gradient(135deg,#0a0a12,#0d0f18)',border:'1px solid rgba(0,229,255,0.18)',borderRadius:'20px',padding:'18px',position:'relative',overflow:'hidden'}}>
-
-          {/* BG grid */}
-          <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px)',backgroundSize:'28px 28px',pointerEvents:'none',borderRadius:'20px'}}/>
-
-          {/* Corner accents */}
-          <div style={{position:'absolute',top:'10px',left:'10px',width:'14px',height:'14px',borderTop:'1.5px solid rgba(0,229,255,0.5)',borderLeft:'1.5px solid rgba(0,229,255,0.5)'}}/>
-          <div style={{position:'absolute',top:'10px',right:'10px',width:'14px',height:'14px',borderTop:'1.5px solid rgba(0,229,255,0.5)',borderRight:'1.5px solid rgba(0,229,255,0.5)'}}/>
-
-          {/* Header */}
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'16px',position:'relative'}}>
-            <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-              <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#00E5FF',boxShadow:'0 0 8px #00E5FF',animation:'statusGlow 1.5s ease-in-out infinite'}}/>
-              <span style={{fontSize:'11px',fontWeight:800,color:'#00E5FF',letterSpacing:'2.5px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>EXPERT VAULT</span>
-            </div>
-            <span style={{fontSize:'10px',fontWeight:700,background:'rgba(0,229,255,0.08)',color:'rgba(0,229,255,0.6)',border:'1px solid rgba(0,229,255,0.15)',borderRadius:'20px',padding:'2px 8px',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.5px'}}>v2.4.1</span>
-          </div>
-
-          {/* IMPACT HEUTE */}
-          <div style={{marginBottom:'16px',position:'relative'}}>
-            <div style={{fontSize:'10px',fontWeight:700,color:'#475569',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'10px'}}>Dein Impact heute</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
-              {/* Gelöste Fälle */}
-              <div style={{background:'rgba(0,255,135,0.05)',border:'1px solid rgba(0,255,135,0.15)',borderRadius:'12px',padding:'12px 14px'}}>
-                <div style={{fontSize:'26px',fontWeight:800,color:'#00FF87',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 16px rgba(0,255,135,0.5)',marginBottom:'4px'}}>3</div>
-                <div style={{fontSize:'10px',color:'rgba(0,255,135,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>gelöste Fälle</div>
-                <div style={{fontSize:'9px',color:'#334155',marginTop:'3px',fontFamily:"'JetBrains Mono',monospace"}}>+2 vs. gestern</div>
-              </div>
-              {/* Zeitersparnis */}
-              <div style={{background:'rgba(0,229,255,0.05)',border:'1px solid rgba(0,229,255,0.15)',borderRadius:'12px',padding:'12px 14px'}}>
-                <div style={{fontSize:'26px',fontWeight:800,color:'#00E5FF',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 16px rgba(0,229,255,0.5)',marginBottom:'4px'}}>120</div>
-                <div style={{fontSize:'10px',color:'rgba(0,229,255,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>Min. gespart</div>
-                <div style={{fontSize:'9px',color:'#334155',marginTop:'3px',fontFamily:"'JetBrains Mono',monospace"}}>durch KI-Doku</div>
-              </div>
-            </div>
-          </div>
-
-          {/* LEVEL UP SYSTEM */}
-          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'12px',padding:'12px 14px',marginBottom:'16px',position:'relative'}}>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}}>
-              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                <div style={{width:'28px',height:'28px',borderRadius:'8px',background:'linear-gradient(135deg,rgba(234,179,8,0.2),rgba(250,204,21,0.1))',border:'1px solid rgba(234,179,8,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px'}}>⚡</div>
-                <div>
-                  <div style={{fontSize:'13px',fontWeight:800,color:'#EAB308',letterSpacing:'-0.3px',textShadow:'0 0 12px rgba(234,179,8,0.4)'}}>Level 5</div>
-                  <div style={{fontSize:'10px',color:'rgba(234,179,8,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>SERVICE-PRO</div>
-                </div>
-              </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',fontFamily:"'JetBrains Mono',monospace"}}>2480 / 3000</div>
-                <div style={{fontSize:'9px',color:'#334155'}}>XP bis Level 6</div>
-              </div>
-            </div>
-            {/* XP Bar */}
-            <div style={{height:'6px',borderRadius:'3px',background:'rgba(255,255,255,0.05)',overflow:'hidden',position:'relative'}}>
-              <div className="xp-fill" style={{'--xp-w':'82.7%',height:'100%',borderRadius:'3px',background:'linear-gradient(90deg,#EAB308,#F59E0B,#FBBF24)',boxShadow:'0 0 10px rgba(234,179,8,0.6)'}}/>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',marginTop:'5px'}}>
-              <span style={{fontSize:'9px',color:'#334155',fontFamily:"'JetBrains Mono',monospace"}}>Level 5</span>
-              <span style={{fontSize:'9px',color:'rgba(234,179,8,0.4)',fontFamily:"'JetBrains Mono',monospace"}}>82% → Level 6</span>
-            </div>
-            {/* Badges */}
-            <div style={{display:'flex',gap:'6px',marginTop:'10px'}}>
-              {[['🏆','Top Technik'],['⚡','Speed Pro'],['🎯','Erstlösung']].map(([e,l])=>(
-                <div key={l} style={{flex:1,background:'rgba(234,179,8,0.05)',border:'1px solid rgba(234,179,8,0.12)',borderRadius:'8px',padding:'5px 4px',textAlign:'center'}}>
-                  <div style={{fontSize:'14px',marginBottom:'2px'}}>{e}</div>
-                  <div style={{fontSize:'8px',color:'rgba(234,179,8,0.5)',fontWeight:600,letterSpacing:'0.3px'}}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* MAGIC SCAN Button */}
-          <button onClick={onMagicScan}
-            style={{width:'100%',background:'linear-gradient(135deg,rgba(0,229,255,0.12),rgba(0,255,135,0.06))',border:'1px solid rgba(0,229,255,0.3)',borderRadius:'14px',padding:'16px',cursor:'pointer',position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'}}
-            className="neon-border-anim btn-press">
-            <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,transparent 40%,rgba(0,229,255,0.05))',pointerEvents:'none'}}/>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" style={{filter:'drop-shadow(0 0 6px #00E5FF)',flexShrink:0}}>
-              <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-              <circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/>
-            </svg>
-            <div>
-              <div style={{fontSize:'14px',fontWeight:800,color:'#00E5FF',letterSpacing:'2px',textTransform:'uppercase',textShadow:'0 0 12px rgba(0,229,255,0.6)'}}>MAGIC SCAN</div>
-              <div style={{fontSize:'9px',color:'rgba(0,229,255,0.5)',letterSpacing:'1px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>KI-Bauteilerkennung</div>
-            </div>
-          </button>
-
-        </div>
-        {/* ── END EXPERT VAULT ──────────────────── */}
+        {/* KI-Magic Scan secondary button */}
+        <button onClick={onMagicScan}
+          style={{width:'100%',background:'rgba(0,229,255,0.05)',border:'1px solid rgba(0,229,255,0.18)',borderRadius:'14px',padding:'11px 16px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" style={{filter:'drop-shadow(0 0 4px rgba(0,229,255,0.6))',flexShrink:0}}>
+            <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+            <circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/>
+          </svg>
+          <span style={{fontSize:'12px',fontWeight:700,color:'rgba(0,229,255,0.75)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>KI-Magic Scan</span>
+          <span style={{fontSize:'10px',color:'rgba(0,229,255,0.35)',fontFamily:"'JetBrains Mono',monospace"}}>Beta</span>
+        </button>
 
         <div>
           <div className="flex items-center justify-between mb-3">
-            <div className="text-gray-400 text-xs uppercase tracking-wider">Letzte Aktivität</div>
-            <span className="text-gray-600 text-xs">Tippen für Details →</span>
+            <div className="text-gray-400 text-xs uppercase tracking-wider">Aktuelle Aufträge</div>
+            <button onClick={()=>onNavigate&&onNavigate('auftraege')} className="text-[#2979FF] text-xs font-medium">Alle →</button>
           </div>
-          <div className="space-y-2">
-            {ASSETS_DB.slice(0,3).map(a=>(
-              <button key={a.id} onClick={()=>onSelectAsset&&onSelectAsset(a)}
-                className="btn-press w-full bg-mob-card border border-mob-border rounded-2xl p-4 flex items-center gap-3 text-left transition-all hover:border-[#2979FF]/30 active:scale-[0.99]">
-                <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${a.status==='OK'?'bg-green-500':a.status==='FEHLER'?'bg-red-500 status-pulse':'bg-amber-500 status-pulse'}`}/>
-                <div className="flex-1 min-w-0">
-                  <div className="text-white text-sm font-medium truncate">{a.name}</div>
-                  <div className="text-gray-500 text-xs truncate">{a.lastEvent}</div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {a.status!=='OK'?(
-                    <span onClick={e=>{e.stopPropagation();openDiagnostic({
-                      title:a.status==='FEHLER'?'Maschinenfehler aktiv':'Wartung erforderlich',
-                      severity:a.status==='FEHLER'?'KRITISCH':'WARNUNG',
-                      code:a.status==='FEHLER'?'E-001':'W-101',
-                      message:a.lastEvent,
-                      ursache:a.status==='FEHLER'?'Hydrauliksystem oder Sensorausfall — sofortige Diagnose erforderlich.':'Planmäßiges Wartungsintervall überschritten.',
-                      loesung:a.status==='FEHLER'?'Betrieb einstellen. Maschine sperren und Servicetechniker anfordern.':'Wartungstermin innerhalb von 48 Stunden einplanen.',
-                      asset:a.name
-                    });}}
-                    className={`text-xs px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80 transition-opacity ${getAssetStatusColor(a.status)}`}>{a.status}</span>
-                  ):(
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getAssetStatusColor(a.status)}`}>{a.status}</span>
-                  )}
-                  <IconChevLeft size={14} cls="text-gray-600 rotate-180"/>
-                </div>
-              </button>
-            ))}
-          </div>
+          {(()=>{
+            const myOrders=orders.filter(o=>o.techId===user.techId&&o.status!=='ABGESCHLOSSEN').slice(0,3);
+            if(myOrders.length===0) return(
+              <div className="bg-mob-card border border-mob-border rounded-2xl p-5 text-center text-gray-500 text-sm">Keine offenen Aufträge ✓</div>
+            );
+            return(
+              <div className="space-y-2">
+                {myOrders.map(o=>{
+                  const linkedAsset=ASSETS_DB.find(a=>a.name===o.asset);
+                  return(
+                    <button key={o.id} onClick={()=>linkedAsset&&onSelectAsset&&onSelectAsset(linkedAsset)}
+                      className={`btn-press w-full text-left bg-mob-card border border-mob-border border-l-4 ${getPrioLeftBorder(o.priority)} rounded-2xl p-4 transition-all ${linkedAsset?'hover:border-[#2979FF]/30 cursor-pointer':'cursor-default'}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-white font-semibold text-sm truncate flex-1 mr-2">{o.title}</span>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${getPrioBadge(o.priority)}`}>{o.priority}</span>
+                      </div>
+                      <div className="text-gray-500 text-xs mb-2">{o.asset}</div>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(o.status)}`}>{o.status.replace('_',' ')}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>
@@ -2700,11 +2618,12 @@ function MobileAuftraege({user,orders,onSelectAsset}){
 }
 
 // ── MOBILE PROFIL ─────────────────────────────────────────────────────────────
-function MobileProfil({user,onLogout,onNavigate}){
+function MobileProfil({user,onLogout,onNavigate,onMagicScan}){
   const [notif,setNotif]=React.useState(true);
   const [dark,setDark]=React.useState(true);
   const [showUrlaub,setShowUrlaub]=React.useState(false);
   const [showOvertime,setShowOvertime]=React.useState(false);
+  const [showVault,setShowVault]=React.useState(false);
   // vacation modal state
   const [pickerYear,setPickerYear]=React.useState(2026);
   const [pickerMonth,setPickerMonth]=React.useState(2);
@@ -2808,6 +2727,98 @@ function MobileProfil({user,onLogout,onNavigate}){
             <div className="text-amber-600 text-xs mt-0.5">→ Details</div>
           </button>
         </div>
+      </div>
+
+      {/* ── Dein Impact & Status (Expert Vault) ── */}
+      <div className="bg-mob-card border border-mob-border rounded-2xl overflow-hidden">
+        <button onClick={()=>setShowVault(v=>!v)}
+          className="btn-press w-full p-4 flex items-center justify-between text-left transition-all active:scale-[0.99]"
+          style={{background:showVault?'rgba(0,229,255,0.04)':'transparent'}}>
+          <div className="flex items-center gap-3">
+            <div style={{width:'34px',height:'34px',borderRadius:'9px',background:'linear-gradient(135deg,rgba(0,229,255,0.15),rgba(0,229,255,0.04))',border:'1px solid rgba(0,229,255,0.25)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <div style={{width:'9px',height:'9px',borderRadius:'50%',background:'#00E5FF',boxShadow:'0 0 8px #00E5FF',animation:'statusGlow 1.5s ease-in-out infinite'}}/>
+            </div>
+            <div>
+              <div className="text-white text-sm font-semibold">Dein Impact &amp; Status</div>
+              <div style={{fontSize:'11px',color:'rgba(234,179,8,0.7)',fontWeight:600,marginTop:'1px'}}>⚡ Level 5 · SERVICE-PRO · 82% XP</div>
+            </div>
+          </div>
+          <div style={{transform:showVault?'rotate(180deg)':'rotate(0deg)',transition:'transform 0.3s cubic-bezier(0.34,1.1,0.64,1)',color:'#475569',fontSize:'18px',lineHeight:1,flexShrink:0}}>▾</div>
+        </button>
+        {showVault&&(
+          <div className="vault-expand" style={{borderTop:'1px solid rgba(0,229,255,0.12)'}}>
+            <div style={{background:'linear-gradient(135deg,#0a0a12,#0d0f18)',padding:'18px',position:'relative',overflow:'hidden'}}>
+              {/* BG grid */}
+              <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px)',backgroundSize:'28px 28px',pointerEvents:'none'}}/>
+              {/* Corner accents */}
+              <div style={{position:'absolute',top:'10px',left:'10px',width:'14px',height:'14px',borderTop:'1.5px solid rgba(0,229,255,0.4)',borderLeft:'1.5px solid rgba(0,229,255,0.4)'}}/>
+              <div style={{position:'absolute',top:'10px',right:'10px',width:'14px',height:'14px',borderTop:'1.5px solid rgba(0,229,255,0.4)',borderRight:'1.5px solid rgba(0,229,255,0.4)'}}/>
+              <div className="space-y-4" style={{position:'relative'}}>
+                {/* IMPACT HEUTE */}
+                <div>
+                  <div style={{fontSize:'10px',fontWeight:700,color:'#475569',letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:'10px'}}>Dein Impact heute</div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+                    <div style={{background:'rgba(0,255,135,0.05)',border:'1px solid rgba(0,255,135,0.15)',borderRadius:'12px',padding:'12px 14px'}}>
+                      <div style={{fontSize:'26px',fontWeight:800,color:'#00FF87',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 16px rgba(0,255,135,0.5)',marginBottom:'4px'}}>3</div>
+                      <div style={{fontSize:'10px',color:'rgba(0,255,135,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>gelöste Fälle</div>
+                      <div style={{fontSize:'9px',color:'#334155',marginTop:'3px',fontFamily:"'JetBrains Mono',monospace"}}>+2 vs. gestern</div>
+                    </div>
+                    <div style={{background:'rgba(0,229,255,0.05)',border:'1px solid rgba(0,229,255,0.15)',borderRadius:'12px',padding:'12px 14px'}}>
+                      <div style={{fontSize:'26px',fontWeight:800,color:'#00E5FF',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 16px rgba(0,229,255,0.5)',marginBottom:'4px'}}>120</div>
+                      <div style={{fontSize:'10px',color:'rgba(0,229,255,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>Min. gespart</div>
+                      <div style={{fontSize:'9px',color:'#334155',marginTop:'3px',fontFamily:"'JetBrains Mono',monospace"}}>durch KI-Doku</div>
+                    </div>
+                  </div>
+                </div>
+                {/* LEVEL SYSTEM */}
+                <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'12px',padding:'12px 14px'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}}>
+                    <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                      <div style={{width:'28px',height:'28px',borderRadius:'8px',background:'linear-gradient(135deg,rgba(234,179,8,0.2),rgba(250,204,21,0.1))',border:'1px solid rgba(234,179,8,0.3)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'13px'}}>⚡</div>
+                      <div>
+                        <div style={{fontSize:'13px',fontWeight:800,color:'#EAB308',letterSpacing:'-0.3px',textShadow:'0 0 12px rgba(234,179,8,0.4)'}}>Level 5</div>
+                        <div style={{fontSize:'10px',color:'rgba(234,179,8,0.6)',fontWeight:600,letterSpacing:'0.5px'}}>SERVICE-PRO</div>
+                      </div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontSize:'11px',fontWeight:700,color:'#64748b',fontFamily:"'JetBrains Mono',monospace"}}>2480 / 3000</div>
+                      <div style={{fontSize:'9px',color:'#334155'}}>XP bis Level 6</div>
+                    </div>
+                  </div>
+                  <div style={{height:'6px',borderRadius:'3px',background:'rgba(255,255,255,0.05)',overflow:'hidden'}}>
+                    <div className="xp-fill" style={{'--xp-w':'82.7%',height:'100%',borderRadius:'3px',background:'linear-gradient(90deg,#EAB308,#F59E0B,#FBBF24)',boxShadow:'0 0 10px rgba(234,179,8,0.6)'}}/>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginTop:'5px'}}>
+                    <span style={{fontSize:'9px',color:'#334155',fontFamily:"'JetBrains Mono',monospace"}}>Level 5</span>
+                    <span style={{fontSize:'9px',color:'rgba(234,179,8,0.4)',fontFamily:"'JetBrains Mono',monospace"}}>82% → Level 6</span>
+                  </div>
+                  <div style={{display:'flex',gap:'6px',marginTop:'10px'}}>
+                    {[['🏆','Top Technik'],['⚡','Speed Pro'],['🎯','Erstlösung']].map(([e,l])=>(
+                      <div key={l} style={{flex:1,background:'rgba(234,179,8,0.05)',border:'1px solid rgba(234,179,8,0.12)',borderRadius:'8px',padding:'5px 4px',textAlign:'center'}}>
+                        <div style={{fontSize:'14px',marginBottom:'2px'}}>{e}</div>
+                        <div style={{fontSize:'8px',color:'rgba(234,179,8,0.5)',fontWeight:600,letterSpacing:'0.3px'}}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Magic Scan button */}
+                <button onClick={onMagicScan}
+                  style={{width:'100%',background:'linear-gradient(135deg,rgba(0,229,255,0.12),rgba(0,255,135,0.06))',border:'1px solid rgba(0,229,255,0.3)',borderRadius:'14px',padding:'16px',cursor:'pointer',position:'relative',overflow:'hidden',display:'flex',alignItems:'center',justifyContent:'center',gap:'10px'}}
+                  className="neon-border-anim btn-press">
+                  <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,transparent 40%,rgba(0,229,255,0.05))',pointerEvents:'none'}}/>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" strokeWidth="2" strokeLinecap="round" style={{filter:'drop-shadow(0 0 6px #00E5FF)',flexShrink:0}}>
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                    <circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/>
+                  </svg>
+                  <div>
+                    <div style={{fontSize:'14px',fontWeight:800,color:'#00E5FF',letterSpacing:'2px',textTransform:'uppercase',textShadow:'0 0 12px rgba(0,229,255,0.6)'}}>MAGIC SCAN</div>
+                    <div style={{fontSize:'9px',color:'rgba(0,229,255,0.5)',letterSpacing:'1px',textTransform:'uppercase',fontFamily:"'JetBrains Mono',monospace"}}>KI-Bauteilerkennung</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Meine Zeit ── */}
@@ -3166,7 +3177,7 @@ function MobileApp({user,onLogout}){
       <div className="overflow-y-auto" style={{paddingBottom:'90px'}}>
         {screen==='home'&&<MobileHome user={user} orders={orders} onScan={()=>setShowScan(true)} onMagicScan={()=>setShowMagicScan(true)} onNavigate={setScreen} onSelectAsset={setSelectedAsset}/>}
         {screen==='auftraege'&&<MobileAuftraege user={user} orders={orders} onSelectAsset={setSelectedAsset}/>}
-        {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout} onNavigate={setScreen}/>}
+        {screen==='profil'&&<MobileProfil user={user} onLogout={onLogout} onNavigate={setScreen} onMagicScan={()=>setShowMagicScan(true)}/>}
       </div>
       {/* ── BOTTOM NAV ── */}
       <div className="fixed bottom-0 bg-[#111] border-t border-mob-border flex items-end justify-around z-40"
