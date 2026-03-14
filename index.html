@@ -5230,6 +5230,188 @@ function UrlaubsDashboardPage(){
   );
 }
 
+/* ─────────────────────────────────────────────────────────
+   Executive Insights — CEO-Level KPI & AI Strategy View
+───────────────────────────────────────────────────────── */
+function ExecInsightsPage(){
+  const chartRef=React.useRef(null);
+  const chartInst=React.useRef(null);
+  const [tickerIdx,setTickerIdx]=React.useState(0);
+  const [tickerAnim,setTickerAnim]=React.useState(true);
+
+  const aiTips=[
+    {tag:'Anomalie Region',msg:'In Region Süd steigt die Fehlerquote bei Modell HP-500 um +31%. Empfehlung: Gezielte Schulung für 2 Techniker vor Ort einplanen.'},
+    {tag:'Umsatz-Chance',msg:'3 Wartungsverträge laufen in den nächsten 30 Tagen aus. Proaktive Verlängerung sichert rund €12.400 Folge-Umsatz.'},
+    {tag:'Effizienz-Tipp',msg:'Durchschnittliche Reparaturzeit bei CAT-320 +22% gegenüber Vormonat. Ursache: Ersatzteil-Engpass. Lieferkette prüfen.'},
+    {tag:'Best Practice',msg:'M. Köhler erreicht eine Erstlösungsrate von 94%. Know-how dokumentieren und als internen Wissensträger einsetzen.'},
+    {tag:'Kapazität Q2',msg:'Prognose zeigt +18% Auftragslast in Q2. Frühzeitige Kapazitätsplanung verhindert SLA-Überschreitungen.'},
+  ];
+
+  React.useEffect(()=>{
+    const iv=setInterval(()=>{
+      setTickerAnim(false);
+      setTimeout(()=>{setTickerIdx(i=>(i+1)%aiTips.length);setTickerAnim(true);},200);
+    },4500);
+    return ()=>clearInterval(iv);
+  },[]);
+
+  React.useEffect(()=>{
+    if(!chartRef.current)return;
+    if(chartInst.current)chartInst.current.destroy();
+    chartInst.current=new Chart(chartRef.current,{
+      type:'doughnut',
+      data:{
+        labels:['Garantie','Kostenpflichtig','Wartungsvertrag'],
+        datasets:[{
+          data:[28,45,27],
+          backgroundColor:['rgba(6,182,212,0.82)','rgba(234,179,8,0.82)','rgba(139,92,246,0.82)'],
+          borderColor:['rgba(6,182,212,0.25)','rgba(234,179,8,0.25)','rgba(139,92,246,0.25)'],
+          borderWidth:2,hoverOffset:10,
+        }],
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,cutout:'70%',
+        plugins:{
+          legend:{position:'bottom',labels:{color:'#94a3b8',padding:18,font:{size:12,family:'Inter'},usePointStyle:true,pointStyleWidth:8}},
+          tooltip:{callbacks:{label:(c)=>`${c.label}: ${c.parsed}%`}},
+        },
+      },
+    });
+    return ()=>{if(chartInst.current)chartInst.current.destroy();};
+  },[]);
+
+  const kpiCards=[
+    {
+      accent:'#EAB308',glow:'rgba(234,179,8,',border:'rgba(234,179,8,0.22)',
+      tag:'KI-Empfehlung',tagIcon:<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>,
+      label:'Umsatz-Potenzial',
+      main:<span>€ 47.200</span>,
+      sub:'durch KI-Analyse identifiziert',
+      extra:<div style={{marginTop:'16px'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+          <div style={{flex:1,height:'4px',borderRadius:'2px',background:'rgba(255,255,255,0.05)',overflow:'hidden'}}>
+            <div style={{width:'73%',height:'100%',background:'linear-gradient(90deg,#EAB308,#F59E0B)',borderRadius:'2px'}}/>
+          </div>
+          <span style={{fontSize:'11px',color:'#EAB308',fontWeight:700}}>73%</span>
+          <span style={{fontSize:'11px',color:'#475569'}}>Konfidenz</span>
+        </div>
+      </div>,
+    },
+    {
+      accent:'#06B6D4',glow:'rgba(6,182,212,',border:'rgba(6,182,212,0.22)',
+      tag:'Effizienz',tagIcon:<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+      label:'Bearbeitungszeit pro Fall',
+      main:<div style={{display:'flex',alignItems:'flex-end',gap:'14px'}}>
+        <div><div style={{fontSize:'11px',color:'#475569',marginBottom:'2px'}}>Vorher</div><div style={{fontSize:'24px',fontWeight:700,color:'#ef4444',letterSpacing:'-0.5px',lineHeight:1,textDecoration:'line-through',opacity:0.6}}>3,2h</div></div>
+        <div style={{fontSize:'18px',color:'#334155',marginBottom:'0px',lineHeight:1}}>→</div>
+        <div><div style={{fontSize:'11px',color:'#475569',marginBottom:'2px'}}>Nachher</div><div style={{fontSize:'36px',fontWeight:800,color:'#06B6D4',letterSpacing:'-1px',lineHeight:1,textShadow:'0 0 20px rgba(6,182,212,0.45)'}}>1,9h</div></div>
+      </div>,
+      sub:null,
+      extra:<div style={{marginTop:'14px',display:'flex',alignItems:'center',gap:'6px'}}><span style={{fontSize:'13px',fontWeight:700,color:'#4ade80'}}>↓ 41%</span><span style={{fontSize:'12px',color:'#64748b'}}>Reduktion durch Auto-Dokumentation</span></div>,
+    },
+    {
+      accent:'#a78bfa',glow:'rgba(139,92,246,',border:'rgba(139,92,246,0.22)',
+      tag:'Produktivität',tagIcon:<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+      label:'Techniker-Produktivität',
+      main:<span>+15%</span>,
+      sub:'durch automatische Dokumentation',
+      extra:<div style={{marginTop:'14px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+        {[['4 Aktiv','Techniker im Einsatz'],['94%','Erstlösungsrate']].map(([v,l])=>(
+          <div key={l} style={{background:'rgba(139,92,246,0.07)',border:'1px solid rgba(139,92,246,0.12)',borderRadius:'8px',padding:'8px 10px'}}>
+            <div style={{fontSize:'14px',fontWeight:700,color:'#c4b5fd'}}>{v}</div>
+            <div style={{fontSize:'10px',color:'#475569',marginTop:'1px'}}>{l}</div>
+          </div>
+        ))}
+      </div>,
+    },
+  ];
+
+  return(
+    <div style={{maxWidth:'1180px'}}>
+
+      {/* Header */}
+      <div style={{marginBottom:'28px',display:'flex',alignItems:'flex-end',justifyContent:'space-between'}}>
+        <div>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="2" strokeLinecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z" fill="rgba(234,179,8,0.15)"/></svg>
+            <span style={{fontSize:'22px',fontWeight:800,color:'#fff',letterSpacing:'-0.5px'}}>Executive Insights</span>
+            <span style={{fontSize:'11px',fontWeight:700,background:'linear-gradient(90deg,rgba(234,179,8,0.12),rgba(6,182,212,0.12))',color:'#EAB308',border:'1px solid rgba(234,179,8,0.28)',borderRadius:'20px',padding:'3px 11px',letterSpacing:'0.7px',textTransform:'uppercase'}}>CEO View</span>
+          </div>
+          <div style={{color:'#475569',fontSize:'13px'}}>KI-gestützte Unternehmensübersicht · Stand: März 2026</div>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+          <div style={{width:'6px',height:'6px',borderRadius:'50%',background:'#4ade80',boxShadow:'0 0 6px rgba(74,222,128,0.7)',animation:'statusGlow 2s ease-in-out infinite'}}/>
+          <span style={{fontSize:'11px',color:'#334155',fontFamily:"'JetBrains Mono',monospace"}}>Live · auto-refresh 5 min</span>
+        </div>
+      </div>
+
+      {/* 3 KPI tiles */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px',marginBottom:'20px'}}>
+        {kpiCards.map((c,i)=>(
+          <div key={i} style={{background:'rgba(13,14,18,0.85)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',border:`1px solid ${c.border}`,borderRadius:'16px',padding:'24px',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,right:0,width:'140px',height:'140px',background:`radial-gradient(circle at 80% 15%,${c.glow}0.1),transparent 65%)`,pointerEvents:'none'}}/>
+            <div style={{fontSize:'10px',fontWeight:700,color:c.accent,letterSpacing:'1px',textTransform:'uppercase',marginBottom:'12px',display:'flex',alignItems:'center',gap:'5px'}}>
+              {c.tagIcon}{c.tag}
+            </div>
+            <div style={{fontSize:'11px',color:'#64748b',marginBottom:'6px',fontWeight:500}}>{c.label}</div>
+            <div style={{fontSize:'36px',fontWeight:800,color:c.accent,letterSpacing:'-1px',lineHeight:1.05,textShadow:`0 0 24px ${c.glow}0.4)`}}>
+              {c.main}
+            </div>
+            {c.sub&&<div style={{fontSize:'12px',color:'#64748b',marginTop:'6px'}}>{c.sub}</div>}
+            {c.extra}
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom row */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}>
+
+        {/* Donut chart */}
+        <div style={{background:'rgba(13,14,18,0.85)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:'16px',padding:'24px'}}>
+          <div style={{marginBottom:'20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div>
+              <div style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>Verteilung der Service-Typen</div>
+              <div style={{fontSize:'11px',color:'#475569',marginTop:'3px'}}>Aktuelle Periode · Q1 2026</div>
+            </div>
+            <span style={{fontSize:'10px',fontWeight:600,background:'rgba(255,255,255,0.04)',color:'#475569',border:'1px solid rgba(255,255,255,0.07)',borderRadius:'20px',padding:'3px 9px'}}>287 Fälle</span>
+          </div>
+          <div style={{height:'230px',position:'relative'}}>
+            <canvas ref={chartRef}/>
+          </div>
+        </div>
+
+        {/* AI Strategy Ticker */}
+        <div style={{background:'rgba(13,14,18,0.85)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',border:'1px solid rgba(6,182,212,0.18)',borderRadius:'16px',padding:'24px',display:'flex',flexDirection:'column'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'20px'}}>
+            <div style={{width:'7px',height:'7px',borderRadius:'50%',background:'#06B6D4',boxShadow:'0 0 8px rgba(6,182,212,0.9)',animation:'statusGlow 1.5s ease-in-out infinite'}}/>
+            <span style={{fontSize:'13px',fontWeight:600,color:'#e2e8f0'}}>KI Strategy Advisor</span>
+            <span style={{marginLeft:'auto',fontSize:'10px',fontWeight:700,background:'rgba(6,182,212,0.08)',color:'#06B6D4',border:'1px solid rgba(6,182,212,0.2)',borderRadius:'20px',padding:'2px 9px',letterSpacing:'0.6px'}}>LIVE</span>
+          </div>
+
+          <div style={{flex:1,display:'flex',flexDirection:'column',gap:'14px'}}>
+            <div style={{background:'rgba(6,182,212,0.05)',border:'1px solid rgba(6,182,212,0.13)',borderRadius:'12px',padding:'18px 16px',flex:1,display:'flex',flexDirection:'column',justifyContent:'center',opacity:tickerAnim?1:0,transform:tickerAnim?'translateY(0)':'translateY(6px)',transition:'opacity 0.25s ease,transform 0.25s ease'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'12px'}}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span style={{fontSize:'10px',fontWeight:700,color:'#06B6D4',letterSpacing:'0.8px',textTransform:'uppercase'}}>{aiTips[tickerIdx].tag}</span>
+                <span style={{marginLeft:'auto',fontSize:'10px',color:'#334155'}}>{tickerIdx+1} / {aiTips.length}</span>
+              </div>
+              <div style={{fontSize:'14px',color:'#cbd5e1',lineHeight:1.65}}>{aiTips[tickerIdx].msg}</div>
+            </div>
+
+            <div style={{display:'flex',justifyContent:'center',alignItems:'center',gap:'7px'}}>
+              {aiTips.map((_,i)=>(
+                <button key={i} onClick={()=>{setTickerAnim(false);setTimeout(()=>{setTickerIdx(i);setTickerAnim(true);},150);}}
+                  style={{width:i===tickerIdx?18:6,height:'6px',borderRadius:'3px',background:i===tickerIdx?'#06B6D4':'rgba(255,255,255,0.1)',border:'none',cursor:'pointer',padding:0,transition:'all 0.25s ease'}}/>
+              ))}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 function ArchivPage(){
   const [search,setSearch]=React.useState('');
   const [machineFilter,setMachineFilter]=React.useState('');
@@ -5401,6 +5583,7 @@ function DesktopDashboard({user,onLogout}){
   if(selectedAsset) return <AssetDetailView asset={selectedAsset} onBack={()=>setSelectedAsset(null)}/>;
 
   const navItems=[
+    ['executive','Exec Insights',<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>],
     ['dashboard','Dashboard',<IconGrid size={17}/>],
     ['assets','Assets',<IconCube size={17}/>],
     ['auftraege','Aufträge',<IconClipboard size={17}/>],
@@ -5419,6 +5602,7 @@ function DesktopDashboard({user,onLogout}){
   const isBillingPage=['abrechnungsbridge','garantiecheck','archiv'].includes(activePage);
   const isResourcePage=['urlaub'].includes(activePage);
   const pageTitle={
+    executive:'Executive Insights',
     dashboard:'Dashboard',assets:'Asset-Verwaltung',auftraege:'Auftragsmanagement',
     techniker:'Techniker',news:'News & Updates',einstellungen:'Einstellungen',
     abrechnungsbridge:'Abrechnungs-Bridge',garantiecheck:'Garantie-Check',archiv:'Archiv & Historie',
@@ -5456,14 +5640,23 @@ function DesktopDashboard({user,onLogout}){
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-2 flex flex-col gap-0.5">
-          {navItems.map(([id,label,icon])=>(
-            <button key={id} onClick={()=>goPage(id)} title={collapsed?label:undefined}
-              className={navBtnCls(activePage===id&&!isBillingPage?activePage===id:activePage===id)}
-              style={{justifyContent:collapsed?'center':'flex-start'}}>
-              <span className="flex-shrink-0">{icon}</span>
-              {!collapsed&&<span className="truncate">{label}</span>}
-            </button>
-          ))}
+          {navItems.map(([id,label,icon])=>{
+            const isExec=id==='executive';
+            const isActive=activePage===id;
+            const execActiveCls=isExec&&isActive?'bg-[rgba(234,179,8,0.1)] text-[#EAB308]':'';
+            const execHoverStyle=isExec?{boxShadow:isActive?'0 0 0 1px rgba(234,179,8,0.25) inset':undefined}:{};
+            return(
+              <React.Fragment key={id}>
+                <button onClick={()=>goPage(id)} title={collapsed?label:undefined}
+                  className={isExec?(isActive?`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-semibold transition-all ${execActiveCls}`:`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all text-[#92834a] hover:text-[#EAB308] hover:bg-[rgba(234,179,8,0.05)]`):navBtnCls(isActive)}
+                  style={{justifyContent:collapsed?'center':'flex-start',...execHoverStyle}}>
+                  <span className="flex-shrink-0" style={isExec?{color:isActive?'#EAB308':'#92834a'}:{}}>{icon}</span>
+                  {!collapsed&&<span className="truncate">{label}</span>}
+                </button>
+                {isExec&&<div className="h-px bg-desk-border mx-1 my-1"/>}
+              </React.Fragment>
+            );
+          })}
 
           {/* Billing Center section */}
           <div className="mt-3">
@@ -5531,6 +5724,9 @@ function DesktopDashboard({user,onLogout}){
         className="flex-1 flex flex-col min-h-screen">
         <div className="h-14 border-b border-desk-border flex items-center px-6 justify-between bg-desk-base/80 backdrop-blur sticky top-0 z-20">
           <div className="flex items-center gap-2">
+            {activePage==='executive'&&(
+              <span className="text-xs px-2 py-0.5 rounded-md font-semibold mr-1" style={{background:'rgba(234,179,8,0.1)',color:'#EAB308',border:'1px solid rgba(234,179,8,0.22)'}}>✦ CEO</span>
+            )}
             {isBillingPage&&(
               <span className="text-xs px-2 py-0.5 rounded-md bg-[rgba(41,121,255,0.1)] text-[#60a5fa] border border-[rgba(41,121,255,0.15)] font-medium mr-1">Billing</span>
             )}
@@ -5550,6 +5746,7 @@ function DesktopDashboard({user,onLogout}){
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-6 page-enter" key={activePage}>
+          {activePage==='executive'&&<ExecInsightsPage/>}
           {activePage==='dashboard'&&<DashboardPage onNavigate={setActivePage} onSelectAsset={setSelectedAsset}/>}
           {activePage==='assets'&&<AssetsPage onSelect={setSelectedAsset}/>}
           {activePage==='auftraege'&&<AuftraegePage orders={orders} setOrders={setOrders} showNew={showNew} setShowNew={setShowNew}/>}
